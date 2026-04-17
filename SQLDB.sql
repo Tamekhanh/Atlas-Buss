@@ -57,15 +57,15 @@ GO
 
 CREATE TABLE AtlasDB.dbo.VendorsPerson(
     id int identity(1,1) primary key,
-    CompanyId int not null UNIQUE,
-    FOREIGN KEY (CompanyId) REFERENCES AtlasDB.dbo.Companies(id)
+    PersonId int not null UNIQUE,
+    FOREIGN KEY (PersonId) REFERENCES AtlasDB.dbo.Persons(id)
 )
 GO
 
 CREATE TABLE AtlasDB.dbo.CustomerCompany(
     id int identity(1,1) primary key,
-    PersonId int not null UNIQUE,
-    FOREIGN KEY (PersonId) REFERENCES AtlasDB.dbo.Persons(id)
+    CompanyId int not null UNIQUE,
+    FOREIGN KEY (CompanyId) REFERENCES AtlasDB.dbo.Companies(id)
 )
 GO
 
@@ -106,5 +106,21 @@ CREATE TABLE AtlasDB.dbo.Accounts(
     IsActive bit not null default 1,
     LastLogin datetime null,
     FOREIGN KEY (EmployeeId) REFERENCES AtlasDB.dbo.Employee(id)
+)
+GO
+
+CREATE TABLE AtlasDB.dbo.Departments(
+    id int identity(1,1) primary key,
+    DepartmentName varchar(100) not null UNIQUE,
+    Description varchar(255) null
+)
+GO
+
+CREATE TABLE AtlasDB.dbo.EmployeeDepartments(
+    EmployeeId int not null,
+    DepartmentId int not null,
+    PRIMARY KEY (EmployeeId, DepartmentId),
+    FOREIGN KEY (EmployeeId) REFERENCES AtlasDB.dbo.Employee(id),
+    FOREIGN KEY (DepartmentId) REFERENCES Departments(id)
 )
 GO
