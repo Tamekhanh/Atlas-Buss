@@ -1,0 +1,11 @@
+D:\MyWebsite\Atlas\Atlas.Core\bin\Debug\net10.0\Atlas.Core.deps.json
+D:\MyWebsite\Atlas\Atlas.Core\bin\Debug\net10.0\Atlas.Core.dll
+D:\MyWebsite\Atlas\Atlas.Core\bin\Debug\net10.0\Atlas.Core.pdb
+D:\MyWebsite\Atlas\Atlas.Core\obj\Debug\net10.0\Atlas.Core.GeneratedMSBuildEditorConfig.editorconfig
+D:\MyWebsite\Atlas\Atlas.Core\obj\Debug\net10.0\Atlas.Core.AssemblyInfoInputs.cache
+D:\MyWebsite\Atlas\Atlas.Core\obj\Debug\net10.0\Atlas.Core.AssemblyInfo.cs
+D:\MyWebsite\Atlas\Atlas.Core\obj\Debug\net10.0\Atlas.Core.csproj.CoreCompileInputs.cache
+D:\MyWebsite\Atlas\Atlas.Core\obj\Debug\net10.0\Atlas.Core.dll
+D:\MyWebsite\Atlas\Atlas.Core\obj\Debug\net10.0\refint\Atlas.Core.dll
+D:\MyWebsite\Atlas\Atlas.Core\obj\Debug\net10.0\Atlas.Core.pdb
+D:\MyWebsite\Atlas\Atlas.Core\obj\Debug\net10.0\ref\Atlas.Core.dll

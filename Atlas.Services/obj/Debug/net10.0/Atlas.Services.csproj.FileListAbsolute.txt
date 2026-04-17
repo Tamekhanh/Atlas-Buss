@@ -1,0 +1,17 @@
+D:\MyWebsite\Atlas\Atlas.Services\bin\Debug\net10.0\Atlas.Services.deps.json
+D:\MyWebsite\Atlas\Atlas.Services\bin\Debug\net10.0\Atlas.Services.dll
+D:\MyWebsite\Atlas\Atlas.Services\bin\Debug\net10.0\Atlas.Services.pdb
+D:\MyWebsite\Atlas\Atlas.Services\bin\Debug\net10.0\Atlas.Core.dll
+D:\MyWebsite\Atlas\Atlas.Services\bin\Debug\net10.0\Atlas.Infrastructure.dll
+D:\MyWebsite\Atlas\Atlas.Services\bin\Debug\net10.0\Atlas.Core.pdb
+D:\MyWebsite\Atlas\Atlas.Services\bin\Debug\net10.0\Atlas.Infrastructure.pdb
+D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\Atlas.Services.csproj.AssemblyReference.cache
+D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\Atlas.Services.GeneratedMSBuildEditorConfig.editorconfig
+D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\Atlas.Services.AssemblyInfoInputs.cache
+D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\Atlas.Services.AssemblyInfo.cs
+D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\Atlas.Services.csproj.CoreCompileInputs.cache
+D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\Atlas.Se.582C15EA.Up2Date
+D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\Atlas.Services.dll
+D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\refint\Atlas.Services.dll
+D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\Atlas.Services.pdb
+D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\ref\Atlas.Services.dll

@@ -1,0 +1,15 @@
+D:\MyWebsite\Atlas\Atlas.Infrastructure\bin\Debug\net10.0\Atlas.Infrastructure.deps.json
+D:\MyWebsite\Atlas\Atlas.Infrastructure\bin\Debug\net10.0\Atlas.Infrastructure.dll
+D:\MyWebsite\Atlas\Atlas.Infrastructure\bin\Debug\net10.0\Atlas.Infrastructure.pdb
+D:\MyWebsite\Atlas\Atlas.Infrastructure\bin\Debug\net10.0\Atlas.Core.dll
+D:\MyWebsite\Atlas\Atlas.Infrastructure\bin\Debug\net10.0\Atlas.Core.pdb
+D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\Atlas.Infrastructure.csproj.AssemblyReference.cache
+D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\Atlas.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\Atlas.Infrastructure.AssemblyInfoInputs.cache
+D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\Atlas.Infrastructure.AssemblyInfo.cs
+D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\Atlas.Infrastructure.csproj.CoreCompileInputs.cache
+D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\Atlas.In.F773356F.Up2Date
+D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\Atlas.Infrastructure.dll
+D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\refint\Atlas.Infrastructure.dll
+D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\Atlas.Infrastructure.pdb
+D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\ref\Atlas.Infrastructure.dll
