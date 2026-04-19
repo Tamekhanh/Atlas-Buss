@@ -1,0 +1,79 @@
+@model ProductEntity
+
+@{
+    ViewData["Title"] = "Product Detail";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Product Detail</h1>
+            <p class="text-muted mb-0">Thông tin chi tiết của sản phẩm @Model.ProductName.</p>
+        </div>
+        <a asp-area="Products" asp-controller="Product" asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h2 class="h5 mb-3">Basic Information</h2>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Id</dt>
+                        <dd class="col-sm-8">@Model.Id</dd>
+
+                        <dt class="col-sm-4">Name</dt>
+                        <dd class="col-sm-8">@Model.ProductName</dd>
+
+                        <dt class="col-sm-4">Code</dt>
+                        <dd class="col-sm-8">@Model.ProductCode</dd>
+
+                        <dt class="col-sm-4">Barcode</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Barcode) ? "N/A" : Model.Barcode)</dd>
+
+                        <dt class="col-sm-4">Sale Price</dt>
+                        <dd class="col-sm-8">@Model.SalePrice.ToString("N0")</dd>
+
+                        <dt class="col-sm-4">Cost Price</dt>
+                        <dd class="col-sm-8">@Model.CostPrice.ToString("N0")</dd>
+
+                        <dt class="col-sm-4">Active</dt>
+                        <dd class="col-sm-8">@(Model.IsActive ? "Yes" : "No")</dd>
+
+                        <dt class="col-sm-4">On Sale</dt>
+                        <dd class="col-sm-8">@(Model.Onsale ? "Yes" : "No")</dd>
+                    </dl>
+                </div>
+
+                <div class="col-md-6">
+                    <h2 class="h5 mb-3">Product Details</h2>
+                    @if (Model.ProductDetail != null)
+                    {
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Description</dt>
+                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDetail.ProductDescription) ? "N/A" : Model.ProductDetail.ProductDescription)</dd>
+
+                            <dt class="col-sm-4">Weight</dt>
+                            <dd class="col-sm-8">@(Model.ProductDetail.Weight.HasValue ? Model.ProductDetail.Weight.Value.ToString("N2") : "N/A")</dd>
+
+                            <dt class="col-sm-4">Warranty</dt>
+                            <dd class="col-sm-8">@(Model.ProductDetail.WarrantyPeriod.HasValue ? $"{Model.ProductDetail.WarrantyPeriod} months" : "N/A")</dd>
+
+                            <dt class="col-sm-4">Dimensions</dt>
+                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDetail.Dimensions) ? "N/A" : Model.ProductDetail.Dimensions)</dd>
+
+                            <dt class="col-sm-4">Manufacturer</dt>
+                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDetail.Manufacturer) ? "N/A" : Model.ProductDetail.Manufacturer)</dd>
+                        </dl>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mb-0" role="alert">
+                            Sản phẩm này chưa có dữ liệu trong bảng ProductDetails.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

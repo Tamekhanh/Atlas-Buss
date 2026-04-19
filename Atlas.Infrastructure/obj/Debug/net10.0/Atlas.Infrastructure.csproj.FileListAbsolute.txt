@@ -13,3 +13,4 @@ D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\Atlas.Infrastructure.d
 D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\refint\Atlas.Infrastructure.dll
 D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\Atlas.Infrastructure.pdb
 D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\ref\Atlas.Infrastructure.dll
+D:\MyWebsite\Atlas\Atlas.Infrastructure\obj\Debug\net10.0\Atlas.Infrastructure.sourcelink.json

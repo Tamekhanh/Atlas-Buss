@@ -22,11 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\" />
-    <Folder Include="Areas\HRM\Controllers\" />
     <Folder Include="Areas\HRM\Data\" />
     <Folder Include="Areas\HRM\Models\" />
     <Folder Include="Areas\HRM\Views\" />
+    <Folder Include="Areas\Login\Controllers\" />
+    <Folder Include="Areas\Login\Data\" />
+    <Folder Include="Areas\Login\Models\" />
+    <Folder Include="Areas\Login\Views\" />
   </ItemGroup>
 
 </Project>

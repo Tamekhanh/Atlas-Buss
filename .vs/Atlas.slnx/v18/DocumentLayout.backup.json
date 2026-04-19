@@ -3,24 +3,56 @@
   "WorkspaceRootPath": "D:\\MyWebsite\\Atlas\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\areas\\products\\controllers\\productcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\areas\\products\\controllers\\productcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\MyWebsite\\Atlas\\Atlas.Web\\ScaffoldingReadMe.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Atlas.Web\\ScaffoldingReadMe.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\scaffoldingreadme.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\scaffoldingreadme.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\atlas.web.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\atlas.web.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{97648A36-1823-6820-181E-9AD6DC37A895}|Atlas.Core\\Atlas.Core.csproj|d:\\mywebsite\\atlas\\atlas.core\\entities\\products.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{97648A36-1823-6820-181E-9AD6DC37A895}|Atlas.Core\\Atlas.Core.csproj|solutionrelative:atlas.core\\entities\\products.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2ADAD8E2-2F7A-EFA1-DC86-C019DE6F76A2}|Atlas.Infrastructure\\Atlas.Infrastructure.csproj|d:\\mywebsite\\atlas\\atlas.infrastructure\\atlas.infrastructure.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{2ADAD8E2-2F7A-EFA1-DC86-C019DE6F76A2}|Atlas.Infrastructure\\Atlas.Infrastructure.csproj|solutionrelative:atlas.infrastructure\\atlas.infrastructure.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{97648A36-1823-6820-181E-9AD6DC37A895}|Atlas.Core\\Atlas.Core.csproj|d:\\mywebsite\\atlas\\atlas.core\\entities\\employee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{97648A36-1823-6820-181E-9AD6DC37A895}|Atlas.Core\\Atlas.Core.csproj|solutionrelative:atlas.core\\entities\\employee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7C198329-29DA-BC62-A520-D196F39CE6DF}|Atlas.Services\\Atlas.Services.csproj|d:\\mywebsite\\atlas\\atlas.services\\atlas.services.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{7C198329-29DA-BC62-A520-D196F39CE6DF}|Atlas.Services\\Atlas.Services.csproj|solutionrelative:atlas.services\\atlas.services.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{97648A36-1823-6820-181E-9AD6DC37A895}|Atlas.Core\\Atlas.Core.csproj|d:\\mywebsite\\atlas\\atlas.core\\entities\\person.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{97648A36-1823-6820-181E-9AD6DC37A895}|Atlas.Core\\Atlas.Core.csproj|solutionrelative:atlas.core\\entities\\person.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\areas\\hrm\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\areas\\hrm\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\areas\\hrm\\controllers\\hrmcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\areas\\hrm\\controllers\\hrmcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2ADAD8E2-2F7A-EFA1-DC86-C019DE6F76A2}|Atlas.Infrastructure\\Atlas.Infrastructure.csproj|d:\\mywebsite\\atlas\\atlas.infrastructure\\atlasdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2ADAD8E2-2F7A-EFA1-DC86-C019DE6F76A2}|Atlas.Infrastructure\\Atlas.Infrastructure.csproj|solutionrelative:atlas.infrastructure\\atlasdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{97648A36-1823-6820-181E-9AD6DC37A895}|Atlas.Core\\Atlas.Core.csproj|d:\\mywebsite\\atlas\\atlas.core\\entities\\addresses.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{97648A36-1823-6820-181E-9AD6DC37A895}|Atlas.Core\\Atlas.Core.csproj|solutionrelative:atlas.core\\entities\\addresses.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{97648A36-1823-6820-181E-9AD6DC37A895}|Atlas.Core\\Atlas.Core.csproj|d:\\mywebsite\\atlas\\atlas.core\\entities\\contracts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{97648A36-1823-6820-181E-9AD6DC37A895}|Atlas.Core\\Atlas.Core.csproj|solutionrelative:atlas.core\\entities\\contracts.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,72 +62,169 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Program.cs",
-              "RelativeDocumentMoniker": "Atlas.Web\\Program.cs",
-              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Program.cs",
-              "RelativeToolTip": "Atlas.Web\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAaAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-12T13:06:26.932Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "ScaffoldingReadMe.txt",
-              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\ScaffoldingReadMe.txt",
-              "RelativeDocumentMoniker": "Atlas.Web\\ScaffoldingReadMe.txt",
-              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\ScaffoldingReadMe.txt",
-              "RelativeToolTip": "Atlas.Web\\ScaffoldingReadMe.txt",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2026-04-12T13:05:21.032Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Atlas.Web.csproj",
-              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Atlas.Web.csproj",
-              "RelativeDocumentMoniker": "Atlas.Web\\Atlas.Web.csproj",
-              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Atlas.Web.csproj",
-              "RelativeToolTip": "Atlas.Web\\Atlas.Web.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-04-11T14:29:21.742Z",
+              "Title": "ProductController.cs",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Products\\Controllers\\ProductController.cs",
+              "RelativeDocumentMoniker": "Atlas.Web\\Areas\\Products\\Controllers\\ProductController.cs",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Products\\Controllers\\ProductController.cs",
+              "RelativeToolTip": "Atlas.Web\\Areas\\Products\\Controllers\\ProductController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-19T05:58:42.256Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "Atlas.Services.csproj",
-              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Services\\Atlas.Services.csproj",
-              "RelativeDocumentMoniker": "Atlas.Services\\Atlas.Services.csproj",
-              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Services\\Atlas.Services.csproj",
-              "RelativeToolTip": "Atlas.Services\\Atlas.Services.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-04-11T14:29:07.761Z",
+              "Title": "Products.cs",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Core\\Entities\\Products.cs",
+              "RelativeDocumentMoniker": "Atlas.Core\\Entities\\Products.cs",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Core\\Entities\\Products.cs",
+              "RelativeToolTip": "Atlas.Core\\Entities\\Products.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-19T04:38:05.91Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "HRMController.cs",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\HRM\\Controllers\\HRMController.cs",
+              "RelativeDocumentMoniker": "Atlas.Web\\Areas\\HRM\\Controllers\\HRMController.cs",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\HRM\\Controllers\\HRMController.cs",
+              "RelativeToolTip": "Atlas.Web\\Areas\\HRM\\Controllers\\HRMController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T18:36:26.915Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "AtlasDBContext.cs",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Infrastructure\\AtlasDBContext.cs",
+              "RelativeDocumentMoniker": "Atlas.Infrastructure\\AtlasDBContext.cs",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Infrastructure\\AtlasDBContext.cs",
+              "RelativeToolTip": "Atlas.Infrastructure\\AtlasDBContext.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAYwDQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T18:23:04.166Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Employee.cs",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Core\\Entities\\Employee.cs",
+              "RelativeDocumentMoniker": "Atlas.Core\\Entities\\Employee.cs",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Core\\Entities\\Employee.cs",
+              "RelativeToolTip": "Atlas.Core\\Entities\\Employee.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAoAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T18:20:58.707Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\HRM\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "Atlas.Web\\Areas\\HRM\\Views\\Home\\Index.cshtml",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\HRM\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "Atlas.Web\\Areas\\HRM\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAAzAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-18T18:20:07.669Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Person.cs",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Core\\Entities\\Person.cs",
+              "RelativeDocumentMoniker": "Atlas.Core\\Entities\\Person.cs",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Core\\Entities\\Person.cs",
+              "RelativeToolTip": "Atlas.Core\\Entities\\Person.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T18:17:24.817Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Contracts.cs",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Core\\Entities\\Contracts.cs",
+              "RelativeDocumentMoniker": "Atlas.Core\\Entities\\Contracts.cs",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Core\\Entities\\Contracts.cs",
+              "RelativeToolTip": "Atlas.Core\\Entities\\Contracts.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T18:15:45.109Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Addresses.cs",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Core\\Entities\\Addresses.cs",
+              "RelativeDocumentMoniker": "Atlas.Core\\Entities\\Addresses.cs",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Core\\Entities\\Addresses.cs",
+              "RelativeToolTip": "Atlas.Core\\Entities\\Addresses.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T18:12:32.718Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Pages\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "Atlas.Web\\Pages\\Shared\\_Layout.cshtml",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Pages\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "Atlas.Web\\Pages\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB8AAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-04-18T15:15:20.234Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Program.cs",
+              "RelativeDocumentMoniker": "Atlas.Web\\Program.cs",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Program.cs",
+              "RelativeToolTip": "Atlas.Web\\Program.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-18T15:06:38.346Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "Atlas.Infrastructure.csproj",
-              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Infrastructure\\Atlas.Infrastructure.csproj",
-              "RelativeDocumentMoniker": "Atlas.Infrastructure\\Atlas.Infrastructure.csproj",
-              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Infrastructure\\Atlas.Infrastructure.csproj",
-              "RelativeToolTip": "Atlas.Infrastructure\\Atlas.Infrastructure.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2026-04-11T14:26:17.98Z",
+              "Title": "ScaffoldingReadMe.txt",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\ScaffoldingReadMe.txt",
+              "RelativeDocumentMoniker": "Atlas.Web\\ScaffoldingReadMe.txt",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\ScaffoldingReadMe.txt",
+              "RelativeToolTip": "Atlas.Web\\ScaffoldingReadMe.txt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2026-04-19T05:56:15.814Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\appsettings.json",
+              "RelativeDocumentMoniker": "Atlas.Web\\appsettings.json",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\appsettings.json",
+              "RelativeToolTip": "Atlas.Web\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-18T15:09:17.337Z"
             }
           ]
         }

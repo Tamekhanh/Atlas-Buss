@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Atlas.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5dfa16f89795bafca516aad542f3fea9e9029d24")]
 [assembly: System.Reflection.AssemblyProductAttribute("Atlas.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Atlas.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
