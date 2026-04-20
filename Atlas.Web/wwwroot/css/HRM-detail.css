@@ -1,0 +1,152 @@
+.employee-detail-page {
+        --atlas-ink: #122126;
+        --atlas-muted: #5f6d73;
+        --atlas-line: #d9e3e6;
+        --atlas-surface: #ffffff;
+        --atlas-accent: #0f766e;
+        --atlas-highlight: #f59e0b;
+        --atlas-soft: #ecfeff;
+        background: linear-gradient(170deg, #f7fbfb 0%, #f2f7f8 55%, #fff8ef 100%);
+    }
+
+    .employee-detail-page .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: .14em;
+        font-size: .75rem;
+        font-weight: 700;
+        color: #0b6058;
+    }
+
+    .employee-detail-page .detail-card {
+        background: var(--atlas-surface);
+        border: 1px solid var(--atlas-line);
+        border-radius: 1.1rem;
+        box-shadow: 0 10px 30px rgba(15, 118, 110, 0.08);
+        padding: 1.25rem;
+    }
+
+    .employee-detail-page .profile-card {
+        background:
+            radial-gradient(circle at 16% -10%, rgba(15, 118, 110, 0.20), transparent 42%),
+            radial-gradient(circle at 85% 115%, rgba(245, 158, 11, 0.16), transparent 35%),
+            #ffffff;
+    }
+
+    .employee-detail-page .avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(135deg, var(--atlas-accent), #1ea89f);
+        margin-bottom: .85rem;
+    }
+
+    .employee-detail-page .stat-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .65rem;
+    }
+
+    .employee-detail-page .stat-grid article {
+        border: 1px solid var(--atlas-line);
+        border-radius: .75rem;
+        background: #ffffff;
+        padding: .65rem .75rem;
+    }
+
+    .employee-detail-page .stat-grid span,
+    .employee-detail-page .data-block span {
+        display: block;
+        font-size: .75rem;
+        color: var(--atlas-muted);
+        letter-spacing: .03em;
+        margin-bottom: .2rem;
+        text-transform: uppercase;
+    }
+
+    .employee-detail-page .stat-grid strong,
+    .employee-detail-page .data-block p,
+    .employee-detail-page .data-block a {
+        margin: 0;
+        color: var(--atlas-ink);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .employee-detail-page .data-block {
+        border: 1px solid var(--atlas-line);
+        border-radius: .75rem;
+        background: #fff;
+        padding: .8rem .9rem;
+        height: 100%;
+    }
+
+    .employee-detail-page .data-block.compact {
+        padding: .7rem .8rem;
+    }
+
+    .employee-detail-page .detail-section h3 {
+        font-size: 1rem;
+        margin-bottom: .85rem;
+    }
+
+    .employee-detail-page .status-pill {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        font-size: .84rem;
+        padding: .2rem .7rem;
+    }
+
+    .employee-detail-page .status-active {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .employee-detail-page .status-inactive {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .employee-detail-page .permission-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .55rem;
+    }
+
+    .employee-detail-page .permission-chip {
+        border-radius: 999px;
+        padding: .38rem .75rem;
+        font-size: .8rem;
+        border: 1px solid transparent;
+        transition: transform .2s ease;
+    }
+
+    .employee-detail-page .permission-chip.enabled {
+        background: var(--atlas-soft);
+        border-color: #a5f3fc;
+        color: #155e75;
+    }
+
+    .employee-detail-page .permission-chip.disabled {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+        color: #6b7280;
+    }
+
+    .employee-detail-page .permission-chip:hover {
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 575.98px) {
+        .employee-detail-page .stat-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .employee-detail-page .detail-card {
+            padding: 1rem;
+        }
+    }

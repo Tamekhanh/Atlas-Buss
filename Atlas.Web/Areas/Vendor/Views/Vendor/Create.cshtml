@@ -1,0 +1,125 @@
+@model VendorCreateViewModel
+
+@{
+    ViewData["Title"] = "Create Vendor";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Create Vendor</h1>
+            <p class="text-muted mb-0">Chuyen giua Vendor Company va Vendor Person ngay tren cung mot form.</p>
+        </div>
+        <a asp-area="Vendor" asp-controller="Vendor" asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <form asp-area="Vendor" asp-controller="Vendor" asp-action="Create" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label d-block">Vendor Type</label>
+                        <div class="btn-group" role="group" aria-label="Vendor type">
+                            <input type="radio" class="btn-check" name="RegistrationType" id="vendorTypeCompany" value="Company" asp-for="RegistrationType" />
+                            <label class="btn btn-outline-primary" for="vendorTypeCompany">Company</label>
+
+                            <input type="radio" class="btn-check" name="RegistrationType" id="vendorTypePerson" value="Person" asp-for="RegistrationType" />
+                            <label class="btn btn-outline-primary" for="vendorTypePerson">Person</label>
+                        </div>
+                        <span asp-validation-for="RegistrationType" class="text-danger d-block mt-2"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="TaxId" class="form-label"></label>
+                        <input asp-for="TaxId" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row g-3" id="vendorCompanySection">
+                    <div class="col-12"><h2 class="h5">Company fields</h2></div>
+                    <div class="col-md-6">
+                        <label asp-for="CompanyName" class="form-label"></label>
+                        <input asp-for="CompanyName" class="form-control" />
+                    </div>
+
+                </div>
+
+                <div class="row g-3 mt-2" id="vendorPersonSection">
+                    <div class="col-12"><h2 class="h5">Person fields</h2></div>
+                    <div class="col-md-6">
+                        <label asp-for="FirstName" class="form-label"></label>
+                        <input asp-for="FirstName" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="LastName" class="form-label"></label>
+                        <input asp-for="LastName" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="DoB" class="form-label"></label>
+                        <input asp-for="DoB" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-12"><h2 class="h5">Contact and address</h2></div>
+                    <div class="col-md-6">
+                        <label asp-for="Phone" class="form-label"></label>
+                        <input asp-for="Phone" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="AddressType" class="form-label"></label>
+                        <input asp-for="AddressType" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Street" class="form-label"></label>
+                        <input asp-for="Street" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="City" class="form-label"></label>
+                        <input asp-for="City" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="State" class="form-label"></label>
+                        <input asp-for="State" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Country" class="form-label"></label>
+                        <input asp-for="Country" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Save Vendor</button>
+                    <a asp-area="Vendor" asp-controller="Vendor" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const companyRadio = document.getElementById('vendorTypeCompany');
+            const personRadio = document.getElementById('vendorTypePerson');
+            const companySection = document.getElementById('vendorCompanySection');
+            const personSection = document.getElementById('vendorPersonSection');
+
+            function syncVendorSections() {
+                const isCompany = companyRadio.checked;
+                companySection.style.display = isCompany ? '' : 'none';
+                personSection.style.display = isCompany ? 'none' : '';
+            }
+
+            companyRadio.addEventListener('change', syncVendorSections);
+            personRadio.addEventListener('change', syncVendorSections);
+            syncVendorSections();
+        })();
+    </script>
+}

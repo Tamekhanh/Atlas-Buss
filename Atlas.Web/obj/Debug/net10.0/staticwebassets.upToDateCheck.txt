@@ -24,8 +24,10 @@ D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.rtl.c
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.min.js
+D:\MyWebsite\Atlas\Atlas.Web\wwwroot\css\Index.css
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.rtl.css.map
+D:\MyWebsite\Atlas\Atlas.Web\wwwroot\css\HRM-detail.css
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\jquery\dist\jquery.slim.min.js
@@ -45,6 +47,7 @@ D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\js\bootstrap.esm.js.map
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\js\bootstrap.js.map
+D:\MyWebsite\Atlas\Atlas.Web\wwwroot\css\auth.css
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\js\site.js
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.rtl.min.css.map
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
@@ -60,6 +63,9 @@ D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\jquery\dist\jquery.min.js
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\css\bootstrap-utilities.min.css.map
 D:\MyWebsite\Atlas\Atlas.Web\wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
+wwwroot\css\HRM-detail.css
+wwwroot\css\Index.css
+wwwroot\css\auth.css
 wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\js\site.js
@@ -123,3 +129,4 @@ wwwroot\lib\jquery\dist\jquery.min.map
 wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
+wwwroot\public\placeholder.png

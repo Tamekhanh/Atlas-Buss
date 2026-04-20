@@ -1,9 +1,11 @@
 using Atlas.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Atlas.Web.Areas.HRM.Controllers
 {
     [Area("HRM")]
+    [Authorize]
     public class HRMController : Controller
     {
         private readonly IEmployeeService _employeeService;
@@ -17,6 +19,17 @@ namespace Atlas.Web.Areas.HRM.Controllers
         {
             var employees = await _employeeService.GetAllEmployeesAsync();
             return View("~/Areas/HRM/Views/Home/Index.cshtml", employees);
+        }
+
+        public async Task<IActionResult> Detail(int id)
+        {
+            var employee = await _employeeService.GetEmployeeByIdAsync(id);
+            if (employee is null)
+            {
+                return NotFound();
+            }
+
+            return View("~/Areas/HRM/Views/Home/Detail.cshtml", employee);
         }
     }
 }

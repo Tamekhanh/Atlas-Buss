@@ -1,0 +1,98 @@
+:root {
+    --auth-bg-1: #f4efe6;
+    --auth-bg-2: #d8e6ff;
+    --auth-accent: #0f766e;
+    --auth-accent-hover: #0b5f59;
+    --auth-card: #ffffff;
+    --auth-text: #1f2937;
+    --auth-muted: #6b7280;
+    --auth-border: #d9dee7;
+}
+
+.auth-shell {
+    min-height: calc(100vh - 180px);
+    display: grid;
+    place-items: center;
+    padding: 2rem 1rem;
+    background: radial-gradient(circle at 10% 10%, rgba(15, 118, 110, 0.18), transparent 38%),
+        radial-gradient(circle at 90% 20%, rgba(17, 94, 89, 0.18), transparent 35%),
+        linear-gradient(120deg, var(--auth-bg-1), var(--auth-bg-2));
+    border-radius: 18px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 460px;
+    background: var(--auth-card);
+    color: var(--auth-text);
+    border: 1px solid var(--auth-border);
+    border-radius: 18px;
+    box-shadow: 0 18px 42px rgba(16, 24, 40, 0.14);
+    padding: 2rem;
+}
+
+.auth-header {
+    margin-bottom: 1.25rem;
+}
+
+.auth-title {
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+}
+
+.auth-subtitle {
+    margin: 0;
+    color: var(--auth-muted);
+}
+
+.auth-input {
+    border-radius: 10px;
+    border: 1px solid var(--auth-border);
+    padding: 0.62rem 0.75rem;
+}
+
+.auth-input:focus {
+    border-color: color-mix(in srgb, var(--auth-accent), white 30%);
+    box-shadow: 0 0 0 0.2rem rgba(15, 118, 110, 0.15);
+}
+
+.auth-button {
+    background: var(--auth-accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.62rem 0.75rem;
+    font-weight: 600;
+}
+
+.auth-button:hover,
+.auth-button:focus {
+    background: var(--auth-accent-hover);
+    color: #fff;
+}
+
+.auth-footer {
+    color: var(--auth-muted);
+    text-align: center;
+}
+
+.auth-footer a {
+    color: var(--auth-accent);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 575.98px) {
+    .auth-card {
+        padding: 1.35rem;
+    }
+
+    .auth-title {
+        font-size: 1.4rem;
+    }
+}

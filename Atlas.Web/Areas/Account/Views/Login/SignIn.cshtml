@@ -1,0 +1,51 @@
+@model Atlas.Web.Areas.Account.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Sign In";
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+}
+
+<div class="auth-shell">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Welcome Back</h1>
+            <p class="auth-subtitle">Dang nhap de tiep tuc quan ly Atlas.</p>
+        </div>
+
+        @if (TempData["SuccessMessage"] is string message)
+        {
+            <div class="alert alert-success" role="alert">@message</div>
+        }
+
+        <form asp-area="Account" asp-controller="Login" asp-action="SignIn" method="post" novalidate>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <input asp-for="ReturnUrl" type="hidden" />
+
+            <div class="mb-3">
+                <label asp-for="Username" class="form-label"></label>
+                <input asp-for="Username" class="form-control auth-input" autocomplete="username" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control auth-input" autocomplete="current-password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn auth-button w-100">Sign In</button>
+        </form>
+
+        <p class="auth-footer mt-4 mb-0">
+            Chua co tai khoan?
+            <a asp-area="Account" asp-controller="Login" asp-action="Register">Register</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

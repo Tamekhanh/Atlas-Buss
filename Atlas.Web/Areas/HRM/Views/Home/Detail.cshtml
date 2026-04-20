@@ -1,0 +1,193 @@
+@model Employee
+
+@{
+    ViewData["Title"] = "Employee Detail";
+
+    var person = Model.Person;
+    var address = person?.Address;
+    var contact = person?.Contact;
+
+    var displayName = string.IsNullOrWhiteSpace(Model.FullName) ? "Unknown Employee" : Model.FullName;
+    var doB = person?.DoB;
+    var doBText = doB.HasValue ? doB.Value.ToString("dd MMM yyyy") : "N/A";
+    var ageText = doB.HasValue
+        ? $"{Math.Max(0, (int)((DateTime.Today - doB.Value.Date).TotalDays / 365.2425))} years"
+        : "N/A";
+    var addressText = address is null
+        ? "N/A"
+        : $"{address.Street}, {address.City}, {address.State}, {address.Country}";
+
+    var nameParts = displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    var initials = nameParts.Length switch
+    {
+        0 => "NA",
+        1 => nameParts[0][0].ToString().ToUpperInvariant(),
+        _ => (nameParts[0][0].ToString() + nameParts[^1][0].ToString()).ToUpperInvariant()
+    };
+
+    var permissions = new (string Label, bool Enabled)[]
+    {
+        ("Product", Model.Account?.CanProduct ?? false),
+        ("Sale", Model.Account?.CanSale ?? false),
+        ("Employee", Model.Account?.CanEmployee ?? false),
+        ("Inventory", Model.Account?.CanInventory ?? false),
+        ("Admin", Model.Account?.CanAdministration ?? false),
+        ("HR", Model.Account?.CanHR ?? false)
+    };
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/css/HRM-detail.css" asp-append-version="true" />
+}
+
+<div class="employee-detail-page py-4 py-lg-5">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+                <p class="eyebrow mb-2">Human Resources</p>
+                <h1 class="h3 mb-1">Employee Detail</h1>
+                <p class="text-muted mb-0">Overview of profile, contact, and account permissions.</p>
+            </div>
+            <a class="btn btn-outline-dark rounded-pill px-4" href="@Url.Action("Index", "HRM", new { area = "HRM" })">
+                Back to employee list
+            </a>
+        </div>
+
+        <div class="row g-4 align-items-stretch">
+            <div class="col-12 col-xl-4">
+                <section class="detail-card profile-card h-100">
+                    <div class="avatar">@initials</div>
+                    <h2 class="h5 mb-1">@displayName</h2>
+                    <p class="text-muted mb-3">Employee #@Model.EmployeeNumber</p>
+
+                    <div class="stat-grid">
+                        <article>
+                            <span>Employee Id</span>
+                            <strong>@Model.Id</strong>
+                        </article>
+                        <article>
+                            <span>Person Id</span>
+                            <strong>@Model.PersonId</strong>
+                        </article>
+                        <article>
+                            <span>Date of birth</span>
+                            <strong>@doBText</strong>
+                        </article>
+                        <article>
+                            <span>Age</span>
+                            <strong>@ageText</strong>
+                        </article>
+                    </div>
+                </section>
+            </div>
+
+            <div class="col-12 col-xl-8">
+                <section class="detail-card h-100">
+                    <div class="detail-section mb-4">
+                        <h3>Contact</h3>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <div class="data-block">
+                                    <span>Phone</span>
+                                    @if (!string.IsNullOrWhiteSpace(contact?.Phone))
+                                    {
+                                        <a href="tel:@contact.Phone">@contact.Phone</a>
+                                    }
+                                    else
+                                    {
+                                        <p>N/A</p>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="data-block">
+                                    <span>Email</span>
+                                    @if (!string.IsNullOrWhiteSpace(contact?.Email))
+                                    {
+                                        <a href="mailto:@contact.Email">@contact.Email</a>
+                                    }
+                                    else
+                                    {
+                                        <p>N/A</p>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="data-block">
+                                    <span>Contact Id</span>
+                                    <p>@(person?.ContactId.ToString() ?? "N/A")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section mb-4">
+                        <h3>Address</h3>
+                        <div class="data-block">
+                            <span>Primary address</span>
+                            <p>@addressText</p>
+                        </div>
+                        <div class="row g-3 mt-1">
+                            <div class="col-12 col-md-4">
+                                <div class="data-block compact">
+                                    <span>Type</span>
+                                    <p>@(address?.AddressType ?? "N/A")</p>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="data-block compact">
+                                    <span>City</span>
+                                    <p>@(address?.City ?? "N/A")</p>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="data-block compact">
+                                    <span>Country</span>
+                                    <p>@(address?.Country ?? "N/A")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3>Account & Permissions</h3>
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <div class="data-block">
+                                    <span>Username</span>
+                                    <p>@(Model.Account?.Username ?? "N/A")</p>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="data-block">
+                                    <span>Status</span>
+                                    @if (Model.Account is null)
+                                    {
+                                        <p>N/A</p>
+                                    }
+                                    else if (Model.Account.IsActive)
+                                    {
+                                        <p class="status-pill status-active">Active</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="status-pill status-inactive">Inactive</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="permission-wrap">
+                            @foreach (var permission in permissions)
+                            {
+                                <span class="permission-chip @(permission.Enabled ? "enabled" : "disabled")">
+                                    @permission.Label: @(permission.Enabled ? "Yes" : "No")
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>

@@ -39,7 +39,7 @@ INSERT INTO AtlasDB.dbo.VendorsCompany (CompanyId) VALUES (2), (3);
 GO
 
 -- Gán cá nhân làm Nhà cung cấp (Freelancer)
-INSERT INTO AtlasDB.dbo.VendorsPerson (PersonId) VALUES (4);
+INSERT INTO AtlasDB.dbo.VendorsPerson (PersonId, TaxId) VALUES (4, '08028400');
 GO
 
 -- Gán công ty làm Khách hàng
@@ -47,7 +47,7 @@ INSERT INTO AtlasDB.dbo.CustomerCompany (CompanyId) VALUES (2);
 GO
 
 -- Gán cá nhân làm Khách hàng
-INSERT INTO AtlasDB.dbo.CustomerPerson (PersonId) VALUES (3);
+INSERT INTO AtlasDB.dbo.CustomerPerson (PersonId, TaxId) VALUES (3, '08028200');
 GO
 
 -- =============================================

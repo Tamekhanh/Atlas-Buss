@@ -69,3 +69,6 @@ FROM AtlasDB.dbo.Logs l
 JOIN AtlasDB.dbo.Employee e ON l.EmployeeId = e.id
 JOIN AtlasDB.dbo.Persons p ON e.PersonId = p.id
 ORDER BY l.Timestamp DESC;
+
+
+

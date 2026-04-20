@@ -1,9 +1,11 @@
 using Atlas.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Atlas.Web.Areas.Products.Controllers
 {
     [Area("Products")]
+    [Authorize]
     public class ProductController : Controller
     {
         private readonly IProductService _productService;

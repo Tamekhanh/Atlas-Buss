@@ -72,6 +72,7 @@ GO
 CREATE TABLE dbo.VendorsPerson(
     id int identity(1,1) primary key,
     PersonId int not null UNIQUE,
+    TaxId nvarchar(20) null,
     FOREIGN KEY (PersonId) REFERENCES dbo.Persons(id)
 )
 GO
@@ -86,6 +87,7 @@ GO
 CREATE TABLE dbo.CustomerPerson(
     id int identity(1,1) primary key,
     PersonId int not null UNIQUE,
+    TaxId nvarchar(20) null,
     FOREIGN KEY (PersonId) REFERENCES dbo.Persons(id)
 )
 GO

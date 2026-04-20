@@ -1,0 +1,62 @@
+@model Atlas.Web.Areas.Account.Models.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+}
+
+<div class="auth-shell">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Dang ky tai khoan nhan vien de truy cap he thong.</p>
+        </div>
+
+        @if (TempData["SuccessMessage"] is string message)
+        {
+            <div class="alert alert-success" role="alert">@message</div>
+        }
+
+        <form asp-area="Account" asp-controller="Login" asp-action="Register" method="post" novalidate>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="EmployeeNumber" class="form-label"></label>
+                <input asp-for="EmployeeNumber" class="form-control auth-input" autocomplete="off" />
+                <span asp-validation-for="EmployeeNumber" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Username" class="form-label"></label>
+                <input asp-for="Username" class="form-control auth-input" autocomplete="username" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control auth-input" autocomplete="new-password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control auth-input" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn auth-button w-100">Register</button>
+        </form>
+
+        <p class="auth-footer mt-4 mb-0">
+            Da co tai khoan?
+            <a asp-area="Account" asp-controller="Login" asp-action="SignIn">Sign In</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

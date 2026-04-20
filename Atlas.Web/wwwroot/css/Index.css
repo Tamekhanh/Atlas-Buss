@@ -1,0 +1,37 @@
+.home-btn {
+    height: 7.5rem;
+    width: 7.5rem;
+    background-color: rgba(0, 102, 255, 0.277);
+    color: #fff;
+    font-weight: 600;
+    border-radius: 10%;
+    border: none;
+}
+
+img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
+
+.home-btn-container:hover {
+    .home-btn {
+        background-color: #2f2fffa5;
+    }
+}
+.card-body {
+    display: flex;
+    gap: 100px;
+}
+.home-btn-container{
+    display: flex;
+    justify-content: center;
+    flex-flow: column;
+    cursor: pointer;
+    font-weight: bold;
+    align-items: center;
+}
+
+.home-btn-text {
+    width: fit-content;
+}

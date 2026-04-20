@@ -1,0 +1,57 @@
+@model IEnumerable<VendorManagementViewModel>
+
+@{
+    ViewData["Title"] = "Vendor";
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 mb-1">Vendor</h1>
+            <p class="text-muted mb-0">Gom chung Vendor Company va Vendor Person trong mot man hinh.</p>
+        </div>
+        <a asp-area="Vendor" asp-controller="Vendor" asp-action="Create" class="btn btn-primary">Create Vendor</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] is string message)
+    {
+        <div class="alert alert-success" role="alert">@message</div>
+    }
+
+    <div class="table-responsive shadow-sm rounded-3 bg-white">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Tax ID</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.RegistrationType</td>
+                            <td>@item.Name</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.TaxId) ? "N/A" : item.TaxId)</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Phone) ? "N/A" : item.Phone)</td>
+                            <td>@(string.IsNullOrWhiteSpace(item.Email) ? "N/A" : item.Email)</td>
+                            <td>@item.Address</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">Chua co du lieu vendor.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

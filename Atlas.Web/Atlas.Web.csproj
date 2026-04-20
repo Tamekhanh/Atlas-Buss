@@ -22,13 +22,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\Customer\Controllers\" />
+    <Folder Include="Areas\Customer\Data\" />
+    <Folder Include="Areas\Customer\Models\" />
+    <Folder Include="Areas\Customer\Views\" />
     <Folder Include="Areas\HRM\Data\" />
     <Folder Include="Areas\HRM\Models\" />
     <Folder Include="Areas\HRM\Views\" />
-    <Folder Include="Areas\Login\Controllers\" />
-    <Folder Include="Areas\Login\Data\" />
-    <Folder Include="Areas\Login\Models\" />
-    <Folder Include="Areas\Login\Views\" />
+    <Folder Include="Areas\Account\Data\" />
+    <Folder Include="Areas\Vendor\Controllers\" />
+    <Folder Include="Areas\Vendor\Data\" />
+    <Folder Include="Areas\Vendor\Models\" />
+    <Folder Include="Areas\Vendor\Views\" />
   </ItemGroup>
 
 </Project>

@@ -4,7 +4,30 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@section Head {
+    <link rel="stylesheet" href="~/css/Index.css" asp-append-version="true" />
+}
+
+<div class="MainContent">
+    <div class="card-mb-4">
+        <div class="card-body">
+            <div class="home-btn-container" onclick="location.href='/Products/Index'">
+                <button type="button" class="home-btn"><img src="~/public/placeholder.png" alt="Products" /></button>
+                <div class="home-btn-text">Products</div>
+            </div>
+            <div class="home-btn-container" onclick="location.href='/HRM/Index'">
+                <button type="button" class="home-btn"><img src="~/public/placeholder.png" alt="Employees" /></button>
+                <div class="home-btn-text">Employees</div>
+            </div>
+            <div class="home-btn-container" onclick="location.href='/Vendor/Index'">
+                <button type="button" class="home-btn"><img src="~/public/placeholder.png" alt="Vendor" /></button>
+                <div class="home-btn-text">Vendor</div>
+            </div>
+            <div class="home-btn-container" onclick="location.href='/Customer/Index'">
+                <button type="button" class="home-btn"><img src="~/public/placeholder.png" alt="Customer" /></button>
+                <div class="home-btn-text">Customer</div>
+            </div>
+        </div>
+    </div>
 </div>
+

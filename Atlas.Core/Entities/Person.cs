@@ -11,6 +11,22 @@ namespace Atlas.Core.Entities
 
         public Employee? Employee { get; set; }
         public Addresses? Address { get; set; }
-        public Contracts? Contact { get; set; }
+        public Contacts? Contact { get; set; }
+    }
+
+    public class VendorPerson
+    {
+        public int Id { get; set; }
+        public int PersonId { get; set; }
+        public string? TaxId { get; set; }
+        public Person? Person { get; set; }
+    }
+
+    public class CustomerPerson
+    {
+        public int Id { get; set; }
+        public int PersonId { get; set; }
+        public string? TaxId { get; set; }
+        public Person? Person { get; set; }
     }
 }
