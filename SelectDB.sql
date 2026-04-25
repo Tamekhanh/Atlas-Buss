@@ -1,16 +1,34 @@
-SELECT 
-    e.EmployeeNumber, 
-    p.FirstName + ' ' + p.LastName AS FullName, 
-    c.Phone, 
-    a.City, 
-    ea.Username, 
-    ea.canSale, 
-    ea.canInventory
-FROM AtlasDB.dbo.Employee e
-JOIN AtlasDB.dbo.Persons p ON e.PersonId = p.id
-JOIN AtlasDB.dbo.Contacts c ON p.ContactId = c.id
-JOIN AtlasDB.dbo.Addresses a ON p.AddressId = a.id
-JOIN AtlasDB.dbo.EmployeeAccounts ea ON e.id = ea.EmployeeId;
+-- Employee accounts overview (start from EmployeeAccounts so account rows are never hidden)
+SELECT
+    ea.EmployeeId,
+    ea.Username,
+    ea.IsActive,
+    ea.LastLogin,
+    e.EmployeeNumber,
+    p.FirstName + ' ' + p.LastName AS FullName,
+    c.Phone,
+    a.City,
+    ea.canProduct,
+    ea.canSale,
+    ea.canEmployee,
+    ea.canInventory,
+    ea.canAdministration,
+    ea.canHR
+FROM AtlasDB.dbo.EmployeeAccounts ea
+LEFT JOIN AtlasDB.dbo.Employee e ON ea.EmployeeId = e.id
+LEFT JOIN AtlasDB.dbo.Persons p ON e.PersonId = p.id
+LEFT JOIN AtlasDB.dbo.Contacts c ON p.ContactId = c.id
+LEFT JOIN AtlasDB.dbo.Addresses a ON p.AddressId = a.id
+ORDER BY ea.EmployeeId;
+
+-- Quick check by username (change value as needed)
+SELECT
+    ea.EmployeeId,
+    ea.Username,
+    ea.IsActive,
+    ea.LastLogin
+FROM AtlasDB.dbo.EmployeeAccounts ea
+WHERE ea.Username = 'tamek';
 
 
 SELECT 

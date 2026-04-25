@@ -12,10 +12,12 @@ namespace Atlas.Web.Areas.Account.Controllers
     public class LoginController : Controller
     {
         private readonly IAuthService _authService;
+        private readonly ILogService _logService;
 
-        public LoginController(IAuthService authService)
+        public LoginController(IAuthService authService, ILogService logService)
         {
             _authService = authService;
+            _logService = logService;
         }
 
         [HttpGet]
@@ -122,6 +124,12 @@ namespace Atlas.Web.Areas.Account.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(employeeIdValue, out var employeeId))
+            {
+                await _logService.AddLogAsync(employeeId, "User logout");
+            }
+
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction(nameof(SignIn));
         }

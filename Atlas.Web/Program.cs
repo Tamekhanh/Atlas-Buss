@@ -1,11 +1,14 @@
 using Atlas.Core.Interfaces;
 using Atlas.Infrastructure;
 using Atlas.Infrastructure.Repositories;
+using Atlas.Services;
 using Atlas.Services.Auth;
 using Atlas.Services.Customer;
 using Atlas.Services.HRM;
 using Atlas.Services.Inventory;
 using Atlas.Services.Vendor;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +25,28 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Account/Login/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.SlidingExpiration = true;
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnValidatePrincipal = async context =>
+            {
+                var username = context.Principal?.FindFirstValue(ClaimTypes.Name);
+                if (string.IsNullOrWhiteSpace(username))
+                {
+                    context.RejectPrincipal();
+                    await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    return;
+                }
+
+                var authRepository = context.HttpContext.RequestServices.GetRequiredService<IAuthRepository>();
+                var account = await authRepository.GetByUsernameAsync(username);
+
+                if (account is null || !account.IsActive)
+                {
+                    context.RejectPrincipal();
+                    await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                }
+            }
+        };
     });
 
 builder.Services.AddAuthorization();
@@ -45,6 +70,8 @@ builder.Services.AddScoped<ICustomerPersonRepository, CustomerPersonRepository>(
 builder.Services.AddScoped<ICustomerPersonService, CustomerPersonService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ILogRepository, LogRepository>();
+builder.Services.AddScoped<ILogService, LogService>();
 
 var app = builder.Build();
 
@@ -66,6 +93,12 @@ app.UseAuthentication();
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+app.MapAreaControllerRoute(
+    name: "logpage",
+    areaName: "LogPage",
+    pattern: "LogPage/{action=Index}",
+    defaults: new { controller = "Log" });
 
 app.MapAreaControllerRoute(
     name: "account",

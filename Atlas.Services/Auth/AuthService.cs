@@ -8,10 +8,12 @@ namespace Atlas.Services.Auth
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository _authRepository;
+        private readonly ILogService _logService;
 
-        public AuthService(IAuthRepository authRepository)
+        public AuthService(IAuthRepository authRepository, ILogService logService)
         {
             _authRepository = authRepository;
+            _logService = logService;
         }
 
         public async Task<AuthenticatedUser?> AuthenticateAsync(string username, string password)
@@ -33,6 +35,7 @@ namespace Atlas.Services.Auth
             }
 
             await _authRepository.UpdateLastLoginAsync(account.EmployeeId, DateTime.UtcNow);
+            await _logService.AddLogAsync(account.EmployeeId, "User login");
 
             return new AuthenticatedUser
             {
@@ -90,6 +93,11 @@ namespace Atlas.Services.Auth
             };
 
             var created = await _authRepository.AddAccountAsync(account);
+            if (created)
+            {
+                await _logService.AddLogAsync(employee.Id, $"Account registration: {normalizedUsername}");
+            }
+
             return created ? null : "Khong the tao tai khoan.";
         }
 

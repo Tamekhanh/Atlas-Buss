@@ -1,0 +1,32 @@
+@model IEnumerable<Atlas.Core.Models.LogModel>
+
+@{
+    ViewData["Title"] = "LogPage";
+}
+
+<h1>Log</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>EmployeeNumber</th>
+            <th>Username</th>
+            <th>Employee</th>
+            <th>Action</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model)
+        {
+            <tr>
+                <td>@log.Id</td>
+                <td>@log.EmployeeNumber</td>
+                <td>@log.Username</td>
+                <td>@(string.IsNullOrWhiteSpace(log.EmployeeName) ? log.EmployeeNumber : log.EmployeeName)</td>
+                <td>@log.Action</td>
+                <td>@log.Timestamp</td>
+            </tr>
+        }
+    </tbody>
+</table>

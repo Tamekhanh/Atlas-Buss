@@ -18,10 +18,24 @@ namespace Atlas.Infrastructure
         public DbSet<CustomerCompany> CustomerCompanies { get; set; }
         public DbSet<VendorPerson> VendorPersons { get; set; }
         public DbSet<CustomerPerson> CustomerPersons { get; set; }
+        public DbSet<Log> Logs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Log>(entity =>
+            {
+                entity.ToTable("Logs", "dbo");
+                entity.HasKey(log => log.Id);
+                entity.Property(log => log.Action).HasMaxLength(255).IsRequired();
+                entity.Property(log => log.Timestamp).HasDefaultValueSql("GETDATE()");
+
+                entity.HasOne(log => log.Employee)
+                    .WithMany()
+                    .HasForeignKey(log => log.EmployeeId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
 
             modelBuilder.Entity<Person>(entity =>
             {

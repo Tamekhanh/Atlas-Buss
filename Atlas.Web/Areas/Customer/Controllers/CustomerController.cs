@@ -12,11 +12,13 @@ namespace Atlas.Web.Areas.Customer.Controllers
     {
         private readonly ICustomerCompanyService _customerCompanyService;
         private readonly ICustomerPersonService _customerPersonService;
+        private readonly ILogService _logService;
 
-        public CustomerController(ICustomerCompanyService customerCompanyService, ICustomerPersonService customerPersonService)
+        public CustomerController(ICustomerCompanyService customerCompanyService, ICustomerPersonService customerPersonService, ILogService logService)
         {
             _customerCompanyService = customerCompanyService;
             _customerPersonService = customerPersonService;
+            _logService = logService;
         }
 
         public async Task<IActionResult> Index()
@@ -57,6 +59,8 @@ namespace Atlas.Web.Areas.Customer.Controllers
                 ModelState.AddModelError(string.Empty, "Khong the tao Customer moi.");
                 return View(model);
             }
+
+
 
             TempData["SuccessMessage"] = "Tao moi Customer thanh cong.";
             return RedirectToAction(nameof(Index));

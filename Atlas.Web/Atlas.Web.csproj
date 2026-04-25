@@ -30,6 +30,10 @@
     <Folder Include="Areas\HRM\Models\" />
     <Folder Include="Areas\HRM\Views\" />
     <Folder Include="Areas\Account\Data\" />
+    <Folder Include="Areas\Log\Controllers\" />
+    <Folder Include="Areas\Log\Data\" />
+    <Folder Include="Areas\Log\Models\" />
+    <Folder Include="Areas\Log\Views\" />
     <Folder Include="Areas\Vendor\Controllers\" />
     <Folder Include="Areas\Vendor\Data\" />
     <Folder Include="Areas\Vendor\Models\" />
