@@ -3,6 +3,7 @@ using Atlas.Core.Models;
 using Atlas.Web.Areas.Customer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Atlas.Web.Areas.Customer.Controllers
 {
@@ -63,6 +64,12 @@ namespace Atlas.Web.Areas.Customer.Controllers
 
 
             TempData["SuccessMessage"] = "Tao moi Customer thanh cong.";
+            var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(employeeIdValue, out var employeeId))
+            {
+                await _logService.AddLogAsync(employeeId, model.RegistrationType == CustomerRegistrationType.Company ? $"Created new company customer {model.CompanyName}" : $"Created new person customer {model.FirstName} {model.LastName}");
+            }
+
             return RedirectToAction(nameof(Index));
         }
 

@@ -3,8 +3,12 @@
   "WorkspaceRootPath": "D:\\MyWebsite\\Atlas\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\areas\\account\\views\\login\\style.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
-      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\areas\\account\\views\\login\\style.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\areas\\customer\\controllers\\customercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\areas\\customer\\controllers\\customercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\areas\\account\\controllers\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\areas\\account\\controllers\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,14 +23,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Style.css",
-              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Account\\Views\\Login\\Style.css",
-              "RelativeDocumentMoniker": "Atlas.Web\\Areas\\Account\\Views\\Login\\Style.css",
-              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Account\\Views\\Login\\Style.css",
-              "RelativeToolTip": "Atlas.Web\\Areas\\Account\\Views\\Login\\Style.css",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-04-19T15:19:08.537Z",
+              "Title": "CustomerController.cs",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Customer\\Controllers\\CustomerController.cs",
+              "RelativeDocumentMoniker": "Atlas.Web\\Areas\\Customer\\Controllers\\CustomerController.cs",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Customer\\Controllers\\CustomerController.cs",
+              "RelativeToolTip": "Atlas.Web\\Areas\\Customer\\Controllers\\CustomerController.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAAAhwEQAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-27T13:33:56.197Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LoginController.cs",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Account\\Controllers\\LoginController.cs",
+              "RelativeDocumentMoniker": "Atlas.Web\\Areas\\Account\\Controllers\\LoginController.cs",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Account\\Controllers\\LoginController.cs",
+              "RelativeToolTip": "Atlas.Web\\Areas\\Account\\Controllers\\LoginController.cs",
+              "ViewState": "AgIAAF4AAAAAAAAAAAAkwIUAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-27T14:48:24.018Z",
               "EditorCaption": ""
             }
           ]
