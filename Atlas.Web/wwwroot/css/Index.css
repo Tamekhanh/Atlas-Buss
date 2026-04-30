@@ -32,6 +32,10 @@ img {
     align-items: center;
 }
 
+.home-btn {
+    padding: 10px;
+}
+
 .home-btn-text {
     width: fit-content;
 }

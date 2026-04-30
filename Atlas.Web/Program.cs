@@ -130,6 +130,11 @@ app.MapAreaControllerRoute(
     pattern: "Customer/{action=Index}/{id?}",
     defaults: new { controller = "Customer" });
 
+app.MapControllerRoute(
+    name: "setting",
+    pattern: "Setting",
+    defaults: new { controller = "Setting", action = "Settings" });
+
 app.MapGet("/", (HttpContext context) =>
     context.User.Identity?.IsAuthenticated == true
         ? Results.Redirect("/Index")

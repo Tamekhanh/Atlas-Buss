@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\MyWebsite\\Atlas\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\scaffoldingreadme.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\scaffoldingreadme.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\areas\\customer\\controllers\\customercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\areas\\customer\\controllers\\customercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -23,19 +27,32 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "ScaffoldingReadMe.txt",
+              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\ScaffoldingReadMe.txt",
+              "RelativeDocumentMoniker": "Atlas.Web\\ScaffoldingReadMe.txt",
+              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\ScaffoldingReadMe.txt",
+              "RelativeToolTip": "Atlas.Web\\ScaffoldingReadMe.txt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2026-04-29T18:26:11.049Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "CustomerController.cs",
               "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Customer\\Controllers\\CustomerController.cs",
               "RelativeDocumentMoniker": "Atlas.Web\\Areas\\Customer\\Controllers\\CustomerController.cs",
               "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Customer\\Controllers\\CustomerController.cs",
               "RelativeToolTip": "Atlas.Web\\Areas\\Customer\\Controllers\\CustomerController.cs",
-              "ViewState": "AgIAACIAAAAAAAAAAAAhwEQAAAANAAAAAAAAAA==",
+              "ViewState": "AgIAADkAAAAAAAAAAAAlwEgAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-27T13:33:56.197Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "LoginController.cs",
               "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Account\\Controllers\\LoginController.cs",
               "RelativeDocumentMoniker": "Atlas.Web\\Areas\\Account\\Controllers\\LoginController.cs",
@@ -43,8 +60,7 @@
               "RelativeToolTip": "Atlas.Web\\Areas\\Account\\Controllers\\LoginController.cs",
               "ViewState": "AgIAAF4AAAAAAAAAAAAkwIUAAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-27T14:48:24.018Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-27T14:48:24.018Z"
             }
           ]
         }

@@ -344,6 +344,6 @@ D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\Atlas.Web.sourcelink.json
 D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\compressed\aym27y46nn-{0}-7fk00zwzm5-7fk00zwzm5.gz
 D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\compressed\spyalqk8ps-{0}-jp3brdphke-jp3brdphke.gz
 D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\compressed\s7svojhzxz-{0}-4i66vma0hp-4i66vma0hp.gz
-D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\compressed\il6cvgpzt4-{0}-4it9cbt9p3-4it9cbt9p3.gz
 D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\compressed\jgf3efvvtm-{0}-ezoct9hfnp-ezoct9hfnp.gz
+D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\compressed\il6cvgpzt4-{0}-tgqir4hcub-tgqir4hcub.gz
 D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

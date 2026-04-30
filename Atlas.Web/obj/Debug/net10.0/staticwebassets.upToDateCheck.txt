@@ -129,4 +129,9 @@ wwwroot\lib\jquery\dist\jquery.min.map
 wwwroot\lib\jquery\dist\jquery.slim.js
 wwwroot\lib\jquery\dist\jquery.slim.min.js
 wwwroot\lib\jquery\dist\jquery.slim.min.map
+wwwroot\public\Customer.png
+wwwroot\public\Employee.png
+wwwroot\public\Log.png
+wwwroot\public\Product.png
+wwwroot\public\Vendor.png
 wwwroot\public\placeholder.png

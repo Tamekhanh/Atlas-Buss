@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Atlas.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+09fdee83acff047cba2417fc859eeff895123ed1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+25149b5dd9447d9eb4adab7788dcbcc7933ad67d")]
 [assembly: System.Reflection.AssemblyProductAttribute("Atlas.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Atlas.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

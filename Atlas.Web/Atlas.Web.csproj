@@ -37,6 +37,10 @@
     <Folder Include="Areas\HRM\Models\" />
     <Folder Include="Areas\HRM\Views\" />
     <Folder Include="Areas\Account\Data\" />
+    <Folder Include="Areas\Setting\Controllers\" />
+    <Folder Include="Areas\Setting\Data\" />
+    <Folder Include="Areas\Setting\Models\" />
+    <Folder Include="Areas\Setting\Views\" />
     <Folder Include="Areas\Vendor\Controllers\" />
     <Folder Include="Areas\Vendor\Data\" />
     <Folder Include="Areas\Vendor\Models\" />
