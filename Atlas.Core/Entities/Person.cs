@@ -8,6 +8,7 @@ namespace Atlas.Core.Entities
         public DateTime DoB { get; set; }
         public int AddressId { get; set; }
         public int ContactId { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         public Employee? Employee { get; set; }
         public Addresses? Address { get; set; }

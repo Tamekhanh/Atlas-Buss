@@ -8,11 +8,12 @@ namespace Atlas.Core.Entities
         public int EmployeeId { get; set; }
         public int? CustomerCompanyId { get; set; }
         public int? CustomerPersonId { get; set; }
-        public string OrderStatus { get; set; } = "Pending";
+        public int OrderStatusId { get; set; } = 1;
 
         public Employee? Employee { get; set; }
         public CustomerCompany? CustomerCompany { get; set; }
         public CustomerPerson? CustomerPerson { get; set; }
+        public SalesOrderStatus? OrderStatus { get; set; }
         public ICollection<SalesOrderDetail> SalesOrderDetails { get; set; } = new List<SalesOrderDetail>();
     }
 

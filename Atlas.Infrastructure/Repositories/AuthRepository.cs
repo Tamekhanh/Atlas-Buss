@@ -18,6 +18,9 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.EmployeeAccounts
                 .Include(account => account.Employee)
                     .ThenInclude(employee => employee!.Person)
+                .Include(account => account.Role)
+                    .ThenInclude(role => role!.RolePermissions)
+                        .ThenInclude(rolePermission => rolePermission.Permission)
                 .FirstOrDefaultAsync(account => account.Username == username);
         }
 

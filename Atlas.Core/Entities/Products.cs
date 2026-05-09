@@ -12,9 +12,11 @@
         public bool IsActive { get; set; } = true;
         public bool Onsale { get; set; } = false;
         public int EmployeeId { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         public Employee? Employee { get; set; }
         public ProductDetails? ProductDetail { get; set; }
+        public ICollection<ProductTax> ProductTaxes { get; set; } = new List<ProductTax>();
     }
 
     public class ProductDetails

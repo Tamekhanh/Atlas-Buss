@@ -15,7 +15,50 @@ USE AtlasDB
 GO
 
 -- =============================================
--- 3. TẠO CÁC BẢNG (SCHEMA)
+-- 1. DANH MỤC HỆ THỐNG (LOOKUP TABLES)
+-- =============================================
+
+-- Quản lý phân quyền RBAC
+CREATE TABLE dbo.Roles(
+    id int identity(1,1) primary key,
+    RoleName nvarchar(50) not null UNIQUE,
+    Description nvarchar(255) null
+)
+GO
+
+CREATE TABLE dbo.Permissions(
+    id int identity(1,1) primary key,
+    PermissionKey nvarchar(100) not null UNIQUE, -- Ví dụ: 'PRODUCT_EDIT', 'SALE_CREATE'
+    Description nvarchar(255) null
+)
+GO
+
+CREATE TABLE dbo.RolePermissions(
+    RoleId int not null,
+    PermissionId int not null,
+    PRIMARY KEY (RoleId, PermissionId),
+    FOREIGN KEY (RoleId) REFERENCES dbo.Roles(id),
+    FOREIGN KEY (PermissionId) REFERENCES dbo.Permissions(id)
+)
+GO
+
+-- Quản lý trạng thái đơn hàng
+CREATE TABLE dbo.SalesOrderStatuses(
+    id int identity(1,1) primary key,
+    StatusName nvarchar(50) not null UNIQUE, -- 'Pending', 'Confirmed', 'Shipped', 'Cancelled', 'Completed'
+    Description nvarchar(255) null
+)
+GO
+
+CREATE TABLE dbo.PurchaseOrderStatuses(
+    id int identity(1,1) primary key,
+    StatusName nvarchar(50) not null UNIQUE, -- 'Draft', 'Ordered', 'Received', 'Cancelled'
+    Description nvarchar(255) null
+)
+GO
+
+-- =============================================
+-- 2. QUẢN LÝ THÔNG TIN ĐỐI TÁC (PARTY MODEL)
 -- =============================================
 
 CREATE TABLE dbo.Addresses(
@@ -25,7 +68,7 @@ CREATE TABLE dbo.Addresses(
     City nvarchar(100),
     State nvarchar(100),
     Country nvarchar(100),
-    IsDeleted bit default 0 -- Thêm để xóa mềm
+    IsDeleted bit default 0
 )
 GO
 
@@ -92,6 +135,10 @@ CREATE TABLE dbo.CustomerPerson(
 )
 GO
 
+-- =============================================
+-- 3. QUẢN LÝ NHÂN VIÊN & TÀI KHOẢN
+-- =============================================
+
 CREATE TABLE dbo.Employee(
     id int identity(1,1) primary key,
     EmployeeNumber nvarchar(20) not null UNIQUE,
@@ -104,16 +151,12 @@ GO
 CREATE TABLE dbo.EmployeeAccounts(
     EmployeeId int primary key,
     Username nvarchar(50) not null UNIQUE,
-    PasswordHash nvarchar(255) not null,
+    PasswordHash nvarchar(max) not null, -- Thay đổi sang nvarchar(max) cho hash bảo mật
     IsActive bit not null default 1,
     LastLogin datetime null,
-    canProduct bit not null default 0,
-    canSale bit not null default 0,
-    canEmployee bit not null default 0,
-    canInventory bit not null default 0,
-    canAdministration bit not null default 0,
-    canHR bit not null default 0,
-    FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id)
+    RoleId int null, -- Thay thế các cột canProduct, canSale... bằng RoleId
+    FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id),
+    FOREIGN KEY (RoleId) REFERENCES dbo.Roles(id)
 )
 GO
 
@@ -144,10 +187,14 @@ CREATE TABLE dbo.Logs(
 )
 GO
 
+-- =============================================
+-- 4. QUẢN LÝ SẢN PHẨM & GIÁ
+-- =============================================
+
 CREATE TABLE dbo.Taxes(
     id int identity(1,1) primary key,
     TaxName nvarchar(50) not null UNIQUE,
-    TaxRate decimal(18,4) not null, -- Chỉnh lại độ chính xác
+    TaxRate decimal(18,4) not null,
     Description nvarchar(255) null,
     IsActive bit not null default 1,
     IsStackable bit not null default 0
@@ -165,7 +212,7 @@ CREATE TABLE dbo.Products(
     isActive bit not null default 1,
     Onsale bit not null default 0,
     EmployeeId int not null,
-    IsDeleted bit default 0, -- Thêm để xóa mềm
+    IsDeleted bit default 0,
     FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id)
 )
 GO
@@ -181,10 +228,10 @@ GO
 
 CREATE TABLE dbo.ProductDetails(
     ProductId int primary key,
-    ProductDescription nvarchar(255) null,
+    ProductDescription nvarchar(max) null,
     Weight decimal(18,2) null,
     WarrantyPeriod int null,
-    Dimensions nvarchar(50) null,
+    Dimensions nvarchar(50) null, -- Giữ nguyên để không vỡ project
     Manufacturer nvarchar(100) null,
     FOREIGN KEY (ProductId) REFERENCES dbo.Products(id)
 )
@@ -242,6 +289,10 @@ CREATE TABLE dbo.CategoryProducts(
 )
 GO
 
+-- =============================================
+-- 5. QUẢN LÝ KHO (INVENTORY)
+-- =============================================
+
 CREATE TABLE dbo.Warehouses(
     id int identity(1,1) primary key,
     WarehouseName nvarchar(100) not null UNIQUE,
@@ -252,11 +303,11 @@ CREATE TABLE dbo.Warehouses(
 )
 GO
 
--- BẢNG TỒN KHO HIỆN TẠI
 CREATE TABLE dbo.InventoryStock(
     WarehouseId int not null,
     ProductId int not null,
-    Quantity int not null default 0,
+    Quantity int not null default 0, -- Tổng số lượng thực tế trong kho
+    ReservedQuantity int not null default 0, -- Số lượng đã đặt nhưng chưa xuất kho
     LastUpdated datetime not null default GETDATE(),
     PRIMARY KEY (WarehouseId, ProductId),
     FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id),
@@ -264,14 +315,13 @@ CREATE TABLE dbo.InventoryStock(
 )
 GO
 
--- BỔ SUNG: BẢNG LỊCH SỬ GIAO DỊCH KHO (Quan trọng)
 CREATE TABLE dbo.InventoryTransactions(
     id bigint identity(1,1) primary key,
     ProductId int not null,
     WarehouseId int not null,
-    Quantity int not null, -- Dương là nhập, Âm là xuất
+    Quantity int not null,
     TransactionType nvarchar(50), -- 'SALE', 'PURCHASE', 'ADJUSTMENT', 'TRANSFER'
-    ReferenceId nvarchar(50), -- ID của Order hoặc PO
+    ReferenceId nvarchar(50),
     EmployeeId int not null,
     TransactionDate datetime default GETDATE(),
     Note nvarchar(255),
@@ -281,7 +331,10 @@ CREATE TABLE dbo.InventoryTransactions(
 )
 GO
 
--- Sales Management
+-- =============================================
+-- 6. QUẢN LÝ BÁN HÀNG (SALES)
+-- =============================================
+
 CREATE TABLE dbo.SalesOrders(
     id int identity(1,1) primary key,
     OrderNumber nvarchar(50) not null UNIQUE, 
@@ -289,10 +342,11 @@ CREATE TABLE dbo.SalesOrders(
     EmployeeId int not null,
     CustomerCompanyId int null,
     CustomerPersonId int null,
-    OrderStatus nvarchar(50) not null default 'Pending', 
+    OrderStatusId int not null default 1, -- Chuyển sang ID từ bảng danh mục
     FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id),
     FOREIGN KEY (CustomerCompanyId) REFERENCES dbo.CustomerCompany(id),
     FOREIGN KEY (CustomerPersonId) REFERENCES dbo.CustomerPerson(id),
+    FOREIGN KEY (OrderStatusId) REFERENCES dbo.SalesOrderStatuses(id),
     CONSTRAINT CHK_SalesOrder_Customer CHECK (
         (CustomerCompanyId IS NOT NULL AND CustomerPersonId IS NULL) 
         OR (CustomerCompanyId IS NULL AND CustomerPersonId IS NOT NULL)
@@ -308,7 +362,7 @@ CREATE TABLE dbo.SalesOrderDetails(
     Quantity int not null CHECK (Quantity > 0),
     UnitPrice decimal(18,2) not null, 
     Discount decimal(18,2) not null default 0,
-    TaxRate decimal(18,4) not null default 0, -- Chỉnh lại độ chính xác
+    TaxRate decimal(18,4) not null default 0,
     SubTotal AS ((Quantity * UnitPrice) - Discount), 
     TaxAmount AS (((Quantity * UnitPrice) - Discount) * (TaxRate / 100.0)),
     LineTotal AS (((Quantity * UnitPrice) - Discount) * (1 + TaxRate / 100.0)), 
@@ -318,7 +372,34 @@ CREATE TABLE dbo.SalesOrderDetails(
 )
 GO
 
--- Purchase Management
+-- BỔ SUNG: Hóa đơn và Thanh toán để quản lý tiền
+CREATE TABLE dbo.Invoices(
+    id int identity(1,1) primary key,
+    InvoiceNumber nvarchar(50) not null UNIQUE,
+    OrderId int not null,
+    InvoiceDate datetime not null default GETDATE(),
+    DueDate date null,
+    TotalAmount decimal(18,2) not null,
+    IsPaid bit default 0,
+    FOREIGN KEY (OrderId) REFERENCES dbo.SalesOrders(id)
+)
+GO
+
+CREATE TABLE dbo.Payments(
+    id int identity(1,1) primary key,
+    InvoiceId int not null,
+    PaymentDate datetime not null default GETDATE(),
+    Amount decimal(18,2) not null,
+    PaymentMethod nvarchar(50), -- 'Cash', 'Bank Transfer', 'Credit Card'
+    Note nvarchar(255),
+    FOREIGN KEY (InvoiceId) REFERENCES dbo.Invoices(id)
+)
+GO
+
+-- =============================================
+-- 7. QUẢN LÝ NHẬP HÀNG (PURCHASE)
+-- =============================================
+
 CREATE TABLE dbo.PurchaseOrders(
     id int identity(1,1) primary key,
     PONumber nvarchar(50) not null UNIQUE, 
@@ -326,10 +407,11 @@ CREATE TABLE dbo.PurchaseOrders(
     EmployeeId int not null,
     VendorCompanyId int null,
     VendorPersonId int null,
-    OrderStatus nvarchar(50) not null default 'Draft', 
+    OrderStatusId int not null default 1, -- Chuyển sang ID từ bảng danh mục
     FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id),
     FOREIGN KEY (VendorCompanyId) REFERENCES dbo.VendorsCompany(id),
     FOREIGN KEY (VendorPersonId) REFERENCES dbo.VendorsPerson(id),
+    FOREIGN KEY (OrderStatusId) REFERENCES dbo.PurchaseOrderStatuses(id),
     CONSTRAINT CHK_PurchaseOrder_Vendor CHECK (
         (VendorCompanyId IS NOT NULL AND VendorPersonId IS NULL) 
         OR (VendorCompanyId IS NULL AND VendorPersonId IS NOT NULL)
@@ -344,7 +426,7 @@ CREATE TABLE dbo.PurchaseOrderDetails(
     WarehouseId int not null,
     Quantity int not null CHECK (Quantity > 0),
     UnitPrice decimal(18,2) not null, 
-    TaxRate decimal(18,4) not null default 0, -- Chỉnh lại độ chính xác
+    TaxRate decimal(18,4) not null default 0,
     SubTotal AS (Quantity * UnitPrice),
     TaxAmount AS ((Quantity * UnitPrice) * (TaxRate / 100.0)),
     LineTotal AS ((Quantity * UnitPrice) * (1 + TaxRate / 100.0)),
@@ -355,9 +437,10 @@ CREATE TABLE dbo.PurchaseOrderDetails(
 GO
 
 -- =============================================
--- 4. TỐI ƯU HÓA HIỆU SUẤT (INDEXING)
+-- 8. TỐI ƯU HÓA (INDEXING)
 -- =============================================
 CREATE INDEX IX_Products_ProductName ON dbo.Products(ProductName);
 CREATE INDEX IX_SalesOrders_OrderNumber ON dbo.SalesOrders(OrderNumber);
 CREATE INDEX IX_PurchaseOrders_PONumber ON dbo.PurchaseOrders(PONumber);
+CREATE INDEX IX_Inventory_ProductWarehouse ON dbo.InventoryStock(ProductId, WarehouseId);
 GO

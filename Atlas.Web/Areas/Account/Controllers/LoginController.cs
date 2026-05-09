@@ -59,6 +59,16 @@ namespace Atlas.Web.Areas.Account.Controllers
                 new(ClaimTypes.GivenName, user.FullName)
             };
 
+            if (!string.IsNullOrWhiteSpace(user.RoleName))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, user.RoleName));
+            }
+
+            foreach (var permissionKey in user.PermissionKeys)
+            {
+                claims.Add(new Claim("permission", permissionKey));
+            }
+
             if (user.CanProduct) claims.Add(new Claim("permission", "canProduct"));
             if (user.CanSale) claims.Add(new Claim("permission", "canSale"));
             if (user.CanEmployee) claims.Add(new Claim("permission", "canEmployee"));

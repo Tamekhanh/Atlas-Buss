@@ -1,16 +1,9 @@
 using Atlas.Core.Interfaces;
 using Atlas.Infrastructure;
-using Atlas.Infrastructure.Repositories;
 using Atlas.Services;
-using Atlas.Services.Auth;
-using Atlas.Services.Customer;
-using Atlas.Services.HRM;
-using Atlas.Services.Inventory;
-using Atlas.Services.Vendor;
 using Microsoft.AspNetCore.Authentication;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,27 +44,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddDbContext<AtlasDBContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        sqlOptions => sqlOptions.EnableRetryOnFailure()));
-
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-builder.Services.AddScoped<IVendorCompanyRepository, VendorCompanyRepository>();
-builder.Services.AddScoped<IVendorCompanyService, VendorCompanyService>();
-builder.Services.AddScoped<ICustomerCompanyRepository, CustomerCompanyRepository>();
-builder.Services.AddScoped<ICustomerCompanyService, CustomerCompanyService>();
-builder.Services.AddScoped<IVendorPersonRepository, VendorPersonRepository>();
-builder.Services.AddScoped<IVendorPersonService, VendorPersonService>();
-builder.Services.AddScoped<ICustomerPersonRepository, CustomerPersonRepository>();
-builder.Services.AddScoped<ICustomerPersonService, CustomerPersonService>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ILogRepository, LogRepository>();
-builder.Services.AddScoped<ILogService, LogService>();
+builder.Services.AddAtlasInfrastructure(builder.Configuration);
+builder.Services.AddAtlasApplicationServices();
 
 var app = builder.Build();
 
@@ -88,6 +62,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthentication();
+
+app.UseAuthorization();
 
 // Code định tuyến Area
 app.MapControllerRoute(
@@ -139,8 +115,6 @@ app.MapGet("/", (HttpContext context) =>
     context.User.Identity?.IsAuthenticated == true
         ? Results.Redirect("/Index")
         : Results.Redirect("/Account/Login/SignIn"));
-
-app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorPages()

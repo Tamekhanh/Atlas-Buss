@@ -18,6 +18,10 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.Employees
                 .Include(employee => employee.Person)
                 .ThenInclude(person => person!.Address)
+                .Include(employee => employee.Account)
+                    .ThenInclude(account => account!.Role)
+                        .ThenInclude(role => role!.RolePermissions)
+                            .ThenInclude(rolePermission => rolePermission.Permission)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -27,6 +31,12 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.Employees
                 .Include(employee => employee.Person)
                 .ThenInclude(person => person!.Address)
+                .Include(employee => employee.Person)
+                .ThenInclude(person => person!.Contact)
+                .Include(employee => employee.Account)
+                    .ThenInclude(account => account!.Role)
+                        .ThenInclude(role => role!.RolePermissions)
+                            .ThenInclude(rolePermission => rolePermission.Permission)
                 .FirstOrDefaultAsync(employee => employee.Id == id);
         }
 

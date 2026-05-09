@@ -37,17 +37,29 @@ namespace Atlas.Services.Auth
             await _authRepository.UpdateLastLoginAsync(account.EmployeeId, DateTime.UtcNow);
             await _logService.AddLogAsync(account.EmployeeId, "User login");
 
+            var permissionKeys = account.Role?.RolePermissions?
+                .Where(rp => rp.Permission is not null && !string.IsNullOrWhiteSpace(rp.Permission.PermissionKey))
+                .Select(rp => rp.Permission!.PermissionKey)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList() ?? new List<string>();
+
+            bool hasPermission(string token) =>
+                permissionKeys.Any(key => key.Contains(token, StringComparison.OrdinalIgnoreCase));
+
             return new AuthenticatedUser
             {
                 EmployeeId = account.EmployeeId,
                 Username = account.Username,
                 FullName = account.Employee?.FullName ?? string.Empty,
-                CanProduct = account.CanProduct,
-                CanSale = account.CanSale,
-                CanEmployee = account.CanEmployee,
-                CanInventory = account.CanInventory,
-                CanAdministration = account.CanAdministration,
-                CanHR = account.CanHR
+                RoleId = account.RoleId,
+                RoleName = account.Role?.RoleName,
+                PermissionKeys = permissionKeys,
+                CanProduct = hasPermission("PRODUCT"),
+                CanSale = hasPermission("SALE"),
+                CanEmployee = hasPermission("EMPLOYEE"),
+                CanInventory = hasPermission("INVENTORY"),
+                CanAdministration = hasPermission("ADMIN"),
+                CanHR = hasPermission("HR")
             };
         }
 
@@ -84,12 +96,7 @@ namespace Atlas.Services.Auth
                 PasswordHash = HashPassword(password),
                 IsActive = true,
                 LastLogin = null,
-                CanProduct = false,
-                CanSale = false,
-                CanEmployee = false,
-                CanInventory = false,
-                CanAdministration = false,
-                CanHR = false
+                RoleId = null
             };
 
             var created = await _authRepository.AddAccountAsync(account);
