@@ -13,6 +13,10 @@ namespace Atlas.Web.Areas.Products.Models
         [StringLength(50)]
         public string ProductCode { get; set; } = string.Empty;
 
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Unit is required.")]
+        public int UnitId { get; set; }
+
         [StringLength(255)]
         public string? ImageUrl { get; set; }
 

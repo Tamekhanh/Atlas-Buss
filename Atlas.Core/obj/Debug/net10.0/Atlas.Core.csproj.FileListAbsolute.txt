@@ -10,3 +10,6 @@ D:\MyWebsite\Atlas\Atlas.Core\obj\Debug\net10.0\refint\Atlas.Core.dll
 D:\MyWebsite\Atlas\Atlas.Core\obj\Debug\net10.0\Atlas.Core.pdb
 D:\MyWebsite\Atlas\Atlas.Core\obj\Debug\net10.0\ref\Atlas.Core.dll
 D:\MyWebsite\Atlas\Atlas.Core\obj\Debug\net10.0\Atlas.Core.sourcelink.json
+d:\MyWebsite\Atlas\_build_temp\Atlas.Core.deps.json
+d:\MyWebsite\Atlas\_build_temp\Atlas.Core.dll
+d:\MyWebsite\Atlas\_build_temp\Atlas.Core.pdb

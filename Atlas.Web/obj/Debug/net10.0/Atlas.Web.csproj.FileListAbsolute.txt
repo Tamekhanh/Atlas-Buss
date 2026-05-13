@@ -346,4 +346,13 @@ D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\compressed\spyalqk8ps-{0}-jp3brdp
 D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\compressed\s7svojhzxz-{0}-4i66vma0hp-4i66vma0hp.gz
 D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\compressed\jgf3efvvtm-{0}-ezoct9hfnp-ezoct9hfnp.gz
 D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\compressed\il6cvgpzt4-{0}-tgqir4hcub-tgqir4hcub.gz
+d:\MyWebsite\Atlas\_build_temp\appsettings.Development.json
+d:\MyWebsite\Atlas\_build_temp\appsettings.json
+d:\MyWebsite\Atlas\_build_temp\Atlas.Web.staticwebassets.runtime.json
+d:\MyWebsite\Atlas\_build_temp\Atlas.Web.staticwebassets.endpoints.json
+d:\MyWebsite\Atlas\_build_temp\Atlas.Web.exe
+d:\MyWebsite\Atlas\_build_temp\Atlas.Web.deps.json
+d:\MyWebsite\Atlas\_build_temp\Atlas.Web.runtimeconfig.json
+d:\MyWebsite\Atlas\_build_temp\Atlas.Web.dll
+d:\MyWebsite\Atlas\_build_temp\Atlas.Web.pdb
 D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

@@ -42,6 +42,7 @@ namespace Atlas.Infrastructure
         public DbSet<PricelistProduct> PricelistProducts { get; set; }
         public DbSet<Tax> Taxes { get; set; }
         public DbSet<ProductTax> ProductTaxes { get; set; }
+        public DbSet<Units> Units { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -192,6 +193,15 @@ namespace Atlas.Infrastructure
                 entity.Property(address => address.Country).HasMaxLength(100);
             });
 
+            modelBuilder.Entity<Units>(entity =>
+            {
+                entity.ToTable("Units", "dbo");
+                entity.HasKey(u => u.Id);
+                entity.Property(u => u.UnitName).HasMaxLength(50).IsRequired();
+                entity.Property(u => u.ShortName).HasMaxLength(10);
+                entity.HasIndex(u => u.UnitName).IsUnique();
+            });
+
             modelBuilder.Entity<Employee>(entity =>
             {
                 entity.ToTable("Employee", "dbo");
@@ -247,9 +257,18 @@ namespace Atlas.Infrastructure
                 entity.Property(product => product.IsActive).HasColumnName("isActive");
                 entity.Property(product => product.Onsale).HasColumnName("Onsale");
 
+                entity.Property(product => product.UnitId).IsRequired();
+                entity.Property(product => product.CreatedAt).HasDefaultValueSql("GETDATE()");
+                entity.Property(product => product.UpdatedAt).IsRequired(false);
+
                 entity.HasOne(product => product.Employee)
                     .WithMany(employee => employee.Products)
                     .HasForeignKey(product => product.EmployeeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(product => product.Unit)
+                    .WithMany()
+                    .HasForeignKey(product => product.UnitId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
@@ -467,6 +486,9 @@ namespace Atlas.Infrastructure
             {
                 entity.ToTable("InventoryStock", "dbo");
                 entity.HasKey(stock => new { stock.WarehouseId, stock.ProductId });
+
+                entity.Property(stock => stock.ReservedQuantity).HasDefaultValue(0);
+                entity.Property(stock => stock.LastUpdated).HasDefaultValueSql("GETDATE()");
 
                 entity.HasOne(stock => stock.Warehouse)
                     .WithMany(warehouse => warehouse.InventoryStocks)

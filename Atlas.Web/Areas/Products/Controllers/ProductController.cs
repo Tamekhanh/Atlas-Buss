@@ -13,10 +13,12 @@ namespace Atlas.Web.Areas.Products.Controllers
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
+        private readonly ILogService _logService;
 
-        public ProductController(IProductService productService)
+        public ProductController(IProductService productService, ILogService logService)
         {
             _productService = productService;
+            _logService = logService;
         }
 
         public async Task<IActionResult> Index()
@@ -65,6 +67,7 @@ namespace Atlas.Web.Areas.Products.Controllers
             {
                 ProductName = model.ProductName.Trim(),
                 ProductCode = model.ProductCode.Trim(),
+                UnitId = model.UnitId,
                 ImageUrl = string.IsNullOrWhiteSpace(model.ImageUrl) ? null : model.ImageUrl.Trim(),
                 SalePrice = model.SalePrice,
                 CostPrice = model.CostPrice,
@@ -87,6 +90,12 @@ namespace Atlas.Web.Areas.Products.Controllers
             {
                 ModelState.AddModelError(string.Empty, "Could not create product.");
                 return View("~/Areas/Products/Views/Products/Create.cshtml", model);
+            }
+
+            var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (created && int.TryParse(employeeIdValue, out var employeeId))
+            {
+                await _logService.AddLogAsync(employeeId, $"Created new product: {product.ProductName} (ID: {product.Id})");
             }
 
             return RedirectToAction(nameof(Index));

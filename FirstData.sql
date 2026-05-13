@@ -2,7 +2,7 @@ USE AtlasDB
 GO
 
 -- =============================================
--- 1. SEED LOOKUP TABLES (BẮT BUỘC PHẢI LÀM TRƯỚC)
+-- 1. SEED LOOKUP TABLES (DANH MỤC)
 -- =============================================
 
 -- Seed Roles
@@ -22,11 +22,11 @@ INSERT INTO dbo.Permissions (PermissionKey, Description) VALUES
 ('HR_MANAGE', 'Manage HR and departments');
 GO
 
--- Seed RolePermissions (Gán quyền cho Role)
+-- Seed RolePermissions
 INSERT INTO dbo.RolePermissions (RoleId, PermissionId) VALUES 
-(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), -- Admin có tất cả quyền
-(2, 1), (2, 2), (2, 4),                         -- Sales có quyền Sản phẩm, Bán hàng, Kho
-(3, 1), (3, 3), (3, 5), (3, 6);                 -- HR có quyền Sản phẩm, Nhân sự, Admin, HR
+(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), -- Admin
+(2, 1), (2, 2), (2, 4),                         -- Sales
+(3, 1), (3, 3), (3, 5), (3, 6);                 -- HR
 GO
 
 -- Seed Sales Order Statuses
@@ -46,8 +46,17 @@ INSERT INTO dbo.PurchaseOrderStatuses (StatusName, Description) VALUES
 ('Cancelled', 'PO has been cancelled');
 GO
 
+-- SEED MỚI: Đơn vị tính (Bắt buộc phải seed trước Products)
+IF NOT EXISTS (SELECT 1 FROM dbo.Units WHERE UnitName = N'Chiếc')
+	INSERT INTO dbo.Units (UnitName, ShortName) VALUES (N'Chiếc', N'Cái');
+IF NOT EXISTS (SELECT 1 FROM dbo.Units WHERE UnitName = N'Bộ')
+	INSERT INTO dbo.Units (UnitName, ShortName) VALUES (N'Bộ', N'Bộ');
+IF NOT EXISTS (SELECT 1 FROM dbo.Units WHERE UnitName = N'Kilogram')
+	INSERT INTO dbo.Units (UnitName, ShortName) VALUES (N'Kilogram', N'Kg');
+GO
+
 -- =============================================
--- 2. General Information (Giữ nguyên logic cũ)
+-- 2. THÔNG TIN ĐỐI TÁC (PARTY MODEL)
 -- =============================================
 INSERT INTO dbo.Addresses (AddressType, Street, City, State, Country) VALUES 
 ('Office', '123 Le Loi Street', 'District 1', 'Ho Chi Minh City', 'Vietnam'),
@@ -70,9 +79,6 @@ INSERT INTO dbo.Persons (FirstName, LastName, DoB, AddressId, ContactId) VALUES
 ('John', 'Doe', '1980-03-25', 4, 4);    
 GO
 
--- =============================================
--- 3. Business Operations (Giữ nguyên logic cũ)
--- =============================================
 INSERT INTO dbo.Companies (CompanyName, TaxId, AddressId, ContactId) VALUES 
 ('Atlas Technology Company', 'TAX123456', 1, 1),
 ('Global Trade Corp', 'TAX999888', 4, 4),
@@ -86,7 +92,7 @@ INSERT INTO dbo.CustomerPerson (PersonId, TaxId) VALUES (3, '08028200');
 GO
 
 -- =============================================
--- 4. Employee Management (Thay đổi can... thành RoleId)
+-- 3. NHÂN VIÊN & TÀI KHOẢN
 -- =============================================
 INSERT INTO dbo.Employee (EmployeeNumber, PersonId) VALUES 
 ('EMP001', 1), 
@@ -95,9 +101,9 @@ INSERT INTO dbo.Employee (EmployeeNumber, PersonId) VALUES
 GO
 
 INSERT INTO dbo.EmployeeAccounts (EmployeeId, Username, PasswordHash, RoleId) VALUES 
-(1, 'admin_atlas', 'A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3', 1), -- Admin Role
-(2, 'sales_staff', 'hash_password_2', 2), -- Sales Role
-(3, 'hr_admin', 'hash_password_3', 3); -- HR Role
+(1, 'admin_atlas', 'A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3', 1),
+(2, 'sales_staff', 'hash_password_2', 2),
+(3, 'hr_admin', 'hash_password_3', 3);
 GO
 
 INSERT INTO dbo.Departments (DepartmentName, Description, ParentDepartmentId) VALUES 
@@ -113,17 +119,18 @@ INSERT INTO dbo.EmployeeDepartments (EmployeeId, DepartmentId) VALUES
 GO
 
 -- =============================================
--- 5. Inventory Management (Thêm ReservedQuantity)
+-- 4. SẢN PHẨM & GIÁ
 -- =============================================
 INSERT INTO dbo.Taxes (TaxName, TaxRate, Description) VALUES 
 ('VAT 10%', 10.00, 'Standard value-added tax'),
 ('Special Tax 5%', 5.00, 'Luxury goods tax');
 GO
 
-INSERT INTO dbo.Products (ProductName, ProductCode, SalePrice, CostPrice, EmployeeId) VALUES 
-('Dell XPS 13 Laptop', 'LAP-DELL-01', 25000000, 20000000, 1),
-('Logitech MX Master 3 Mouse', 'MOU-LOGI-01', 2500000, 1500000, 1),
-('Keychron K2 Mechanical Keyboard', 'KBD-KEYC-01', 2000000, 1200000, 1);
+-- SỬA ĐỔI: Thêm UnitId (Giả định ID 1 là 'Chiếc')
+INSERT INTO dbo.Products (ProductName, ProductCode, UnitId, SalePrice, CostPrice, EmployeeId) VALUES 
+('Dell XPS 13 Laptop', 'LAP-DELL-01', 1, 25000000, 20000000, 1),
+('Logitech MX Master 3 Mouse', 'MOU-LOGI-01', 1, 2500000, 1500000, 1),
+('Keychron K2 Mechanical Keyboard', 'KBD-KEYC-01', 1, 2000000, 1200000, 1);
 GO
 
 INSERT INTO dbo.ProductTaxes (ProductId, TaxId) VALUES (1, 1), (2, 1), (3, 1);
@@ -143,25 +150,27 @@ GO
 INSERT INTO dbo.CategoryProducts (CategoryId, ProductId) VALUES (1, 1), (2, 2), (2, 3);
 GO
 
+-- =============================================
+-- 5. QUẢN LÝ KHO
+-- =============================================
 INSERT INTO dbo.Warehouses (WarehouseName, AddressId, ManagerId) VALUES 
 ('Main Warehouse Ho Chi Minh', 3, 1),
 ('Hanoi Branch Warehouse', 2, 2);
 GO
 
--- Thêm cột ReservedQuantity = 0
 INSERT INTO dbo.InventoryStock (WarehouseId, ProductId, Quantity, ReservedQuantity) VALUES 
 (1, 1, 50, 0), (1, 2, 100, 0), (1, 3, 80, 0),
 (2, 1, 20, 0), (2, 2, 30, 0), (2, 3, 40, 0);
 GO
 
 -- =============================================
--- 6. Sales Management (Thay đổi OrderStatus -> OrderStatusId)
+-- 6. QUẢN LÝ BÁN HÀNG (SALES)
 -- =============================================
--- Order 1: Completed (Id = 4)
+-- Order 1: Completed (StatusId = 4)
 INSERT INTO dbo.SalesOrders (OrderNumber, EmployeeId, CustomerCompanyId, CustomerPersonId, OrderStatusId) VALUES 
 ('SO-2024-001', 2, 1, NULL, 4);
 
--- Order 2: Pending (Id = 1)
+-- Order 2: Pending (StatusId = 1)
 INSERT INTO dbo.SalesOrders (OrderNumber, EmployeeId, CustomerCompanyId, CustomerPersonId, OrderStatusId) VALUES 
 ('SO-2024-002', 2, NULL, 1, 1);
 GO
@@ -172,23 +181,24 @@ INSERT INTO dbo.SalesOrderDetails (OrderId, ProductId, WarehouseId, Quantity, Un
 (2, 3, 2, 1, 2000000, 200000, 10.00);  
 GO
 
--- BỔ SUNG DỮ LIỆU CHO HÓA ĐƠN (Để khớp với Schema mới)
+-- Hóa đơn (Invoice) - Tính toán lại TotalAmount cho khớp với Order Details
+-- SO-001: ((2 * 25tr - 1tr) + (5 * 2.5tr - 0)) * 1.1 = (49tr + 12.5tr) * 1.1 = 61.5tr * 1.1 = 67,650,000
 INSERT INTO dbo.Invoices (InvoiceNumber, OrderId, TotalAmount, IsPaid) VALUES 
-('INV-2024-001', 1, 61500000, 1); -- Giả định tổng tiền cho SO-001
+('INV-2024-001', 1, 67650000, 1); 
 GO
 
 INSERT INTO dbo.Payments (InvoiceId, Amount, PaymentMethod) VALUES 
-(1, 61500000, 'Bank Transfer');
+(1, 67650000, 'Bank Transfer');
 GO
 
 -- =============================================
--- 7. Purchase Management (Thay đổi OrderStatus -> OrderStatusId)
+-- 7. QUẢN LÝ NHẬP HÀNG (PURCHASE)
 -- =============================================
--- PO 1: Received (Id = 3)
+-- PO 1: Received (StatusId = 3)
 INSERT INTO dbo.PurchaseOrders (PONumber, EmployeeId, VendorCompanyId, VendorPersonId, OrderStatusId) VALUES 
 ('PO-2024-001', 1, 1, NULL, 3);
 
--- PO 2: Draft (Id = 1)
+-- PO 2: Draft (StatusId = 1)
 INSERT INTO dbo.PurchaseOrders (PONumber, EmployeeId, VendorCompanyId, VendorPersonId, OrderStatusId) VALUES 
 ('PO-2024-002', 1, NULL, 1, 1);
 GO
@@ -200,7 +210,7 @@ INSERT INTO dbo.PurchaseOrderDetails (POId, ProductId, WarehouseId, Quantity, Un
 GO
 
 -- =============================================
--- 8. Logs
+-- 8. LOGS
 -- =============================================
 INSERT INTO dbo.Logs (EmployeeId, Action) VALUES 
 (1, 'Initialize database system'),

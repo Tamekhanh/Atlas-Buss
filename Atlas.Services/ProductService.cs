@@ -20,6 +20,7 @@ namespace Atlas.Services.Inventory
         {
             // Viết logic kiểm tra (ví dụ: cấm tạo giá âm)
             if (product.SalePrice <= 0) return false;
+            if (product.UnitId <= 0) return false;
 
             return await _productRepository.AddAsync(product);
         }

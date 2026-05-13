@@ -16,3 +16,6 @@ D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\refint\Atlas.Services.dll
 D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\Atlas.Services.pdb
 D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\ref\Atlas.Services.dll
 D:\MyWebsite\Atlas\Atlas.Services\obj\Debug\net10.0\Atlas.Services.sourcelink.json
+d:\MyWebsite\Atlas\_build_temp\Atlas.Services.deps.json
+d:\MyWebsite\Atlas\_build_temp\Atlas.Services.dll
+d:\MyWebsite\Atlas\_build_temp\Atlas.Services.pdb

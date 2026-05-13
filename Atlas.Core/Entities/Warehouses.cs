@@ -17,6 +17,7 @@ namespace Atlas.Core.Entities
         public int WarehouseId { get; set; }
         public int ProductId { get; set; }
         public int Quantity { get; set; }
+        public int ReservedQuantity { get; set; }
         public DateTime LastUpdated { get; set; } = DateTime.Now;
 
         public Warehouse? Warehouse { get; set; }
