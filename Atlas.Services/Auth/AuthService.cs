@@ -37,11 +37,9 @@ namespace Atlas.Services.Auth
             await _authRepository.UpdateLastLoginAsync(account.EmployeeId, DateTime.UtcNow);
             await _logService.AddLogAsync(account.EmployeeId, "User login");
 
-            var permissionKeys = account.Role?.RolePermissions?
-                .Where(rp => rp.Permission is not null && !string.IsNullOrWhiteSpace(rp.Permission.PermissionKey))
-                .Select(rp => rp.Permission!.PermissionKey)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList() ?? new List<string>();
+            var permissionKeys = account.RoleId.HasValue
+                ? await _authRepository.GetPermissionKeysByRoleIdAsync(account.RoleId.Value)
+                : new List<string>();
 
             bool hasPermission(string token) =>
                 permissionKeys.Any(key => key.Contains(token, StringComparison.OrdinalIgnoreCase));
@@ -50,9 +48,9 @@ namespace Atlas.Services.Auth
             {
                 EmployeeId = account.EmployeeId,
                 Username = account.Username,
-                FullName = account.Employee?.FullName ?? string.Empty,
+                FullName = string.Join(' ', new[] { account.FirstName, account.LastName }.Where(part => !string.IsNullOrWhiteSpace(part))).Trim(),
                 RoleId = account.RoleId,
-                RoleName = account.Role?.RoleName,
+                RoleName = account.RoleName,
                 PermissionKeys = permissionKeys,
                 CanProduct = hasPermission("PRODUCT"),
                 CanSale = hasPermission("SALE"),

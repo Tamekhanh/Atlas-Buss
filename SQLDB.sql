@@ -225,7 +225,7 @@ CREATE TABLE dbo.Products(
     id int identity(1,1) primary key,
     ProductName nvarchar(100) not null,
     ProductCode nvarchar(50) not null UNIQUE,
-    UnitId int not null, -- BỔ SUNG: Đơn vị tính (FK)
+    UnitId int null, -- Could be serviced by a default unit if null, but allowing null for flexibility
     ImageUrl nvarchar(255) null,
     SalePrice decimal(18,2) not null,
     CostPrice decimal(18,2) not null,

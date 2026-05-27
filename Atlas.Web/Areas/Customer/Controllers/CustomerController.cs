@@ -57,13 +57,13 @@ namespace Atlas.Web.Areas.Customer.Controllers
 
             if (!created)
             {
-                ModelState.AddModelError(string.Empty, "Khong the tao Customer moi.");
+                ModelState.AddModelError(string.Empty, "Failed to create new customer.");
                 return View(model);
             }
 
 
 
-            TempData["SuccessMessage"] = "Tao moi Customer thanh cong.";
+            TempData["SuccessMessage"] = "Created new customer successfully.";
             var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (int.TryParse(employeeIdValue, out var employeeId))
             {

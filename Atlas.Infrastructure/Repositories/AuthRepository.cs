@@ -1,5 +1,6 @@
 using Atlas.Core.Entities;
 using Atlas.Core.Interfaces;
+using Atlas.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Atlas.Infrastructure.Repositories
@@ -13,15 +14,41 @@ namespace Atlas.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<EmployeeAccount?> GetByUsernameAsync(string username)
+        public async Task<AuthAccountSnapshot?> GetByUsernameAsync(string username)
         {
             return await _context.EmployeeAccounts
-                .Include(account => account.Employee)
-                    .ThenInclude(employee => employee!.Person)
-                .Include(account => account.Role)
-                    .ThenInclude(role => role!.RolePermissions)
-                        .ThenInclude(rolePermission => rolePermission.Permission)
-                .FirstOrDefaultAsync(account => account.Username == username);
+                .AsNoTracking()
+                .Where(account => account.Username == username)
+                .Select(account => new AuthAccountSnapshot
+                {
+                    EmployeeId = account.EmployeeId,
+                    Username = account.Username,
+                    PasswordHash = account.PasswordHash,
+                    IsActive = account.IsActive,
+                    RoleId = account.RoleId,
+                    RoleName = account.Role != null ? account.Role.RoleName : null,
+                    FirstName = account.Employee != null && account.Employee.Person != null ? account.Employee.Person.FirstName : string.Empty,
+                    LastName = account.Employee != null && account.Employee.Person != null ? account.Employee.Person.LastName : string.Empty
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<string>> GetPermissionKeysByRoleIdAsync(int roleId)
+        {
+            return await _context.RolePermissions
+                .AsNoTracking()
+                .Where(rolePermission => rolePermission.RoleId == roleId)
+                .Select(rolePermission => rolePermission.Permission!.PermissionKey)
+                .Where(permissionKey => !string.IsNullOrWhiteSpace(permissionKey))
+                .Distinct()
+                .ToListAsync();
+        }
+
+        public async Task<bool> IsActiveByUsernameAsync(string username)
+        {
+            return await _context.EmployeeAccounts
+                .AsNoTracking()
+                .AnyAsync(account => account.Username == username && account.IsActive);
         }
 
         public async Task<bool> UsernameExistsAsync(string username)

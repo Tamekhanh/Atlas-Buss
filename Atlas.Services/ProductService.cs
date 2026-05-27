@@ -30,6 +30,16 @@ namespace Atlas.Services.Inventory
             return await _productRepository.GetAllAsync();
         }
 
+        public async Task<IEnumerable<Products>> SearchByNameAsync(string searchTerm)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return await _productRepository.GetAllAsync();
+            }
+
+            return await _productRepository.SearchByNameAsync(searchTerm.Trim());
+        }
+
         public async Task<Products> GetProductByIdAsync(int id)
         {
             return await _productRepository.GetByIdAsync(id);

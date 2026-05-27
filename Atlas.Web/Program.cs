@@ -31,9 +31,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
                 }
 
                 var authRepository = context.HttpContext.RequestServices.GetRequiredService<IAuthRepository>();
-                var account = await authRepository.GetByUsernameAsync(username);
+                var isActive = await authRepository.IsActiveByUsernameAsync(username);
 
-                if (account is null || !account.IsActive)
+                if (!isActive)
                 {
                     context.RejectPrincipal();
                     await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

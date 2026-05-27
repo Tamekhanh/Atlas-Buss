@@ -22,6 +22,17 @@ namespace Atlas.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Products>> SearchByNameAsync(string searchTerm)
+        {
+            return await _context.Products
+                .Include(product => product.Employee)
+                .ThenInclude(employee => employee.Person)
+                .AsNoTracking()
+                .Where(product => product.ProductName.Contains(searchTerm)
+                || product.ProductCode.Contains(searchTerm))
+                .ToListAsync();
+        }
+
         public async Task<Products> GetByIdAsync(int id)
         {
             return await _context.Products
