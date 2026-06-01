@@ -15,10 +15,24 @@ namespace Atlas.Web.Areas.LogPage.Controllers
             _logService = logService;
         }
 
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<IActionResult> Index(DateTime? startDate = null, DateTime? endDate = null, int? employeeId = null, string? searchTerm = null)
         {
-            var logs = await _logService.GetAllLogsAsync();
-            return View("~/Areas/LogPage/Views/LogPage/Index.cshtml", logs);
+            if (!startDate.HasValue && !endDate.HasValue && !employeeId.HasValue && string.IsNullOrWhiteSpace(searchTerm))
+            {
+                var logs = await _logService.GetAllLogsAsync();
+                return View("~/Areas/LogPage/Views/LogPage/Index.cshtml", logs);
+            }
+
+            var filteredLogs = await _logService.GetLogsByDateRangeAsync(startDate, endDate, employeeId, searchTerm);
+            return View("~/Areas/LogPage/Views/LogPage/Index.cshtml", filteredLogs);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> FilterLogs(DateTime? startDate, DateTime? endDate, int? employeeId, string? searchTerm)
+        {
+            var logs = await _logService.GetLogsByDateRangeAsync(startDate, endDate, employeeId, searchTerm);
+            return PartialView("~/Areas/LogPage/Views/LogPage/_LogTable.cshtml", logs);
         }
     }
 }

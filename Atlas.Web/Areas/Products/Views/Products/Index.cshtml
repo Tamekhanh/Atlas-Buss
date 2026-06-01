@@ -13,8 +13,63 @@
         <a asp-area="Products" asp-controller="Product" asp-action="Create" class="btn btn-primary">Create Product</a>
     </div>
     <div class ="search-contain">
-        <form asp-area="Products" asp-controller="Product" asp-action="Search" method="get" class="d-flex gap-2 mb-3">
+        @{
+            var q = ViewContext.HttpContext.Request.Query;
+            var isActiveQ = q["isActive"].ToString();
+            var onSaleQ = q["onSale"].ToString();
+        }
+        <form asp-area="Products" asp-controller="Product" asp-action="Search" method="get" class="d-flex gap-2 mb-3 align-items-center">
             <input type="text" name="searchTerm" value="@(ViewContext.HttpContext.Request.Query["searchTerm"].ToString())" class="form-control" placeholder="Search by name or code" />
+
+            <input type="text"
+                   name="category"
+                   value="@(ViewContext.HttpContext.Request.Query["category"].ToString())"
+                   class="form-control"
+                   style="width:220px"
+                   placeholder="Search category" />
+
+            <select name="isActive" class="form-select" style="width:140px">
+                @if (string.IsNullOrEmpty(isActiveQ))
+                {
+                    <option value="" selected>All</option>
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                }
+                else if (isActiveQ == "true")
+                {
+                    <option value="">All</option>
+                    <option value="true" selected>Active</option>
+                    <option value="false">Inactive</option>
+                }
+                else
+                {
+                    <option value="">All</option>
+                    <option value="true">Active</option>
+                    <option value="false" selected>Inactive</option>
+                }
+            </select>
+
+            <select name="onSale" class="form-select" style="width:140px">
+                @if (string.IsNullOrEmpty(onSaleQ))
+                {
+                    <option value="" selected>All</option>
+                    <option value="true">On sale</option>
+                    <option value="false">Not on sale</option>
+                }
+                else if (onSaleQ == "true")
+                {
+                    <option value="">All</option>
+                    <option value="true" selected>On sale</option>
+                    <option value="false">Not on sale</option>
+                }
+                else
+                {
+                    <option value="">All</option>
+                    <option value="true">On sale</option>
+                    <option value="false" selected>Not on sale</option>
+                }
+            </select>
+
             <button type="submit" class="btn btn-outline-secondary">Search</button>
         </form>
     </div>

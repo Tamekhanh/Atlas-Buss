@@ -45,6 +45,15 @@ namespace Atlas.Services.Inventory
             return await _productRepository.GetByIdAsync(id);
         }
 
+        public async Task<IEnumerable<Products>> GetProductFilterAsync(string? searchTerm = null, string? category = null, bool? isActive = null, bool? onSale = null)
+        {
+            return await _productRepository.GetProductFilterAsync(
+                string.IsNullOrWhiteSpace(searchTerm) ? null : searchTerm.Trim(),
+                category,
+                isActive,
+                onSale);
+        }
+
         public async Task<bool> UpdateProductAsync(Products product)
         {
             if (product.SalePrice <= 0) return false;

@@ -42,6 +42,12 @@ namespace Atlas.Services
             return logs.Select(MapToModel);
         }
 
+        public async Task<IEnumerable<LogModel>> GetLogsByDateRangeAsync(DateTime? startDate = null, DateTime? endDate = null, int? employeeId = null, string? searchTerm = null)
+        {
+            var logs = await _logRepository.GetLogsByDateRangeAsync(startDate, endDate, employeeId, searchTerm);
+            return logs.Select(MapToModel);
+        }
+
         private static LogModel MapToModel(Log log)
         {
             return new LogModel

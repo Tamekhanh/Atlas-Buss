@@ -82,6 +82,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcTG9nUGFnZVxWaWV3c1xMb2dQYWdlXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/MyWebsite/Atlas/Atlas.Web/Areas/LogPage/Views/LogPage/_LogTable.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcTG9nUGFnZVxWaWV3c1xMb2dQYWdlXF9Mb2dUYWJsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/MyWebsite/Atlas/Atlas.Web/Areas/LogPage/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcTG9nUGFnZVxWaWV3c1xfVmlld0ltcG9ydHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -112,6 +116,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/MyWebsite/Atlas/Atlas.Web/Areas/Vendor/Views/Vendor/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcVmVuZG9yXFZpZXdzXFZlbmRvclxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/MyWebsite/Atlas/Atlas.Web/Areas/Vendor/Views/Vendor/Detail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcVmVuZG9yXFZpZXdzXFZlbmRvclxEZXRhaWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/MyWebsite/Atlas/Atlas.Web/Areas/Vendor/Views/Vendor/Index.cshtml]

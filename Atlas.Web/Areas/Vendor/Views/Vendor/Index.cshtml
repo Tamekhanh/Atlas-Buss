@@ -35,7 +35,7 @@
                 {
                     foreach (var item in Model)
                     {
-                        <tr>
+                        <tr class="clickable-row" tabindex="0" role="link" data-href="@Url.Action("Detail", "Vendor", new { area = "Vendor", registrationType = item.RegistrationType, id = item.Id })">
                             <td>@item.RegistrationType</td>
                             <td>@item.Name</td>
                             <td>@(string.IsNullOrWhiteSpace(item.TaxId) ? "N/A" : item.TaxId)</td>

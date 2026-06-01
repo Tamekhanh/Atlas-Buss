@@ -27,9 +27,9 @@ namespace Atlas.Web.Areas.Products.Controllers
             return View("~/Areas/Products/Views/Products/Index.cshtml", products);
         }
 
-        public async Task<IActionResult> Search(string searchTerm)
+        public async Task<IActionResult> Search(string searchTerm, string? category, bool? isActive, bool? onSale)
         {
-            var products = await _productService.SearchByNameAsync(searchTerm);
+            var products = await _productService.GetProductFilterAsync(searchTerm, category, isActive, onSale);
             return View("~/Areas/Products/Views/Products/Index.cshtml", products);
         }
 

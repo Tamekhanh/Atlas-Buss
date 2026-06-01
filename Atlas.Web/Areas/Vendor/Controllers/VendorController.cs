@@ -29,6 +29,25 @@ namespace Atlas.Web.Areas.Vendor.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Detail(VendorRegistrationType registrationType, int id)
+        {
+            VendorManagementViewModel? vendor = registrationType == VendorRegistrationType.Company
+                ? (await _vendorCompanyService.GetAllAsync())
+                    .Select(MapCompany)
+                    .FirstOrDefault(item => item.Id == id)
+                : (await _vendorPersonService.GetAllAsync())
+                    .Select(MapPerson)
+                    .FirstOrDefault(item => item.Id == id);
+
+            if (vendor is null)
+            {
+                return NotFound();
+            }
+
+            return View("~/Areas/Vendor/Views/Vendor/Detail.cshtml", vendor);
+        }
+
+        [HttpGet]
         public IActionResult Create()
         {
             return View(new VendorCreateViewModel());
@@ -112,6 +131,7 @@ namespace Atlas.Web.Areas.Vendor.Controllers
         {
             return new VendorManagementViewModel
             {
+                Id = company.Id,
                 RegistrationType = VendorRegistrationType.Company,
                 Name = company.Company?.CompanyName ?? string.Empty,
                 TaxId = company.Company?.TaxId ?? string.Empty,
@@ -125,6 +145,7 @@ namespace Atlas.Web.Areas.Vendor.Controllers
         {
             return new VendorManagementViewModel
             {
+                Id = person.Id,
                 RegistrationType = VendorRegistrationType.Person,
                 Name = person.Person != null ? $"{person.Person.FirstName} {person.Person.LastName}".Trim() : string.Empty,
                 TaxId = person.TaxId ?? string.Empty,

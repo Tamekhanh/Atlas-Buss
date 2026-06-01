@@ -11,6 +11,7 @@ namespace Atlas.Core.Interfaces
         Task<bool> AddAsync(Products product);
         Task<bool> UpdateAsync(Products product);
         Task<bool> DeleteAsync(int id);
+        Task<IEnumerable<Products>> GetProductFilterAsync(string? searchTerm, string? category = null, bool? isActive = null, bool? onSale = null);
         Task<IEnumerable<Products>> SearchByNameAsync(string searchTerm);
     }
 }
