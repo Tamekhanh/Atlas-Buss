@@ -3,6 +3,7 @@ using Atlas.Core.Entities;
 using Atlas.Web.Areas.Products.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using ProductEntity = Atlas.Core.Entities.Products;
 
@@ -13,11 +14,13 @@ namespace Atlas.Web.Areas.Products.Controllers
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly ILogService _logService;
 
-        public ProductController(IProductService productService, ILogService logService)
+        public ProductController(IProductService productService, ICategoryRepository categoryRepository, ILogService logService)
         {
             _productService = productService;
+            _categoryRepository = categoryRepository;
             _logService = logService;
         }
 
@@ -45,12 +48,16 @@ namespace Atlas.Web.Areas.Products.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View("~/Areas/Products/Views/Products/Create.cshtml", new ProductModelView
+            var model = new ProductModelView
             {
-                EmployeeId = GetCurrentEmployeeId()
-            });
+                EmployeeId = GetCurrentEmployeeId(),
+                AvailableCategories = Array.Empty<SelectListItem>()
+            };
+
+            await PopulateCategoriesAsync(model);
+            return View("~/Areas/Products/Views/Products/Create.cshtml", model);
         }
 
         [HttpPost]
@@ -58,6 +65,7 @@ namespace Atlas.Web.Areas.Products.Controllers
         public async Task<IActionResult> Create(ProductModelView model)
         {
             model.EmployeeId = GetCurrentEmployeeId();
+            await PopulateCategoriesAsync(model);
 
             if (model.EmployeeId <= 0)
             {
@@ -91,7 +99,7 @@ namespace Atlas.Web.Areas.Products.Controllers
                 }
             };
 
-            var created = await _productService.CreateProductAsync(product);
+            var created = await _productService.CreateProductAsync(product, model.CategoryIds, model.NewCategoryName);
             if (!created)
             {
                 ModelState.AddModelError(string.Empty, "Could not create product.");
@@ -111,6 +119,19 @@ namespace Atlas.Web.Areas.Products.Controllers
         {
             var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.TryParse(employeeIdValue, out var employeeId) ? employeeId : 0;
+        }
+
+        private async Task PopulateCategoriesAsync(ProductModelView model)
+        {
+            var categories = await _categoryRepository.GetAllAsync();
+            model.AvailableCategories = categories
+                .OrderBy(category => category.CategoryName)
+                .Select(category => new SelectListItem
+                {
+                    Value = category.Id.ToString(),
+                    Text = category.CategoryName
+                })
+                .ToList();
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Atlas.Web.Areas.Products.Models
 {
@@ -52,5 +53,10 @@ namespace Atlas.Web.Areas.Products.Models
         public string? Manufacturer { get; set; }
 
         public List<int> CategoryIds { get; set; } = new();
+
+        [StringLength(100)]
+        public string? NewCategoryName { get; set; }
+
+        public IEnumerable<SelectListItem> AvailableCategories { get; set; } = Enumerable.Empty<SelectListItem>();
     }
 }

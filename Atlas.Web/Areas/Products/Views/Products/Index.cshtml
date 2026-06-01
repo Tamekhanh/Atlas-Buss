@@ -93,7 +93,7 @@
                 {
                     foreach (var product in Model)
                     {
-                        <tr class="clickable-row" tabindex="0" role="link" data-href="@Url.Action("Detail", "Product", new { area = "Products", id = product.Id })">
+                        <tr  class="clickable-row" tabindex="0" role="link" data-href="@Url.Content($"~/Products/Detail/{product.Id}")">
                             <td>@product.Id</td>
                             <td>
                                 <a asp-area="Products"

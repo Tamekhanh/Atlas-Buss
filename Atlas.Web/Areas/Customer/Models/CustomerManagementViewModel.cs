@@ -8,6 +8,7 @@ namespace Atlas.Web.Areas.Customer.Models
 
     public class CustomerManagementViewModel
     {
+        public int Id { get; set; }
         public CustomerRegistrationType RegistrationType { get; set; }
         public string Name { get; set; } = string.Empty;
         public string TaxId { get; set; } = string.Empty;

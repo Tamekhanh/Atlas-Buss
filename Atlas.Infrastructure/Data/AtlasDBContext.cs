@@ -562,7 +562,7 @@ namespace Atlas.Infrastructure
                     .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(cp => cp.Product)
-                    .WithMany()
+                    .WithMany(product => product.CategoryProducts)
                     .HasForeignKey(cp => cp.ProductId)
                     .OnDelete(DeleteBehavior.Cascade);
             });

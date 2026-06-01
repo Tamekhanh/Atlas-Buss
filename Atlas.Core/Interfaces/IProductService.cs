@@ -9,7 +9,7 @@ namespace Atlas.Core.Interfaces
     {
         Task<IEnumerable<Products>> GetAllProductsAsync();
         Task<Products> GetProductByIdAsync(int id);
-        Task<bool> CreateProductAsync(Products product);
+        Task<bool> CreateProductAsync(Products product, IEnumerable<int>? categoryIds = null, string? newCategoryName = null);
         Task<bool> UpdateProductAsync(Products product);
         Task<bool> DeleteProductAsync(int id);
         Task<IEnumerable<Products>> SearchByNameAsync(string searchTerm);

@@ -33,6 +33,15 @@ namespace Atlas.Infrastructure.Repositories
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
+            public async Task<Category?> FindByNameAsync(string categoryName)
+            {
+                var normalizedName = categoryName.Trim();
+
+                return await _context.Categories
+                .AsNoTracking()
+                .FirstOrDefaultAsync(category => category.CategoryName == normalizedName);
+            }
+
         public async Task<bool> AddAsync(Category category)
         {
             await _context.Categories.AddAsync(category);

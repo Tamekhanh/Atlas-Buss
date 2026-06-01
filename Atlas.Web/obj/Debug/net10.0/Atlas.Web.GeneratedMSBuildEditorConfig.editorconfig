@@ -19,13 +19,13 @@ build_property.TargetFrameworkIdentifier = .NETCoreApp
 build_property.TargetFrameworkVersion = v10.0
 build_property.RootNamespace = Atlas.Web
 build_property.RootNamespace = Atlas.Web
-build_property.ProjectDir = D:\MyWebsite\Atlas\Atlas.Web\
+build_property.ProjectDir = d:\MyWebsite\Atlas\Atlas.Web\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\MyWebsite\Atlas\Atlas.Web
+build_property.MSBuildProjectDirectory = d:\MyWebsite\Atlas\Atlas.Web
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
@@ -48,6 +48,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [D:/MyWebsite/Atlas/Atlas.Web/Areas/Customer/Views/Customer/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQ3VzdG9tZXJcVmlld3NcQ3VzdG9tZXJcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/MyWebsite/Atlas/Atlas.Web/Areas/Customer/Views/Customer/Detail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQ3VzdG9tZXJcVmlld3NcQ3VzdG9tZXJcRGV0YWlsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/MyWebsite/Atlas/Atlas.Web/Areas/Customer/Views/Customer/Index.cshtml]

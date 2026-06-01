@@ -20,6 +20,7 @@
         public Employee? Employee { get; set; }
         public ProductDetails? ProductDetail { get; set; }
         public ICollection<ProductTax> ProductTaxes { get; set; } = new List<ProductTax>();
+        public ICollection<CategoryProduct> CategoryProducts { get; set; } = new List<CategoryProduct>();
         public Units? Unit { get; set; }
     }
 

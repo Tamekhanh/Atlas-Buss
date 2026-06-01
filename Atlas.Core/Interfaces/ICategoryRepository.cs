@@ -8,6 +8,7 @@ namespace Atlas.Core.Interfaces
     {
         Task<IEnumerable<Category>> GetAllAsync();
         Task<Category> GetByIdAsync(int id);
+        Task<Category?> FindByNameAsync(string categoryName);
         Task<bool> AddAsync(Category category);
         Task<bool> UpdateAsync(Category category);
         Task<bool> DeleteAsync(int id);

@@ -32,6 +32,25 @@ namespace Atlas.Web.Areas.Customer.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Detail(CustomerRegistrationType registrationType, int id)
+        {
+            CustomerManagementViewModel? customer = registrationType == CustomerRegistrationType.Company
+                ? (await _customerCompanyService.GetAllAsync())
+                    .Select(MapCompany)
+                    .FirstOrDefault(item => item.Id == id)
+                : (await _customerPersonService.GetAllAsync())
+                    .Select(MapPerson)
+                    .FirstOrDefault(item => item.Id == id);
+
+            if (customer is null)
+            {
+                return NotFound();
+            }
+
+            return View("~/Areas/Customer/Views/Customer/Detail.cshtml", customer);
+        }
+
+        [HttpGet]
         public IActionResult Create()
         {
             return View(new CustomerCreateViewModel());
@@ -123,6 +142,7 @@ namespace Atlas.Web.Areas.Customer.Controllers
         {
             return new CustomerManagementViewModel
             {
+                Id = company.Id,
                 RegistrationType = CustomerRegistrationType.Company,
                 Name = company.Company?.CompanyName ?? string.Empty,
                 TaxId = company.Company?.TaxId ?? string.Empty,
@@ -136,6 +156,7 @@ namespace Atlas.Web.Areas.Customer.Controllers
         {
             return new CustomerManagementViewModel
             {
+                Id = person.Id,
                 RegistrationType = CustomerRegistrationType.Person,
                 Name = person.Person != null ? $"{person.Person.FirstName} {person.Person.LastName}".Trim() : string.Empty,
                 TaxId = person.TaxId ?? string.Empty,
