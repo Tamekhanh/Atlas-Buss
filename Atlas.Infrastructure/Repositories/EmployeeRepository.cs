@@ -63,5 +63,32 @@ namespace Atlas.Infrastructure.Repositories
             _context.Employees.Remove(employee);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<IEnumerable<Employee>> SearchEmployeesAsync(string? searchTerm = null, string? EmployeeNumber = null)
+        {
+            searchTerm = searchTerm?.Trim();
+            EmployeeNumber = EmployeeNumber?.Trim();
+
+            var query = _context.Employees
+                .Include(employee => employee.Person)
+                .ThenInclude(person => person!.Address)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(employee =>
+                    employee.Person.FirstName.Contains(searchTerm) ||
+                    employee.Person.LastName.Contains(searchTerm));
+            }
+
+            if (!string.IsNullOrWhiteSpace(EmployeeNumber))
+            {
+                query = query.Where(employee => employee.EmployeeNumber.Contains(EmployeeNumber));
+            }
+
+            return await query
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }

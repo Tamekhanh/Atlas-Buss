@@ -9,5 +9,6 @@ namespace Atlas.Core.Interfaces
         Task<bool> AddAsync(Employee employee);
         Task<bool> UpdateAsync(Employee employee);
         Task<bool> DeleteAsync(int id);
+        Task<IEnumerable<Employee>> SearchEmployeesAsync(string? searchTerm = null, string? EmployeeNumber = null);
     }
 }

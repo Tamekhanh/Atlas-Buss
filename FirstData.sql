@@ -9,24 +9,28 @@ GO
 INSERT INTO dbo.Roles (RoleName, Description) VALUES 
 ('Administrator', 'Full system access'),
 ('Sales Staff', 'Access to sales and inventory'),
-('HR Manager', 'Access to personnel and administration');
+('HR Manager', 'Access to personnel and administration'),
+('Product Manager', 'Can create and manage products');
 GO
 
 -- Seed Permissions
 INSERT INTO dbo.Permissions (PermissionKey, Description) VALUES 
 ('PRODUCT_MANAGE', 'Manage products and categories'),
 ('SALE_CREATE', 'Create and edit sales orders'),
+('PURCHASE_CREATE', 'Create and edit purchase orders'),
 ('EMPLOYEE_MANAGE', 'Manage employee records'),
 ('INVENTORY_MANAGE', 'Manage warehouse and stock'),
 ('ADMIN_ALL', 'Full administrative access'),
-('HR_MANAGE', 'Manage HR and departments');
+('HR_MANAGE', 'Manage HR and departments'),
+('PRODUCT_CREATE', 'Create products');
 GO
 
 -- Seed RolePermissions
 INSERT INTO dbo.RolePermissions (RoleId, PermissionId) VALUES 
-(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), -- Admin
+(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), -- Admin
 (2, 1), (2, 2), (2, 4),                         -- Sales
-(3, 1), (3, 3), (3, 5), (3, 6);                 -- HR
+(3, 1), (3, 3), (3, 5), (3, 6),                 -- HR
+(4, 7);                                         -- Product Manager
 GO
 
 -- Seed Sales Order Statuses
@@ -104,6 +108,26 @@ INSERT INTO dbo.EmployeeAccounts (EmployeeId, Username, PasswordHash, RoleId) VA
 (1, 'admin_atlas', 'A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3', 1),
 (2, 'sales_staff', 'hash_password_2', 2),
 (3, 'hr_admin', 'hash_password_3', 3);
+GO
+
+INSERT INTO dbo.Addresses (AddressType, Street, City, State, Country) VALUES 
+('Office', '222 Nguyen Van Linh Street', 'District 7', 'Ho Chi Minh City', 'Vietnam');
+GO
+
+INSERT INTO dbo.Contacts (Phone, Email) VALUES 
+('0922333444', 'product.manager@atlas.com');
+GO
+
+INSERT INTO dbo.Persons (FirstName, LastName, DoB, AddressId, ContactId) VALUES 
+('Minh', 'Pham', '1993-08-12', 5, 5);
+GO
+
+INSERT INTO dbo.Employee (EmployeeNumber, PersonId) VALUES 
+('EMP004', 5);
+GO
+
+INSERT INTO dbo.EmployeeAccounts (EmployeeId, Username, PasswordHash, RoleId) VALUES 
+(4, 'product_manager', 'Atlas@123', 4);
 GO
 
 INSERT INTO dbo.Departments (DepartmentName, Description, ParentDepartmentId) VALUES 

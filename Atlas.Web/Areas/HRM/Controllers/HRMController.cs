@@ -31,5 +31,11 @@ namespace Atlas.Web.Areas.HRM.Controllers
 
             return View("~/Areas/HRM/Views/Home/Detail.cshtml", employee);
         }
+
+        public async Task<IActionResult> Search(string? searchTerm = null, string? employeeNumber = null)
+        {
+            var employees = await _employeeService.SearchEmployeesAsync(searchTerm, employeeNumber);
+            return View("~/Areas/HRM/Views/Home/Index.cshtml", employees);
+        }
     }
 }

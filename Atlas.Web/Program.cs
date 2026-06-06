@@ -42,7 +42,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ProductCreate", policy =>
+        policy.RequireClaim("permission", "PRODUCT_MANAGE", "PRODUCT_CREATE"));
+});
 
 builder.Services.AddAtlasInfrastructure(builder.Configuration);
 builder.Services.AddAtlasApplicationServices();

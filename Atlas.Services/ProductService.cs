@@ -98,9 +98,50 @@ namespace Atlas.Services.Inventory
                 onSale);
         }
 
-        public async Task<bool> UpdateProductAsync(Products product)
+        public async Task<bool> UpdateProductAsync(Products product, IEnumerable<int>? categoryIds = null, string? newCategoryName = null)
         {
             if (product.SalePrice <= 0) return false;
+
+            var distinctCategoryIds = (categoryIds ?? Enumerable.Empty<int>())
+                .Where(categoryId => categoryId > 0)
+                .Distinct()
+                .ToList();
+
+            if (!string.IsNullOrWhiteSpace(newCategoryName))
+            {
+                var trimmedCategoryName = newCategoryName.Trim();
+                var existingCategory = await _categoryRepository.FindByNameAsync(trimmedCategoryName);
+
+                if (existingCategory is null)
+                {
+                    var createdCategory = new Category
+                    {
+                        CategoryName = trimmedCategoryName
+                    };
+
+                    if (!await _categoryRepository.AddAsync(createdCategory))
+                    {
+                        return false;
+                    }
+
+                    distinctCategoryIds.Add(createdCategory.Id);
+                }
+                else
+                {
+                    distinctCategoryIds.Add(existingCategory.Id);
+                }
+            }
+
+            if (distinctCategoryIds.Count > 0)
+            {
+                product.CategoryProducts = distinctCategoryIds
+                    .Distinct()
+                    .Select(categoryId => new CategoryProduct
+                    {
+                        CategoryId = categoryId
+                    })
+                    .ToList();
+            }
 
             return await _productRepository.UpdateAsync(product);
         }

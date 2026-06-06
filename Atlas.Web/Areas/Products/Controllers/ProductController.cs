@@ -44,10 +44,60 @@ namespace Atlas.Web.Areas.Products.Controllers
                 return NotFound();
             }
 
-            return View("~/Areas/Products/Views/Products/Detail.cshtml", product);
+            var model = ToDetailModel(product);
+            await PopulateCategoriesAsync(model);
+            return View("~/Areas/Products/Views/Products/Detail.cshtml", model);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "ProductCreate")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Detail(int id, ProductModelView model)
+        {
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product is null)
+            {
+                return NotFound();
+            }
+
+            model.Id = id;
+
+            product.ProductName = model.ProductName.Trim();
+            product.ProductCode = model.ProductCode.Trim();
+            product.UnitId = model.UnitId > 0 ? model.UnitId : product.UnitId;
+            product.ImageUrl = string.IsNullOrWhiteSpace(model.ImageUrl) ? null : model.ImageUrl.Trim();
+            product.SalePrice = model.SalePrice;
+            product.CostPrice = model.CostPrice;
+            product.Barcode = string.IsNullOrWhiteSpace(model.Barcode) ? null : model.Barcode.Trim();
+            product.IsActive = model.IsActive;
+            product.Onsale = model.Onsale;
+
+            product.ProductDetail ??= new ProductDetails();
+            product.ProductDetail.ProductDescription = string.IsNullOrWhiteSpace(model.ProductDescription) ? null : model.ProductDescription.Trim();
+            product.ProductDetail.Weight = model.Weight;
+            product.ProductDetail.WarrantyPeriod = model.WarrantyPeriod;
+            product.ProductDetail.Dimensions = string.IsNullOrWhiteSpace(model.Dimensions) ? null : model.Dimensions.Trim();
+            product.ProductDetail.Manufacturer = string.IsNullOrWhiteSpace(model.Manufacturer) ? null : model.Manufacturer.Trim();
+
+            var updated = await _productService.UpdateProductAsync(product, model.CategoryIds, model.NewCategoryName);
+            if (!updated)
+            {
+                ModelState.AddModelError(string.Empty, "Could not update product.");
+                await PopulateCategoriesAsync(model);
+                return View("~/Areas/Products/Views/Products/Detail.cshtml", model);
+            }
+
+            var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(employeeIdValue, out var employeeId))
+            {
+                await _logService.AddLogAsync(employeeId, $"Updated product: {product.ProductName} (ID: {product.Id})");
+            }
+
+            return RedirectToRoute("products", new { action = "Detail", id = product.Id });
         }
 
         [HttpGet]
+        [Authorize(Policy = "ProductCreate")]
         public async Task<IActionResult> Create()
         {
             var model = new ProductModelView
@@ -61,6 +111,7 @@ namespace Atlas.Web.Areas.Products.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "ProductCreate")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductModelView model)
         {
@@ -119,6 +170,34 @@ namespace Atlas.Web.Areas.Products.Controllers
         {
             var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return int.TryParse(employeeIdValue, out var employeeId) ? employeeId : 0;
+        }
+
+        private static ProductModelView ToDetailModel(ProductEntity product)
+        {
+            return new ProductModelView
+            {
+                Id = product.Id,
+                ProductName = product.ProductName,
+                ProductCode = product.ProductCode,
+                UnitId = product.UnitId,
+                ImageUrl = product.ImageUrl,
+                SalePrice = product.SalePrice,
+                CostPrice = product.CostPrice,
+                Barcode = product.Barcode,
+                IsActive = product.IsActive,
+                Onsale = product.Onsale,
+                EmployeeId = product.EmployeeId,
+                ProductDescription = product.ProductDetail?.ProductDescription,
+                Weight = product.ProductDetail?.Weight,
+                WarrantyPeriod = product.ProductDetail?.WarrantyPeriod,
+                Dimensions = product.ProductDetail?.Dimensions,
+                Manufacturer = product.ProductDetail?.Manufacturer,
+                CategoryIds = product.CategoryProducts
+                    .Where(categoryProduct => categoryProduct.CategoryId > 0)
+                    .Select(categoryProduct => categoryProduct.CategoryId)
+                    .Distinct()
+                    .ToList()
+            };
         }
 
         private async Task PopulateCategoriesAsync(ProductModelView model)

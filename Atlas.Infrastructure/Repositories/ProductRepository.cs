@@ -18,6 +18,8 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.Products
                 .Include(product => product.Employee)
                 .ThenInclude(employee => employee.Person)
+                .Include(product => product.CategoryProducts)
+                .ThenInclude(categoryProduct => categoryProduct.Category)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -27,6 +29,8 @@ namespace Atlas.Infrastructure.Repositories
             var query = _context.Products
                 .Include(product => product.Employee)
                 .ThenInclude(employee => employee.Person)
+                .Include(product => product.CategoryProducts)
+                .ThenInclude(categoryProduct => categoryProduct.Category)
                 .AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -66,6 +70,8 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.Products
                 .Include(product => product.Employee)
                 .ThenInclude(employee => employee.Person)
+                .Include(product => product.CategoryProducts)
+                .ThenInclude(categoryProduct => categoryProduct.Category)
                 .AsNoTracking()
                 .Where(product => product.ProductName.Contains(term) || product.ProductCode.Contains(term))
                 .ToListAsync();
@@ -76,6 +82,8 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.Products
                 .Include(product => product.Employee)
                 .ThenInclude(employee => employee.Person)
+                .Include(product => product.CategoryProducts)
+                .ThenInclude(categoryProduct => categoryProduct.Category)
                 .Include(product => product.ProductDetail)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(product => product.Id == id);
@@ -89,7 +97,57 @@ namespace Atlas.Infrastructure.Repositories
 
         public async Task<bool> UpdateAsync(Products product)
         {
-            _context.Products.Update(product);
+            var existingProduct = await _context.Products
+                .Include(current => current.ProductDetail)
+                .Include(current => current.CategoryProducts)
+                .FirstOrDefaultAsync(current => current.Id == product.Id);
+
+            if (existingProduct is null)
+            {
+                return false;
+            }
+
+            existingProduct.ProductName = product.ProductName;
+            existingProduct.ProductCode = product.ProductCode;
+            existingProduct.UnitId = product.UnitId;
+            existingProduct.ImageUrl = product.ImageUrl;
+            existingProduct.SalePrice = product.SalePrice;
+            existingProduct.CostPrice = product.CostPrice;
+            existingProduct.Barcode = product.Barcode;
+            existingProduct.IsActive = product.IsActive;
+            existingProduct.Onsale = product.Onsale;
+            existingProduct.UpdatedAt = DateTime.Now;
+
+            if (product.ProductDetail is not null)
+            {
+                if (existingProduct.ProductDetail is null)
+                {
+                    existingProduct.ProductDetail = new ProductDetails
+                    {
+                        ProductId = existingProduct.Id
+                    };
+                }
+
+                existingProduct.ProductDetail.ProductDescription = product.ProductDetail.ProductDescription;
+                existingProduct.ProductDetail.Weight = product.ProductDetail.Weight;
+                existingProduct.ProductDetail.WarrantyPeriod = product.ProductDetail.WarrantyPeriod;
+                existingProduct.ProductDetail.Dimensions = product.ProductDetail.Dimensions;
+                existingProduct.ProductDetail.Manufacturer = product.ProductDetail.Manufacturer;
+            }
+
+            existingProduct.CategoryProducts.Clear();
+            if (product.CategoryProducts is not null)
+            {
+                foreach (var categoryProduct in product.CategoryProducts)
+                {
+                    existingProduct.CategoryProducts.Add(new CategoryProduct
+                    {
+                        ProductId = existingProduct.Id,
+                        CategoryId = categoryProduct.CategoryId
+                    });
+                }
+            }
+
             return await _context.SaveChangesAsync() > 0;
         }
 

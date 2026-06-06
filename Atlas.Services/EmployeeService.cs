@@ -46,5 +46,10 @@ namespace Atlas.Services.HRM
         {
             return await _employeeRepository.DeleteAsync(id);
         }
+
+        public async Task<IEnumerable<Employee>> SearchEmployeesAsync(string? searchTerm = null, string? EmployeeNumber = null)
+        {
+            return await _employeeRepository.SearchEmployeesAsync(searchTerm, EmployeeNumber);
+        }
     }
 }

@@ -1,7 +1,20 @@
-@model ProductEntity
+@model ProductModelView
+@using System.Linq
 
 @{
     ViewData["Title"] = "Product Detail";
+    var canEdit = User.HasClaim("permission", "PRODUCT_CREATE") || User.HasClaim("permission", "PRODUCT_MANAGE");
+    var selectedCategoryIds = new HashSet<int>(Model.CategoryIds ?? new List<int>());
+    var availableCategories = Model.AvailableCategories ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+    var selectedCategories = new List<(int Id, string Name)>();
+
+    foreach (var category in availableCategories)
+    {
+        if (int.TryParse(category.Value, out var categoryId) && selectedCategoryIds.Contains(categoryId))
+        {
+            selectedCategories.Add((categoryId, category.Text ?? string.Empty));
+        }
+    }
 }
 
 <div class="container py-4">
@@ -15,65 +28,308 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <h2 class="h5 mb-3">Basic Information</h2>
-                    <dl class="row mb-0">
-                        <dt class="col-sm-4">Id</dt>
-                        <dd class="col-sm-8">@Model.Id</dd>
+            @if (canEdit)
+            {
+                <form method="post" asp-action="Detail" asp-route-id="@Model.Id">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="UnitId" />
+                    <input type="hidden" asp-for="EmployeeId" />
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h2 class="h5 mb-3">Basic Information</h2>
+                            <div class="mb-3">
+                                <label asp-for="ProductName" class="form-label"></label>
+                                <input asp-for="ProductName" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="ProductCode" class="form-label"></label>
+                                <input asp-for="ProductCode" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Barcode" class="form-label"></label>
+                                <input asp-for="Barcode" class="form-control" />
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <label asp-for="SalePrice" class="form-label"></label>
+                                    <input asp-for="SalePrice" class="form-control" />
+                                </div>
+                                <div class="col-sm-6">
+                                    <label asp-for="CostPrice" class="form-label"></label>
+                                    <input asp-for="CostPrice" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-check form-switch mt-3">
+                                <input asp-for="IsActive" class="form-check-input" />
+                                <label asp-for="IsActive" class="form-check-label"></label>
+                            </div>
+                            <div class="form-check form-switch mt-2">
+                                <input asp-for="Onsale" class="form-check-input" />
+                                <label asp-for="Onsale" class="form-check-label"></label>
+                            </div>
+                        </div>
 
-                        <dt class="col-sm-4">Name</dt>
-                        <dd class="col-sm-8">@Model.ProductName</dd>
+                        <div class="col-md-6">
+                            <h2 class="h5 mb-3">Product Details</h2>
+                            <div class="mb-3">
+                                <label asp-for="ProductDescription" class="form-label"></label>
+                                <textarea asp-for="ProductDescription" class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-sm-4">
+                                    <label asp-for="Weight" class="form-label"></label>
+                                    <input asp-for="Weight" class="form-control" />
+                                </div>
+                                <div class="col-sm-4">
+                                    <label asp-for="WarrantyPeriod" class="form-label"></label>
+                                    <input asp-for="WarrantyPeriod" class="form-control" />
+                                </div>
+                                <div class="col-sm-4">
+                                    <label asp-for="ImageUrl" class="form-label"></label>
+                                    <input asp-for="ImageUrl" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label asp-for="Dimensions" class="form-label"></label>
+                                <input asp-for="Dimensions" class="form-control" />
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Manufacturer" class="form-label"></label>
+                                <input asp-for="Manufacturer" class="form-control" />
+                            </div>
 
-                        <dt class="col-sm-4">Code</dt>
-                        <dd class="col-sm-8">@Model.ProductCode</dd>
+                            <div class="col-12 mt-3">
+                                <label class="form-label fw-semibold d-block">Categories</label>
+                                <div class="dropdown w-100" id="detail-category-picker">
+                                    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" aria-expanded="false">
+                                        Chọn category để gắn vào sản phẩm
+                                    </button>
+                                    <div class="dropdown-menu w-100 p-2 shadow category-picker-menu">
+                                        <div class="d-flex justify-content-between align-items-center gap-2 border-bottom pb-2">
+                                            <span class="fw-semibold small text-muted">Pick categories</span>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" id="detail-category-picker-close">Close</button>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm mb-2" id="detail-category-search" placeholder="Search category" autocomplete="off" />
+                                        <div class="category-option-list overflow-auto pe-1" id="detail-category-option-list">
+                                            @foreach (var category in availableCategories)
+                                            {
+                                                var categoryValue = category.Value ?? string.Empty;
 
-                        <dt class="col-sm-4">Barcode</dt>
-                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Barcode) ? "N/A" : Model.Barcode)</dd>
+                                                if (int.TryParse(categoryValue, out var categoryId))
+                                                {
+                                                    var categoryName = category.Text ?? string.Empty;
+                                                    var isSelected = selectedCategoryIds.Contains(categoryId);
+                                                    <button type="button"
+                                                            class="dropdown-item category-option @(isSelected ? "d-none" : string.Empty)"
+                                                            data-category-id="@categoryId"
+                                                            data-category-name="@categoryName">
+                                                        @categoryName
+                                                    </button>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="border-top pt-2 mt-1">
+                                            <label asp-for="NewCategoryName" class="form-label fw-semibold small mb-1">Không tìm thấy? Tạo mới ngay tại đây</label>
+                                            <input asp-for="NewCategoryName" class="form-control form-control-sm" placeholder="Type a new category name" />
+                                            <small class="text-muted d-block mt-1">Kéo xuống cuối dropdown để tạo category mới và gắn trực tiếp vào sản phẩm này.</small>
+                                            <span asp-validation-for="NewCategoryName" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <dt class="col-sm-4">Sale Price</dt>
-                        <dd class="col-sm-8">@Model.SalePrice.ToString("N0")</dd>
+                                <div class="mt-2 d-flex flex-wrap gap-2" id="detail-category-tag-container">
+                                    @foreach (var category in selectedCategories)
+                                    {
+                                        <span class="badge rounded-pill text-bg-primary category-tag" data-category-id="@category.Id">
+                                            <span class="category-tag-text">@category.Name</span>
+                                            <button type="button" class="btn-close btn-close-white ms-2 category-remove" aria-label="Remove" data-category-id="@category.Id"></button>
+                                            <input type="hidden" name="CategoryIds" value="@category.Id" />
+                                        </span>
+                                    }
+                                </div>
+                                <small class="text-muted d-block mt-2">Chạm vào category trong danh sách để thêm tag. Bấm x để xóa tag.</small>
+                            </div>
+                        </div>
+                    </div>
 
-                        <dt class="col-sm-4">Cost Price</dt>
-                        <dd class="col-sm-8">@Model.CostPrice.ToString("N0")</dd>
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a class="btn btn-outline-secondary" href="@Url.Content("~/Products/Index")">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <h2 class="h5 mb-3">Basic Information</h2>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Id</dt>
+                            <dd class="col-sm-8">@Model.Id</dd>
 
-                        <dt class="col-sm-4">Active</dt>
-                        <dd class="col-sm-8">@(Model.IsActive ? "Yes" : "No")</dd>
+                            <dt class="col-sm-4">Name</dt>
+                            <dd class="col-sm-8">@Model.ProductName</dd>
 
-                        <dt class="col-sm-4">On Sale</dt>
-                        <dd class="col-sm-8">@(Model.Onsale ? "Yes" : "No")</dd>
-                    </dl>
-                </div>
+                            <dt class="col-sm-4">Code</dt>
+                            <dd class="col-sm-8">@Model.ProductCode</dd>
 
-                <div class="col-md-6">
-                    <h2 class="h5 mb-3">Product Details</h2>
-                    @if (Model.ProductDetail != null)
-                    {
+                            <dt class="col-sm-4">Barcode</dt>
+                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Barcode) ? "N/A" : Model.Barcode)</dd>
+
+                            <dt class="col-sm-4">Sale Price</dt>
+                            <dd class="col-sm-8">@Model.SalePrice.ToString("N0")</dd>
+
+                            <dt class="col-sm-4">Cost Price</dt>
+                            <dd class="col-sm-8">@Model.CostPrice.ToString("N0")</dd>
+
+                            <dt class="col-sm-4">Active</dt>
+                            <dd class="col-sm-8">@(Model.IsActive ? "Yes" : "No")</dd>
+
+                            <dt class="col-sm-4">On Sale</dt>
+                            <dd class="col-sm-8">@(Model.Onsale ? "Yes" : "No")</dd>
+                        </dl>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h2 class="h5 mb-3">Product Details</h2>
                         <dl class="row mb-0">
                             <dt class="col-sm-4">Description</dt>
-                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDetail.ProductDescription) ? "N/A" : Model.ProductDetail.ProductDescription)</dd>
+                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDescription) ? "N/A" : Model.ProductDescription)</dd>
 
                             <dt class="col-sm-4">Weight</dt>
-                            <dd class="col-sm-8">@(Model.ProductDetail.Weight.HasValue ? Model.ProductDetail.Weight.Value.ToString("N2") : "N/A")</dd>
+                            <dd class="col-sm-8">@(Model.Weight.HasValue ? Model.Weight.Value.ToString("N2") : "N/A")</dd>
 
                             <dt class="col-sm-4">Warranty</dt>
-                            <dd class="col-sm-8">@(Model.ProductDetail.WarrantyPeriod.HasValue ? $"{Model.ProductDetail.WarrantyPeriod} months" : "N/A")</dd>
+                            <dd class="col-sm-8">@(Model.WarrantyPeriod.HasValue ? $"{Model.WarrantyPeriod} months" : "N/A")</dd>
 
                             <dt class="col-sm-4">Dimensions</dt>
-                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDetail.Dimensions) ? "N/A" : Model.ProductDetail.Dimensions)</dd>
+                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Dimensions) ? "N/A" : Model.Dimensions)</dd>
 
                             <dt class="col-sm-4">Manufacturer</dt>
-                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDetail.Manufacturer) ? "N/A" : Model.ProductDetail.Manufacturer)</dd>
+                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Manufacturer) ? "N/A" : Model.Manufacturer)</dd>
                         </dl>
-                    }
-                    else
-                    {
-                        <div class="alert alert-warning mb-0" role="alert">
-                            Sản phẩm này chưa có dữ liệu trong bảng ProductDetails.
-                        </div>
-                    }
+
+                        <h3 class="h6 mt-4 mb-2">Categories</h3>
+                        @if (selectedCategories.Count > 0)
+                        {
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var category in selectedCategories)
+                                {
+                                    <span class="badge rounded-pill text-bg-primary">@category.Name</span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted">Chưa có category nào.</div>
+                        }
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     </div>
 </div>
+
+@if (canEdit)
+{
+    <script>
+        (() => {
+            const picker = document.getElementById('detail-category-picker');
+            const toggleButton = picker?.querySelector('.dropdown-toggle');
+            const closeButton = document.getElementById('detail-category-picker-close');
+            const searchInput = document.getElementById('detail-category-search');
+            const optionList = document.getElementById('detail-category-option-list');
+            const tagContainer = document.getElementById('detail-category-tag-container');
+            if (!picker || !toggleButton || !searchInput || !optionList || !tagContainer) {
+                return;
+            }
+
+            const getDropdown = () => bootstrap.Dropdown.getOrCreateInstance(toggleButton);
+            const hideDropdown = () => getDropdown().hide();
+            const toggleDropdown = () => getDropdown().toggle();
+
+            toggleButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                toggleDropdown();
+            });
+
+            closeButton?.addEventListener('click', () => hideDropdown());
+
+            const selectedIds = new Set(Array.from(tagContainer.querySelectorAll('input[name="CategoryIds"]')).map(input => Number(input.value)));
+
+            const hideOption = (option) => option.classList.add('d-none');
+            const showOption = (option) => option.classList.remove('d-none');
+
+            const refreshOptions = () => {
+                const query = searchInput.value.trim().toLowerCase();
+                Array.from(optionList.querySelectorAll('.category-option')).forEach(option => {
+                    const id = Number(option.dataset.categoryId);
+                    const name = (option.dataset.categoryName || '').toLowerCase();
+                    if (selectedIds.has(id) || (query && !name.includes(query))) {
+                        hideOption(option);
+                    } else {
+                        showOption(option);
+                    }
+                });
+            };
+
+            const addTag = (id, name) => {
+                if (selectedIds.has(id)) {
+                    return;
+                }
+
+                selectedIds.add(id);
+
+                const tag = document.createElement('span');
+                tag.className = 'badge rounded-pill text-bg-primary category-tag';
+                tag.dataset.categoryId = String(id);
+                tag.innerHTML = `
+                    <span class="category-tag-text"></span>
+                    <button type="button" class="btn-close btn-close-white ms-2 category-remove" aria-label="Remove"></button>
+                    <input type="hidden" name="CategoryIds" value="${id}" />
+                `;
+
+                tag.querySelector('.category-tag-text').textContent = name;
+                tag.querySelector('.category-remove').addEventListener('click', () => removeTag(id));
+                tagContainer.appendChild(tag);
+                refreshOptions();
+                hideDropdown();
+            };
+
+            const removeTag = (id) => {
+                selectedIds.delete(id);
+                const tag = tagContainer.querySelector(`.category-tag[data-category-id="${id}"]`);
+                if (tag) {
+                    tag.remove();
+                }
+                refreshOptions();
+            };
+
+            optionList.addEventListener('click', (event) => {
+                const option = event.target.closest('.category-option');
+                if (!option) {
+                    return;
+                }
+
+                addTag(Number(option.dataset.categoryId), option.dataset.categoryName || option.textContent.trim());
+                searchInput.value = '';
+                refreshOptions();
+            });
+
+            tagContainer.addEventListener('click', (event) => {
+                const removeButton = event.target.closest('.category-remove');
+                if (!removeButton) {
+                    return;
+                }
+
+                removeTag(Number(removeButton.dataset.categoryId));
+            });
+
+            searchInput.addEventListener('input', refreshOptions);
+
+            picker.addEventListener('shown.bs.dropdown', refreshOptions);
+            refreshOptions();
+        })();
+    </script>
+}

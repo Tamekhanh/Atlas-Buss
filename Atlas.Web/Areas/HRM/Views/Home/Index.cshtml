@@ -12,6 +12,21 @@
         </div>
     </div>
 
+    <div class="mb-3">
+        <form method="get" asp-area="HRM" asp-controller="HRM" asp-action="Search" class="row g-2">
+            <div class="col-md-5">
+                <input name="searchTerm" class="form-control" placeholder="Tìm theo tên (Firstname hoặc Lastname)" value="@ViewContext.HttpContext.Request.Query["searchTerm"]" />
+            </div>
+            <div class="col-md-3">
+                <input name="employeeNumber" class="form-control" placeholder="Employee Number" value="@ViewContext.HttpContext.Request.Query["employeeNumber"]" />
+            </div>
+            <div class="col-md-2 d-flex">
+                <button type="submit" class="btn btn-primary me-2">Search</button>
+                <a class="btn btn-outline-secondary" asp-area="HRM" asp-action="Index">Reset</a>
+            </div>
+        </form>
+    </div>
+
     <div class="table-responsive shadow-sm rounded-3 bg-white">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-dark">

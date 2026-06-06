@@ -10,23 +10,22 @@
             <h1 class="h3 mb-1">Products</h1>
             <p class="text-muted mb-0">Danh sách sản phẩm lấy trực tiếp từ database.</p>
         </div>
-        <a asp-area="Products" asp-controller="Product" asp-action="Create" class="btn btn-primary">Create Product</a>
+        <a href="@Url.Content("~/Products/Create")" class="btn btn-primary">Create Product</a>
     </div>
-    <div class ="search-contain">
+    <div class="search-contain">
         @{
             var q = ViewContext.HttpContext.Request.Query;
             var isActiveQ = q["isActive"].ToString();
             var onSaleQ = q["onSale"].ToString();
         }
-        <form asp-area="Products" asp-controller="Product" asp-action="Search" method="get" class="d-flex gap-2 mb-3 align-items-center">
-            <input type="text" name="searchTerm" value="@(ViewContext.HttpContext.Request.Query["searchTerm"].ToString())" class="form-control" placeholder="Search by name or code" />
+        <form asp-area="Products" asp-controller="Product" asp-action="Search" method="get"
+              class="d-flex gap-2 mb-3 align-items-center">
+            <input type="text" name="searchTerm"
+                   value="@(ViewContext.HttpContext.Request.Query["searchTerm"].ToString())" class="form-control"
+                   placeholder="Search by name or code" />
 
-            <input type="text"
-                   name="category"
-                   value="@(ViewContext.HttpContext.Request.Query["category"].ToString())"
-                   class="form-control"
-                   style="width:220px"
-                   placeholder="Search category" />
+            <input type="text" name="category" value="@(ViewContext.HttpContext.Request.Query["category"].ToString())"
+                   class="form-control" style="width:220px" placeholder="Search category" />
 
             <select name="isActive" class="form-select" style="width:140px">
                 @if (string.IsNullOrEmpty(isActiveQ))
@@ -93,17 +92,10 @@
                 {
                     foreach (var product in Model)
                     {
-                        <tr  class="clickable-row" tabindex="0" role="link" data-href="@Url.Content($"~/Products/Detail/{product.Id}")">
+                        <tr class="clickable-row" tabindex="0" role="link"
+                            data-href="@Url.Content($"~/Products/Detail/{product.Id}")">
                             <td>@product.Id</td>
-                            <td>
-                                <a asp-area="Products"
-                                   asp-controller="Product"
-                                   asp-action="Detail"
-                                   asp-route-id="@product.Id"
-                                   class="fw-semibold text-decoration-none">
-                                    @product.ProductName
-                                </a>
-                            </td>
+                            <td>@product.ProductName</td>
                             <td>@product.ProductCode</td>
                             <td class="text-end">@product.SalePrice.ToString("N0")</td>
                             <td class="text-end">@product.CostPrice.ToString("N0")</td>
