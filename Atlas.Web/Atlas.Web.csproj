@@ -29,6 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\Category\Controllers\" />
+    <Folder Include="Areas\Category\Data\" />
+    <Folder Include="Areas\Category\Models\" />
+    <Folder Include="Areas\Category\Views\" />
     <Folder Include="Areas\Customer\Controllers\" />
     <Folder Include="Areas\Customer\Data\" />
     <Folder Include="Areas\Customer\Models\" />

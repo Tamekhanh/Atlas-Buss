@@ -4,6 +4,7 @@ using Atlas.Services.Customer;
 using Atlas.Services.HRM;
 using Atlas.Services.Inventory;
 using Atlas.Services.Vendor;
+using Atlas.Services.Category;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Atlas.Services;
@@ -20,6 +21,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICustomerPersonService, CustomerPersonService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ILogService, LogService>();
+        services.AddScoped<ICategoryService, CategoryService>();
 
         return services;
     }

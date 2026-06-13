@@ -10,6 +10,10 @@
             <h1 class="h3 mb-1">Employees</h1>
             <p class="text-muted mb-0">Danh sách nhân viên nối từ bảng Employee và Persons.</p>
         </div>
+        @if (User.HasClaim("permission", "HR_MANAGE"))
+        {
+            <a class="btn btn-primary" data-href="@Url.Content($"~/HRM/Create")">Create Employee</a>
+        }
     </div>
 
     <div class="mb-3">

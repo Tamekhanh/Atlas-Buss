@@ -17,6 +17,8 @@ namespace Atlas.Web.Areas.Products.Controllers
         private readonly ICategoryRepository _categoryRepository;
         private readonly ILogService _logService;
 
+        const int pageSize = 20;
+
         public ProductController(IProductService productService, ICategoryRepository categoryRepository, ILogService logService)
         {
             _productService = productService;
@@ -24,16 +26,23 @@ namespace Atlas.Web.Areas.Products.Controllers
             _logService = logService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? page)
         {
-            var products = await _productService.GetAllProductsAsync();
+            var currentPage = page.GetValueOrDefault(1);
+            var products = (await _productService.GetAllProductsAsync(currentPage, pageSize)).ToList();
+            ViewData["CurrentPage"] = currentPage;
+            ViewData["HasNext"] = products.Count == pageSize;
             return View("~/Areas/Products/Views/Products/Index.cshtml", products);
         }
 
-        public async Task<IActionResult> Search(string searchTerm, string? category, bool? isActive, bool? onSale)
+        public async Task<IActionResult> Search(string searchTerm, string? category, bool? isActive, bool? onSale, int? page)
         {
-            var products = await _productService.GetProductFilterAsync(searchTerm, category, isActive, onSale);
-            return View("~/Areas/Products/Views/Products/Index.cshtml", products);
+            var currentPage = page.GetValueOrDefault(1);
+            var all = (await _productService.GetProductFilterAsync(searchTerm, category, isActive, onSale))?.ToList() ?? new List<ProductEntity>();
+            var paged = all.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            ViewData["CurrentPage"] = currentPage;
+            ViewData["HasNext"] = paged.Count == pageSize && all.Count > (currentPage * pageSize);
+            return View("~/Areas/Products/Views/Products/Index.cshtml", paged);
         }
 
         public async Task<IActionResult> Detail(int id)
@@ -62,12 +71,13 @@ namespace Atlas.Web.Areas.Products.Controllers
 
             model.Id = id;
 
+            // Cập nhật thông tin cha (Sử dụng BaseSalePrice)
             product.ProductName = model.ProductName.Trim();
             product.ProductCode = model.ProductCode.Trim();
             product.UnitId = model.UnitId > 0 ? model.UnitId : product.UnitId;
             product.ImageUrl = string.IsNullOrWhiteSpace(model.ImageUrl) ? null : model.ImageUrl.Trim();
-            product.SalePrice = model.SalePrice;
-            product.CostPrice = model.CostPrice;
+            product.BaseSalePrice = model.BaseSalePrice; // Đổi tên
+            product.BaseCostPrice = model.BaseCostPrice; // Đổi tên
             product.Barcode = string.IsNullOrWhiteSpace(model.Barcode) ? null : model.Barcode.Trim();
             product.IsActive = model.IsActive;
             product.Onsale = model.Onsale;
@@ -79,7 +89,10 @@ namespace Atlas.Web.Areas.Products.Controllers
             product.ProductDetail.Dimensions = string.IsNullOrWhiteSpace(model.Dimensions) ? null : model.Dimensions.Trim();
             product.ProductDetail.Manufacturer = string.IsNullOrWhiteSpace(model.Manufacturer) ? null : model.Manufacturer.Trim();
 
-            var updated = await _productService.UpdateProductAsync(product, model.CategoryIds, model.NewCategoryName);
+            // Logic cập nhật biến thể (Variants) có thể được triển khai tại đây hoặc trong Service
+            // Ở đây ta tạm thời tập trung vào update thông tin cha
+
+            var updated = await _productService.UpdateProductAsync(product, model.CategoryIds);
             if (!updated)
             {
                 ModelState.AddModelError(string.Empty, "Could not update product.");
@@ -107,6 +120,11 @@ namespace Atlas.Web.Areas.Products.Controllers
             };
 
             await PopulateCategoriesAsync(model);
+
+            // Lấy danh sách các loại thuộc tính để Frontend render dynamic variant
+            ViewBag.AttributeTypes = await _productService.GetAvailableAttributeTypesAsync();
+
+            // SỬA: Phải truyền 'model' vào View
             return View("~/Areas/Products/Views/Products/Create.cshtml", model);
         }
 
@@ -125,17 +143,20 @@ namespace Atlas.Web.Areas.Products.Controllers
 
             if (!ModelState.IsValid)
             {
+                // QUAN TRỌNG: Gán lại ViewBag và TRUYỀN model quay lại View để giữ dữ liệu đã nhập
+                ViewBag.AttributeTypes = await _productService.GetAvailableAttributeTypesAsync();
                 return View("~/Areas/Products/Views/Products/Create.cshtml", model);
             }
 
+            // Mapping sang Entity Sản phẩm cha
             var product = new ProductEntity
             {
                 ProductName = model.ProductName.Trim(),
                 ProductCode = model.ProductCode.Trim(),
                 UnitId = model.UnitId,
                 ImageUrl = string.IsNullOrWhiteSpace(model.ImageUrl) ? null : model.ImageUrl.Trim(),
-                SalePrice = model.SalePrice,
-                CostPrice = model.CostPrice,
+                BaseSalePrice = model.BaseSalePrice,
+                BaseCostPrice = model.BaseCostPrice,
                 Barcode = string.IsNullOrWhiteSpace(model.Barcode) ? null : model.Barcode.Trim(),
                 IsActive = model.IsActive,
                 Onsale = model.Onsale,
@@ -150,15 +171,33 @@ namespace Atlas.Web.Areas.Products.Controllers
                 }
             };
 
-            var created = await _productService.CreateProductAsync(product, model.CategoryIds, model.NewCategoryName);
+            // Mapping sang Entity Biến thể (Variants) từ ViewModel
+            if (model.Variants != null && model.Variants.Any())
+            {
+                product.Variants = model.Variants.Select(v => new ProductVariant
+                {
+                    SKU = v.SKU.Trim(),
+                    VariantPrice = v.Price,
+                    VariantCost = v.Cost,
+                    AttributeMappings = v.AttributeValueIds.Select(avId => new VariantAttributeMapping
+                    {
+                        AttributeValueId = avId
+                    }).ToList()
+                }).ToList();
+            }
+
+            // Gọi Service tạo sản phẩm
+            var created = await _productService.CreateProductAsync(product, model.CategoryIds, product.Variants);
             if (!created)
             {
                 ModelState.AddModelError(string.Empty, "Could not create product.");
+                ViewBag.AttributeTypes = await _productService.GetAvailableAttributeTypesAsync();
                 return View("~/Areas/Products/Views/Products/Create.cshtml", model);
             }
 
+            // LOGGING: Đơn giản hóa vì đã biết 'created' là true
             var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (created && int.TryParse(employeeIdValue, out var employeeId))
+            if (int.TryParse(employeeIdValue, out var employeeId))
             {
                 await _logService.AddLogAsync(employeeId, $"Created new product: {product.ProductName} (ID: {product.Id})");
             }
@@ -179,10 +218,13 @@ namespace Atlas.Web.Areas.Products.Controllers
                 Id = product.Id,
                 ProductName = product.ProductName,
                 ProductCode = product.ProductCode,
-                UnitId = product.UnitId,
+
+                // SỬA TẠI ĐÂY: Sử dụng toán tử ?? để gán giá trị 0 nếu UnitId bị null
+                UnitId = product.UnitId ?? 0,
+
                 ImageUrl = product.ImageUrl,
-                SalePrice = product.SalePrice,
-                CostPrice = product.CostPrice,
+                BaseSalePrice = product.BaseSalePrice,
+                BaseCostPrice = product.BaseCostPrice,
                 Barcode = product.Barcode,
                 IsActive = product.IsActive,
                 Onsale = product.Onsale,
@@ -196,7 +238,17 @@ namespace Atlas.Web.Areas.Products.Controllers
                     .Where(categoryProduct => categoryProduct.CategoryId > 0)
                     .Select(categoryProduct => categoryProduct.CategoryId)
                     .Distinct()
-                    .ToList()
+                    .ToList(),
+
+                Variants = product.Variants?.Select(v => new VariantModel
+                {
+                    Id = v.Id,
+                    SKU = v.SKU,
+                    Price = v.VariantPrice ?? product.BaseSalePrice,
+                    Cost = v.VariantCost ?? product.BaseCostPrice,
+                    // SỬA TẠI ĐÂY: Thêm ?. và ?? để tránh lỗi NullReferenceException nếu AttributeMappings bị null
+                    AttributeValueIds = v.AttributeMappings?.Select(m => m.AttributeValueId).ToList() ?? new List<int>()
+                }).ToList() ?? new List<VariantModel>()
             };
         }
 

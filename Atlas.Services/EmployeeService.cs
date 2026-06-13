@@ -1,5 +1,8 @@
 using Atlas.Core.Entities;
 using Atlas.Core.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Atlas.Services.HRM
 {
@@ -12,9 +15,9 @@ namespace Atlas.Services.HRM
             _employeeRepository = employeeRepository;
         }
 
-        public async Task<IEnumerable<Employee>> GetAllEmployeesAsync()
+        public async Task<IEnumerable<Employee>> GetAllEmployeesAsync(int pageNumber, int pageSize)
         {
-            return await _employeeRepository.GetAllAsync();
+            return await _employeeRepository.GetAllAsync(pageNumber, pageSize);
         }
 
         public async Task<Employee?> GetEmployeeByIdAsync(int id)
@@ -22,14 +25,17 @@ namespace Atlas.Services.HRM
             return await _employeeRepository.GetByIdAsync(id);
         }
 
-        public async Task<bool> CreateEmployeeAsync(Employee employee)
+        // SỬA TẠI ĐÂY: Thay Task<bool> thành Task<Employee>
+        public async Task<Employee> CreateEmployeeAsync(Employee employee)
         {
             if (string.IsNullOrWhiteSpace(employee.EmployeeNumber))
             {
-                return false;
+                throw new ArgumentException("Employee number is required.");
             }
 
-            return await _employeeRepository.AddAsync(employee);
+            var result = await _employeeRepository.CreateEmployeeAsync(employee);
+
+            return result;
         }
 
         public async Task<bool> UpdateEmployeeAsync(Employee employee)

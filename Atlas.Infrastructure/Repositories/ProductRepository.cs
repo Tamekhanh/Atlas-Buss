@@ -1,6 +1,10 @@
 using Atlas.Core.Entities;
 using Atlas.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Atlas.Infrastructure.Repositories
 {
@@ -13,14 +17,22 @@ namespace Atlas.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Products>> GetAllAsync()
+        // =============================================
+        // 1. QUẢN LÝ SẢN PHẨM CHA (PARENT PRODUCTS)
+        // =============================================
+
+        public async Task<IEnumerable<Products>> GetAllAsync(int pageNumber, int pageSize)
         {
             return await _context.Products
                 .Include(product => product.Employee)
                 .ThenInclude(employee => employee.Person)
                 .Include(product => product.CategoryProducts)
                 .ThenInclude(categoryProduct => categoryProduct.Category)
+                .Include(product => product.Unit) // Thêm Unit
                 .AsNoTracking()
+                .OrderBy(product => product.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 
@@ -40,10 +52,10 @@ namespace Atlas.Infrastructure.Repositories
 
             if (!string.IsNullOrWhiteSpace(category))
             {
-                query = query.Where(product => _context.CategoryProducts.Any(categoryProduct =>
-                    categoryProduct.ProductId == product.Id &&
-                    categoryProduct.Category != null &&
-                    categoryProduct.Category.CategoryName.Contains(category)));
+                query = query.Where(product => _context.CategoryProducts.Any(cp =>
+                    cp.ProductId == product.Id &&
+                    cp.Category != null &&
+                    cp.Category.CategoryName.Contains(category)));
             }
 
             if (isActive.HasValue)
@@ -59,11 +71,11 @@ namespace Atlas.Infrastructure.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<IEnumerable<Products>> SearchByNameAsync(string searchTerm)
+        public async Task<IEnumerable<Products>> SearchByNameAsync(string searchTerm, int pageNumber, int pageSize)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
-                return await GetAllAsync();
+                return await GetAllAsync(pageNumber, pageSize);
             }
 
             var term = searchTerm.Trim();
@@ -74,6 +86,9 @@ namespace Atlas.Infrastructure.Repositories
                 .ThenInclude(categoryProduct => categoryProduct.Category)
                 .AsNoTracking()
                 .Where(product => product.ProductName.Contains(term) || product.ProductCode.Contains(term))
+                .OrderBy(product => product.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 
@@ -85,6 +100,11 @@ namespace Atlas.Infrastructure.Repositories
                 .Include(product => product.CategoryProducts)
                 .ThenInclude(categoryProduct => categoryProduct.Category)
                 .Include(product => product.ProductDetail)
+                .Include(product => product.Unit)
+                // QUAN TRỌNG: Lấy tất cả biến thể và thuộc tính của biến thể đó
+                .Include(product => product.Variants)
+                    .ThenInclude(v => v.AttributeMappings)
+                        .ThenInclude(m => m.AttributeValue)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(product => product.Id == id);
         }
@@ -102,30 +122,26 @@ namespace Atlas.Infrastructure.Repositories
                 .Include(current => current.CategoryProducts)
                 .FirstOrDefaultAsync(current => current.Id == product.Id);
 
-            if (existingProduct is null)
-            {
-                return false;
-            }
+            if (existingProduct is null) return false;
 
+            // Cập nhật thông tin cơ bản (Lưu ý tên trường BaseSalePrice/BaseCostPrice)
             existingProduct.ProductName = product.ProductName;
             existingProduct.ProductCode = product.ProductCode;
             existingProduct.UnitId = product.UnitId;
             existingProduct.ImageUrl = product.ImageUrl;
-            existingProduct.SalePrice = product.SalePrice;
-            existingProduct.CostPrice = product.CostPrice;
+            existingProduct.BaseSalePrice = product.BaseSalePrice;
+            existingProduct.BaseCostPrice = product.BaseCostPrice;
             existingProduct.Barcode = product.Barcode;
             existingProduct.IsActive = product.IsActive;
             existingProduct.Onsale = product.Onsale;
             existingProduct.UpdatedAt = DateTime.Now;
 
+            // Cập nhật chi tiết sản phẩm
             if (product.ProductDetail is not null)
             {
                 if (existingProduct.ProductDetail is null)
                 {
-                    existingProduct.ProductDetail = new ProductDetails
-                    {
-                        ProductId = existingProduct.Id
-                    };
+                    existingProduct.ProductDetail = new ProductDetails { ProductId = existingProduct.Id };
                 }
 
                 existingProduct.ProductDetail.ProductDescription = product.ProductDetail.ProductDescription;
@@ -135,15 +151,16 @@ namespace Atlas.Infrastructure.Repositories
                 existingProduct.ProductDetail.Manufacturer = product.ProductDetail.Manufacturer;
             }
 
+            // Cập nhật Category
             existingProduct.CategoryProducts.Clear();
             if (product.CategoryProducts is not null)
             {
-                foreach (var categoryProduct in product.CategoryProducts)
+                foreach (var cp in product.CategoryProducts)
                 {
                     existingProduct.CategoryProducts.Add(new CategoryProduct
                     {
                         ProductId = existingProduct.Id,
-                        CategoryId = categoryProduct.CategoryId
+                        CategoryId = cp.CategoryId
                     });
                 }
             }
@@ -154,13 +171,81 @@ namespace Atlas.Infrastructure.Repositories
         public async Task<bool> DeleteAsync(int id)
         {
             var product = await _context.Products.FindAsync(id);
-            if (product is null)
-            {
-                return false;
-            }
+            if (product is null) return false;
 
             _context.Products.Remove(product);
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        // =============================================
+        // 2. QUẢN LÝ BIẾN THỂ (VARIANTS)
+        // =============================================
+
+        public async Task<IEnumerable<ProductVariant>> GetVariantsByProductIdAsync(int productId)
+        {
+            return await _context.ProductVariants
+                .Include(v => v.AttributeMappings)
+                    .ThenInclude(m => m.AttributeValue)
+                .Where(v => v.ProductId == productId)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<ProductVariant> GetVariantByIdAsync(int variantId)
+        {
+            return await _context.ProductVariants
+                .Include(v => v.AttributeMappings)
+                    .ThenInclude(m => m.AttributeValue)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(v => v.Id == variantId);
+        }
+
+        public async Task<bool> AddVariantAsync(ProductVariant variant)
+        {
+            await _context.ProductVariants.AddAsync(variant);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> UpdateVariantAsync(ProductVariant variant)
+        {
+            var existing = await _context.ProductVariants.FindAsync(variant.Id);
+            if (existing == null) return false;
+
+            existing.SKU = variant.SKU;
+            existing.VariantPrice = variant.VariantPrice;
+            existing.VariantCost = variant.VariantCost;
+            existing.IsActive = variant.IsActive;
+
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> DeleteVariantAsync(int variantId)
+        {
+            var variant = await _context.ProductVariants.FindAsync(variantId);
+            if (variant == null) return false;
+
+            _context.ProductVariants.Remove(variant);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        // =============================================
+        // 3. QUẢN LÝ THUỘC TÍNH (ATTRIBUTES)
+        // =============================================
+
+        public async Task<IEnumerable<AttributeType>> GetAllAttributeTypesAsync()
+        {
+            return await _context.AttributeTypes
+                .Include(t => t.Values)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<AttributeValue>> GetValuesByAttributeTypeIdAsync(int attributeTypeId)
+        {
+            return await _context.AttributeValues
+                .Where(v => v.AttributeTypeId == attributeTypeId)
+                .AsNoTracking()
+                .ToListAsync();
         }
     }
 }

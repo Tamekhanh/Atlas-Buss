@@ -43,6 +43,11 @@ namespace Atlas.Infrastructure
         public DbSet<Tax> Taxes { get; set; }
         public DbSet<ProductTax> ProductTaxes { get; set; }
         public DbSet<Units> Units { get; set; }
+        public DbSet<ProductVariant> ProductVariants { get; set; } = null!;
+        public DbSet<AttributeType> AttributeTypes { get; set; } = null!;
+        public DbSet<AttributeValue> AttributeValues { get; set; } = null!;
+        public DbSet<VariantAttributeMapping> VariantAttributeMappings { get; set; } = null!;
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,6 +65,55 @@ namespace Atlas.Infrastructure
                     .HasForeignKey(log => log.EmployeeId)
                     .OnDelete(DeleteBehavior.SetNull);
             });
+
+            modelBuilder.Entity<VariantAttributeMapping>(entity =>
+            {
+                entity.ToTable("VariantAttributeMappings", "dbo");
+
+                // Thiết lập Khóa chính hỗn hợp (Composite Key)
+                // Nếu thiếu dòng này, EF Core sẽ báo lỗi runtime
+                entity.HasKey(vam => new { vam.VariantId, vam.AttributeValueId });
+
+                entity.HasOne(vam => vam.ProductVariant)
+                    .WithMany(v => v.AttributeMappings)
+                    .HasForeignKey(vam => vam.VariantId);
+
+                entity.HasOne(vam => vam.AttributeValue)
+                    .WithMany(av => av.VariantMappings)
+                    .HasForeignKey(vam => vam.AttributeValueId);
+            });
+
+            modelBuilder.Entity<ProductVariant>(entity =>
+                {
+                    entity.ToTable("ProductVariants", "dbo");
+                    entity.HasKey(v => v.Id);
+                    entity.Property(v => v.SKU).IsRequired().HasMaxLength(50);
+
+                    // Quan hệ n-1 với Product
+                    entity.HasOne(v => v.Product)
+                        .WithMany(p => p.Variants)
+                        .HasForeignKey(v => v.ProductId)
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity<AttributeType>(entity =>
+                {
+                    entity.ToTable("AttributeTypes", "dbo");
+                    entity.HasKey(at => at.Id);
+                    entity.Property(at => at.AttributeName).IsRequired().HasMaxLength(50);
+                });
+
+            modelBuilder.Entity<AttributeValue>(entity =>
+            {
+                entity.ToTable("AttributeValues", "dbo");
+                entity.HasKey(av => av.Id);
+                entity.Property(av => av.Value).IsRequired().HasMaxLength(50);
+
+                entity.HasOne(av => av.AttributeType)
+                    .WithMany(at => at.Values)
+                    .HasForeignKey(av => av.AttributeTypeId);
+            });
+
 
             modelBuilder.Entity<Role>(entity =>
             {

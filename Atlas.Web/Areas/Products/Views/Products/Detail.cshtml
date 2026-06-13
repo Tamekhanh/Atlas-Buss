@@ -1,11 +1,13 @@
 @model ProductModelView
 @using System.Linq
+@using Atlas.Core.Entities
 
 @{
     ViewData["Title"] = "Product Detail";
     var canEdit = User.HasClaim("permission", "PRODUCT_CREATE") || User.HasClaim("permission", "PRODUCT_MANAGE");
     var selectedCategoryIds = new HashSet<int>(Model.CategoryIds ?? new List<int>());
-    var availableCategories = Model.AvailableCategories ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+    var availableCategories = Model.AvailableCategories ??
+Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
     var selectedCategories = new List<(int Id, string Name)>();
 
     foreach (var category in availableCategories)
@@ -35,9 +37,11 @@
                     <input type="hidden" asp-for="Id" />
                     <input type="hidden" asp-for="UnitId" />
                     <input type="hidden" asp-for="EmployeeId" />
+
                     <div class="row g-4">
+                        <!-- CỘT TRÁI: THÔNG TIN CƠ BẢN -->
                         <div class="col-md-6">
-                            <h2 class="h5 mb-3">Basic Information</h2>
+                            <h2 class="h5 mb-3 border-bottom pb-2">Basic Information</h2>
                             <div class="mb-3">
                                 <label asp-for="ProductName" class="form-label"></label>
                                 <input asp-for="ProductName" class="form-control" />
@@ -52,12 +56,12 @@
                             </div>
                             <div class="row g-3">
                                 <div class="col-sm-6">
-                                    <label asp-for="SalePrice" class="form-label"></label>
-                                    <input asp-for="SalePrice" class="form-control" />
+                                    <label asp-for="BaseSalePrice" class="form-label">Base Sale Price</label>
+                                    <input asp-for="BaseSalePrice" class="form-control" />
                                 </div>
                                 <div class="col-sm-6">
-                                    <label asp-for="CostPrice" class="form-label"></label>
-                                    <input asp-for="CostPrice" class="form-control" />
+                                    <label asp-for="BaseCostPrice" class="form-label">Base Cost Price</label>
+                                    <input asp-for="BaseCostPrice" class="form-control" />
                                 </div>
                             </div>
                             <div class="form-check form-switch mt-3">
@@ -70,8 +74,9 @@
                             </div>
                         </div>
 
+                        <!-- CỘT PHẢI: CHI TIẾT & CATEGORY -->
                         <div class="col-md-6">
-                            <h2 class="h5 mb-3">Product Details</h2>
+                            <h2 class="h5 mb-3 border-bottom pb-2">Product Details</h2>
                             <div class="mb-3">
                                 <label asp-for="ProductDescription" class="form-label"></label>
                                 <textarea asp-for="ProductDescription" class="form-control" rows="3"></textarea>
@@ -99,237 +104,416 @@
                                 <input asp-for="Manufacturer" class="form-control" />
                             </div>
 
+                            <!-- Category Picker (Giữ nguyên logic của bạn) -->
                             <div class="col-12 mt-3">
                                 <label class="form-label fw-semibold d-block">Categories</label>
                                 <div class="dropdown w-100" id="detail-category-picker">
-                                    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" aria-expanded="false">
+                                    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
                                         Chọn category để gắn vào sản phẩm
                                     </button>
                                     <div class="dropdown-menu w-100 p-2 shadow category-picker-menu">
-                                        <div class="d-flex justify-content-between align-items-center gap-2 border-bottom pb-2">
+                                        <div
+                                            class="d-flex justify-content-between align-items-center gap-2 border-bottom pb-2">
                                             <span class="fw-semibold small text-muted">Pick categories</span>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary" id="detail-category-picker-close">Close</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                    id="detail-category-picker-close">Close</button>
                                         </div>
-                                        <input type="text" class="form-control form-control-sm mb-2" id="detail-category-search" placeholder="Search category" autocomplete="off" />
-                                        <div class="category-option-list overflow-auto pe-1" id="detail-category-option-list">
+                                        <input type="text" class="form-control form-control-sm mb-2"
+                                               id="detail-category-search" placeholder="Search category" />
+                                        <div class="category-option-list overflow-auto pe-1"
+                                             id="detail-category-option-list">
                                             @foreach (var category in availableCategories)
                                             {
-                                                var categoryValue = category.Value ?? string.Empty;
-
-                                                if (int.TryParse(categoryValue, out var categoryId))
+                                                if (int.TryParse(category.Value, out var catId))
                                                 {
-                                                    var categoryName = category.Text ?? string.Empty;
-                                                    var isSelected = selectedCategoryIds.Contains(categoryId);
                                                     <button type="button"
-                                                            class="dropdown-item category-option @(isSelected ? "d-none" : string.Empty)"
-                                                            data-category-id="@categoryId"
-                                                            data-category-name="@categoryName">
-                                                        @categoryName
-                                                    </button>
+                                                            class="dropdown-item category-option @(selectedCategoryIds.Contains(catId) ? "d-none" : "")"
+                                                            data-category-id="@catId"
+                                                            data-category-name="@category.Text">@category.Text</button>
                                                 }
                                             }
                                         </div>
                                         <div class="border-top pt-2 mt-1">
-                                            <label asp-for="NewCategoryName" class="form-label fw-semibold small mb-1">Không tìm thấy? Tạo mới ngay tại đây</label>
-                                            <input asp-for="NewCategoryName" class="form-control form-control-sm" placeholder="Type a new category name" />
-                                            <small class="text-muted d-block mt-1">Kéo xuống cuối dropdown để tạo category mới và gắn trực tiếp vào sản phẩm này.</small>
-                                            <span asp-validation-for="NewCategoryName" class="text-danger small"></span>
+                                            <input asp-for="NewCategoryName" class="form-control form-control-sm"
+                                                   placeholder="Create new category..." />
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="mt-2 d-flex flex-wrap gap-2" id="detail-category-tag-container">
                                     @foreach (var category in selectedCategories)
                                     {
-                                        <span class="badge rounded-pill text-bg-primary category-tag" data-category-id="@category.Id">
+                                        <span class="badge rounded-pill text-bg-primary category-tag"
+                                              data-category-id="@category.Id">
                                             <span class="category-tag-text">@category.Name</span>
-                                            <button type="button" class="btn-close btn-close-white ms-2 category-remove" aria-label="Remove" data-category-id="@category.Id"></button>
+                                            <button type="button"
+                                                    class="btn-close btn-close-white ms-2 category-remove"></button>
                                             <input type="hidden" name="CategoryIds" value="@category.Id" />
                                         </span>
                                     }
                                 </div>
-                                <small class="text-muted d-block mt-2">Chạm vào category trong danh sách để thêm tag. Bấm x để xóa tag.</small>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- PHẦN QUẢN LÝ BIẾN THỂ (VARIANTS) -->
+                    <div class="mt-5">
+                        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                            <h2 class="h5 mb-0">Product Variants (SKUs)</h2>
+                            <button type="button" class="btn btn-sm btn-success" id="add-variant-btn">+ Add Variant</button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle" id="variants-table">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 25%;">SKU</th>
+                                        <th style="width: 15%;">Price</th>
+                                        <th style="width: 15%;">Cost</th>
+                                        <th style="width: 35%;">Attributes</th>
+                                        <th style="width: 10%;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int i = 0; i < Model.Variants.Count; i++)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input name="Variants[@i].SKU" value="@Model.Variants[i].SKU"
+                                                       class="form-control" required />
+                                            </td>
+                                            <td>
+                                                <input name="Variants[@i].Price" value="@Model.Variants[i].Price"
+                                                       class="form-control" type="number" step="0.01" required />
+                                            </td>
+                                            <td>
+                                                <input name="Variants[@i].Cost" value="@Model.Variants[i].Cost"
+                                                       class="form-control" type="number" step="0.01" required />
+                                            </td>
+                                            <td>
+                                                <div class="variant-attr-container d-flex flex-wrap gap-1">
+                                                    @foreach (var attrId in Model.Variants[i].AttributeValueIds)
+                                                    {
+                                                        <span class="badge bg-secondary rounded-pill attr-tag">
+                                                            @attrId
+                                                            <button type="button"
+                                                                    class="btn-close btn-close-white ms-1 btn-sm remove-attr"></button>
+                                                            <input type="hidden" name="Variants[@i].AttributeValueIds"
+                                                                   value="@attrId" />
+                                                        </span>
+                                                    }
+                                                </div>
+                                                <!-- Nơi render dropdown chọn attribute cho variant này -->
+                                                <select class="form-select form-select-sm mt-2 attr-selector">
+                                                    <option value="">+ Add Attribute</option>
+                                                    @{
+                                                        var attributeTypes = ViewBag.AttributeTypes as IEnumerable<AttributeType>;
+                                                    }
+
+                                                    @if (attributeTypes != null)
+                                                    {
+                                                        foreach (var attrType in attributeTypes)
+                                                        {
+                                                            // Kiểm tra nếu attrType hoặc attrType.Values bị null thì bỏ qua
+                                                            if (attrType == null || attrType.Values == null) continue;
+
+                                                            <optgroup label="@attrType.AttributeName">
+                                                                @foreach (var val in attrType.Values)
+                                                                {
+                                                                    if (val != null)
+                                                                    {
+                                                                        <option value="@val.Id">@val.Value</option>
+                                                                    }
+                                                                }
+                                                            </optgroup>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="">No attributes available</option>
+                                                    }
+                                                </select>
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button"
+                                                        class="btn btn-outline-danger btn-sm remove-variant">Remove</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 mt-4">
                         <a class="btn btn-outline-secondary" href="@Url.Content("~/Products/Index")">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary px-5">Save Product & Variants</button>
                     </div>
                 </form>
             }
             else
             {
+                <!-- VIEW ONLY MODE -->
                 <div class="row g-4">
                     <div class="col-md-6">
-                        <h2 class="h5 mb-3">Basic Information</h2>
+                        <h2 class="h5 mb-3 border-bottom pb-2">Basic Information</h2>
                         <dl class="row mb-0">
                             <dt class="col-sm-4">Id</dt>
                             <dd class="col-sm-8">@Model.Id</dd>
-
                             <dt class="col-sm-4">Name</dt>
                             <dd class="col-sm-8">@Model.ProductName</dd>
-
                             <dt class="col-sm-4">Code</dt>
                             <dd class="col-sm-8">@Model.ProductCode</dd>
-
                             <dt class="col-sm-4">Barcode</dt>
                             <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Barcode) ? "N/A" : Model.Barcode)</dd>
-
-                            <dt class="col-sm-4">Sale Price</dt>
-                            <dd class="col-sm-8">@Model.SalePrice.ToString("N0")</dd>
-
-                            <dt class="col-sm-4">Cost Price</dt>
-                            <dd class="col-sm-8">@Model.CostPrice.ToString("N0")</dd>
-
+                            <dt class="col-sm-4">Base Sale Price</dt>
+                            <dd class="col-sm-8">@Model.BaseSalePrice.ToString("N0")</dd>
+                            <dt class="col-sm-4">Base Cost Price</dt>
+                            <dd class="col-sm-8">@Model.BaseCostPrice.ToString("N0")</dd>
                             <dt class="col-sm-4">Active</dt>
                             <dd class="col-sm-8">@(Model.IsActive ? "Yes" : "No")</dd>
-
                             <dt class="col-sm-4">On Sale</dt>
                             <dd class="col-sm-8">@(Model.Onsale ? "Yes" : "No")</dd>
                         </dl>
                     </div>
-
                     <div class="col-md-6">
-                        <h2 class="h5 mb-3">Product Details</h2>
+                        <h2 class="h5 mb-3 border-bottom pb-2">Product Details</h2>
                         <dl class="row mb-0">
                             <dt class="col-sm-4">Description</dt>
-                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDescription) ? "N/A" : Model.ProductDescription)</dd>
-
-                            <dt class="col-sm-4">Weight</dt>
-                            <dd class="col-sm-8">@(Model.Weight.HasValue ? Model.Weight.Value.ToString("N2") : "N/A")</dd>
-
-                            <dt class="col-sm-4">Warranty</dt>
-                            <dd class="col-sm-8">@(Model.WarrantyPeriod.HasValue ? $"{Model.WarrantyPeriod} months" : "N/A")</dd>
-
-                            <dt class="col-sm-4">Dimensions</dt>
-                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Dimensions) ? "N/A" : Model.Dimensions)</dd>
-
-                            <dt class="col-sm-4">Manufacturer</dt>
-                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Manufacturer) ? "N/A" : Model.Manufacturer)</dd>
-                        </dl>
-
-                        <h3 class="h6 mt-4 mb-2">Categories</h3>
-                        @if (selectedCategories.Count > 0)
-                        {
-                            <div class="d-flex flex-wrap gap-2">
-                                @foreach (var category in selectedCategories)
-                                {
-                                    <span class="badge rounded-pill text-bg-primary">@category.Name</span>
-                                }
+                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDescription) ? "N/A" :
+                                                                                                                            Model.ProductDescription)</dd>
+                                <dt class="col-sm-4">Weight</dt>
+                                <dd class="col-sm-8">@(Model.Weight.HasValue ? Model.Weight.Value.ToString("N2") : "N/A")</dd>
+                                <dt class="col-sm-4">Warranty</dt>
+                                <dd class="col-sm-8">@(Model.WarrantyPeriod.HasValue ? $"{Model.WarrantyPeriod} months" : "N/A")
+                                </dd>
+                                <dt class="col-sm-4">Dimensions</dt>
+                                <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Dimensions) ? "N/A" : Model.Dimensions)
+                                </dd>
+                                <dt class="col-sm-4">Manufacturer</dt>
+                                <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Manufacturer) ? "N/A" :
+                                                                                                                                        Model.Manufacturer)</dd>
+                                </dl>
+                                <h3 class="h6 mt-4 mb-2">Categories</h3>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @foreach (var category in selectedCategories)
+                                    {
+                                        <span class="badge rounded-pill text-bg-primary">@category.Name</span>
+                                    }
+                                </div>
                             </div>
-                        }
-                        else
-                        {
-                            <div class="text-muted">Chưa có category nào.</div>
-                        }
-                    </div>
-                </div>
-            }
-        </div>
-    </div>
-</div>
+                        </div>
 
-@if (canEdit)
-{
-    <script>
-        (() => {
-            const picker = document.getElementById('detail-category-picker');
-            const toggleButton = picker?.querySelector('.dropdown-toggle');
-            const closeButton = document.getElementById('detail-category-picker-close');
-            const searchInput = document.getElementById('detail-category-search');
-            const optionList = document.getElementById('detail-category-option-list');
-            const tagContainer = document.getElementById('detail-category-tag-container');
-            if (!picker || !toggleButton || !searchInput || !optionList || !tagContainer) {
-                return;
-            }
-
-            const getDropdown = () => bootstrap.Dropdown.getOrCreateInstance(toggleButton);
-            const hideDropdown = () => getDropdown().hide();
-            const toggleDropdown = () => getDropdown().toggle();
-
-            toggleButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                toggleDropdown();
-            });
-
-            closeButton?.addEventListener('click', () => hideDropdown());
-
-            const selectedIds = new Set(Array.from(tagContainer.querySelectorAll('input[name="CategoryIds"]')).map(input => Number(input.value)));
-
-            const hideOption = (option) => option.classList.add('d-none');
-            const showOption = (option) => option.classList.remove('d-none');
-
-            const refreshOptions = () => {
-                const query = searchInput.value.trim().toLowerCase();
-                Array.from(optionList.querySelectorAll('.category-option')).forEach(option => {
-                    const id = Number(option.dataset.categoryId);
-                    const name = (option.dataset.categoryName || '').toLowerCase();
-                    if (selectedIds.has(id) || (query && !name.includes(query))) {
-                        hideOption(option);
-                    } else {
-                        showOption(option);
+                        <!-- HIỂN THỊ BẢNG BIẾN THỂ (READ-ONLY) -->
+                        <div class="mt-5">
+                            <h2 class="h5 mb-3 border-bottom pb-2">Variants List</h2>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>SKU</th>
+                                            <th class="text-end">Price</th>
+                                            <th class="text-end">Cost</th>
+                                            <th>Attributes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var v in Model.Variants)
+                                        {
+                                            <tr>
+                                                <td><strong>@v.SKU</strong></td>
+                                                <td class="text-end">@v.Price.ToString("N0")</td>
+                                                <td class="text-end">@v.Cost.ToString("N0")</td>
+                                                <td>
+                                                    <div class="d-flex flex-wrap gap-1">
+                                                        @foreach (var attrId in v.AttributeValueIds)
+                                                        {
+                                                            <span class="badge bg-secondary rounded-pill">ID: @attrId</span>
+                                                        }
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     }
-                });
-            };
+                </div>
+            </div>
+        </div>
 
-            const addTag = (id, name) => {
-                if (selectedIds.has(id)) {
-                    return;
-                }
+        @if (canEdit)
+        {
+            <!-- JS QUẢN LÝ CATEGORY (Giữ nguyên logic của bạn) -->
+            <script>
+                (() => {
+                    // SỬA LẠI ID CHO KHỚP VỚI HTML (Thêm chữ 'detail-')
+                    const picker = document.getElementById('detail-category-picker');
+                    const searchInput = document.getElementById('detail-category-search');
+                    const optionList = document.getElementById('detail-category-option-list');
+                    const tagContainer = document.getElementById('detail-category-tag-container');
+                    const closeButton = document.getElementById('detail-category-picker-close');
 
-                selectedIds.add(id);
+                    if (!picker || !searchInput || !optionList || !tagContainer) {
+                        console.error("Category Picker elements not found!");
+                        return;
+                    }
 
-                const tag = document.createElement('span');
-                tag.className = 'badge rounded-pill text-bg-primary category-tag';
-                tag.dataset.categoryId = String(id);
-                tag.innerHTML = `
-                    <span class="category-tag-text"></span>
-                    <button type="button" class="btn-close btn-close-white ms-2 category-remove" aria-label="Remove"></button>
-                    <input type="hidden" name="CategoryIds" value="${id}" />
-                `;
+                    // Sử dụng một Set để theo dõi các ID đã chọn
+                    let selectedIds = new Set(
+                        Array.from(tagContainer.querySelectorAll('input[name="CategoryIds"]')).map(input => Number(input.value))
+                    );
 
-                tag.querySelector('.category-tag-text').textContent = name;
-                tag.querySelector('.category-remove').addEventListener('click', () => removeTag(id));
-                tagContainer.appendChild(tag);
-                refreshOptions();
-                hideDropdown();
-            };
+                    // Hàm cập nhật hiển thị danh sách option
+                    const refreshOptions = () => {
+                        const query = searchInput.value.trim().toLowerCase();
+                        optionList.querySelectorAll('.category-option').forEach(option => {
+                            const id = Number(option.dataset.categoryId);
+                            const name = (option.dataset.categoryName || '').toLowerCase();
 
-            const removeTag = (id) => {
-                selectedIds.delete(id);
-                const tag = tagContainer.querySelector(`.category-tag[data-category-id="${id}"]`);
-                if (tag) {
-                    tag.remove();
-                }
-                refreshOptions();
-            };
+                            // Ẩn nếu: đã chọn HOẶC không khớp từ khóa tìm kiếm
+                            const isSelected = selectedIds.has(id);
+                            const matchesQuery = !query || name.includes(query);
 
-            optionList.addEventListener('click', (event) => {
-                const option = event.target.closest('.category-option');
-                if (!option) {
-                    return;
-                }
+                            option.classList.toggle('d-none', isSelected || !matchesQuery);
+                        });
+                    };
 
-                addTag(Number(option.dataset.categoryId), option.dataset.categoryName || option.textContent.trim());
-                searchInput.value = '';
-                refreshOptions();
-            });
+                    // Hàm thêm Tag
+                    const addTag = (id, name) => {
+                        if (selectedIds.has(id)) return;
 
-            tagContainer.addEventListener('click', (event) => {
-                const removeButton = event.target.closest('.category-remove');
-                if (!removeButton) {
-                    return;
-                }
+                        selectedIds.add(id);
 
-                removeTag(Number(removeButton.dataset.categoryId));
-            });
+                        const tag = document.createElement('span');
+                        tag.className = 'badge rounded-pill text-bg-primary category-tag';
+                        tag.dataset.categoryId = id;
+                        tag.innerHTML = `
+                            <span class="category-tag-text">${name}</span>
+                            <button type="button" class="btn-close btn-close-white ms-2 category-remove" aria-label="Close"></button>
+                            <input type="hidden" name="CategoryIds" value="${id}" />
+                        `;
 
-            searchInput.addEventListener('input', refreshOptions);
+                        // Sự kiện xóa tag
+                        tag.querySelector('.category-remove').addEventListener('click', (e) => {
+                            e.preventDefault();
+                            selectedIds.delete(id);
+                            tag.remove();
+                            refreshOptions();
+                        });
 
-            picker.addEventListener('shown.bs.dropdown', refreshOptions);
-            refreshOptions();
-        })();
-    </script>
-}
+                        tagContainer.appendChild(tag);
+                        refreshOptions();
+
+                        // Đóng dropdown sau khi chọn
+                        const toggleBtn = picker.querySelector('.dropdown-toggle');
+                        bootstrap.Dropdown.getInstance(toggleBtn)?.hide();
+                    };
+
+                    // Sự kiện click chọn option
+                    optionList.addEventListener('click', (e) => {
+                        const option = e.target.closest('.category-option');
+                        if (option) {
+                            addTag(Number(option.dataset.categoryId), option.dataset.categoryName);
+                        }
+                    });
+
+                    // Sự kiện tìm kiếm
+                    searchInput.addEventListener('input', refreshOptions);
+
+                    // Nút Close thủ công
+                    closeButton?.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const toggleBtn = picker.querySelector('.dropdown-toggle');
+                        bootstrap.Dropdown.getInstance(toggleBtn)?.hide();
+                    });
+
+                    // Focus vào ô search khi mở dropdown
+                    picker.addEventListener('shown.bs.dropdown', () => {
+                        searchInput.focus();
+                        refreshOptions();
+                    });
+
+                    // Khởi tạo lần đầu
+                    refreshOptions();
+                })();
+            </script>
+
+            <!-- JS QUẢN LÝ VARIANTS -->
+            <script>
+                (() => {
+                    const addBtn = document.getElementById('add-variant-btn');
+                    const tableBody = document.querySelector('#variants-table tbody');
+
+                    const createVariantRow = (index, sku = '', price = '', cost = '', attrIds = []) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                                                        <td><input name="Variants[${index}].SKU" value="${sku}" class="form-control" required /></td>
+                                                        <td><input name="Variants[${index}].Price" value="${price}" class="form-control" type="number" step="0.01" required /></td>
+                                                        <td><input name="Variants[${index}].Cost" value="${cost}" class="form-control" type="number" step="0.01" required /></td>
+                                                        <td>
+                                                            <div class="variant-attr-container d-flex flex-wrap gap-1">
+                                                                ${attrIds.map(id => `
+                                                                    <span class="badge bg-secondary rounded-pill attr-tag">
+                                                                        ${id}
+                                                                        <button type="button" class="btn-close btn-close-white ms-1 btn-sm remove-attr"></button>
+                                                                        <input type="hidden" name="Variants[${index}].AttributeValueIds" value="${id}" />
+                                                                    </span>`).join('')}
+                                                            </div>
+                                                            <select class="form-select form-select-sm mt-2 attr-selector">
+                                                                <option value="">+ Add Attribute</option>
+                                                                ${Array.from(document.querySelectorAll('.attr-selector option')).filter(opt => opt.value !== "").map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('')}
+                                                                <!-- Nếu là row mới hoàn toàn, ta copy options từ row đầu tiên hoặc từ ViewBag -->
+                                                            </select>
+                                                        </td>
+                                                        <td class="text-center"><button type="button" class="btn btn-outline-danger btn-sm remove-variant">Remove</button></td>
+                                                    `;
+                        return tr;
+                    };
+
+                    addBtn?.addEventListener('click', () => {
+                        const index = tableBody.querySelectorAll('tr').length;
+                        tableBody.appendChild(createVariantRow(index));
+                    });
+
+                    tableBody?.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('remove-variant')) {
+                            e.target.closest('tr').remove();
+                            reIndexVariants();
+                        }
+                        if (e.target.classList.contains('remove-attr')) {
+                            const tag = e.target.closest('.attr-tag');
+                            tag.remove();
+                        }
+                    });
+
+                    tableBody?.addEventListener('change', (e) => {
+                        if (e.target.classList.contains('attr-selector')) {
+                            const val = e.target.value;
+                            if (!val) return;
+                            const row = e.target.closest('tr');
+                            const index = row.rowIndex - 1;
+                            const container = row.querySelector('.variant-attr-container');
+
+                            const tag = document.createElement('span');
+                            tag.className = 'badge bg-secondary rounded-pill attr-tag';
+                            tag.innerHTML = `${val} <button type="button" class="btn-close btn-close-white ms-1 btn-sm remove-attr"></button> <input type="hidden" name="Variants[${index}].AttributeValueIds" value="${val}" />`;
+
+                            tag.querySelector('.remove-attr').addEventListener('click', () => tag.remove());
+                            container.appendChild(tag);
+                            e.target.value = "";
+                        }
+                    });
+
+                    const reIndexVariants = () => {
+                        tableBody.querySelectorAll('tr').forEach((tr, idx) => {
+                            tr.querySelectorAll('input').forEach(input => {
+                                const name = input.name;
+                                if (name) input.name = name.replace(/Variants\[\d+\]/, `Variants[${idx}]`);
+                            });
+                        });
+                    };
+                })();
+            </script>
+        }

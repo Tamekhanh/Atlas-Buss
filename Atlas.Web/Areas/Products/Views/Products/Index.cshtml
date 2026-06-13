@@ -8,10 +8,11 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
             <h1 class="h3 mb-1">Products</h1>
-            <p class="text-muted mb-0">Danh sách sản phẩm lấy trực tiếp từ database.</p>
+            <p class="text-muted mb-0">Quản lý sản phẩm và các biến thể (SKU).</p>
         </div>
         <a href="@Url.Content("~/Products/Create")" class="btn btn-primary">Create Product</a>
     </div>
+
     <div class="search-contain">
         @{
             var q = ViewContext.HttpContext.Request.Query;
@@ -28,50 +29,21 @@
                    class="form-control" style="width:220px" placeholder="Search category" />
 
             <select name="isActive" class="form-select" style="width:140px">
-                @if (string.IsNullOrEmpty(isActiveQ))
-                {
-                    <option value="" selected>All</option>
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
-                }
-                else if (isActiveQ == "true")
-                {
-                    <option value="">All</option>
-                    <option value="true" selected>Active</option>
-                    <option value="false">Inactive</option>
-                }
-                else
-                {
-                    <option value="">All</option>
-                    <option value="true">Active</option>
-                    <option value="false" selected>Inactive</option>
-                }
+                <option value="" selected="@(string.IsNullOrEmpty(isActiveQ))">All</option>
+                <option value="true" selected="@(isActiveQ == "true")">Active</option>
+                <option value="false" selected="@(isActiveQ == "false")">Inactive</option>
             </select>
 
             <select name="onSale" class="form-select" style="width:140px">
-                @if (string.IsNullOrEmpty(onSaleQ))
-                {
-                    <option value="" selected>All</option>
-                    <option value="true">On sale</option>
-                    <option value="false">Not on sale</option>
-                }
-                else if (onSaleQ == "true")
-                {
-                    <option value="">All</option>
-                    <option value="true" selected>On sale</option>
-                    <option value="false">Not on sale</option>
-                }
-                else
-                {
-                    <option value="">All</option>
-                    <option value="true">On sale</option>
-                    <option value="false" selected>Not on sale</option>
-                }
+                <option value="" selected="@(string.IsNullOrEmpty(onSaleQ))">All</option>
+                <option value="true" selected="@(onSaleQ == "true")">On sale</option>
+                <option value="false" selected="@(onSaleQ == "false")">Not on sale</option>
             </select>
 
             <button type="submit" class="btn btn-outline-secondary">Search</button>
         </form>
     </div>
+
     <div class="table-responsive shadow-sm rounded-3 bg-white">
         <table class="table table-hover align-middle mb-0">
             <thead class="table-dark">
@@ -79,8 +51,9 @@
                     <th>Id</th>
                     <th>Name</th>
                     <th>Code</th>
-                    <th class="text-end">Sale Price</th>
-                    <th class="text-end">Cost Price</th>
+                    <th class="text-center">Variants</th> <!-- BỔ SUNG: Hiển thị số lượng biến thể -->
+                    <th class="text-end">Base Sale Price</th> <!-- ĐỔI TÊN -->
+                    <th class="text-end">Base Cost Price</th> <!-- ĐỔI TÊN -->
                     <th>Active</th>
                     <th>On Sale</th>
                     <th>Employee</th>
@@ -95,10 +68,15 @@
                         <tr class="clickable-row" tabindex="0" role="link"
                             data-href="@Url.Content($"~/Products/Detail/{product.Id}")">
                             <td>@product.Id</td>
-                            <td>@product.ProductName</td>
+                            <td><strong>@product.ProductName</strong></td>
                             <td>@product.ProductCode</td>
-                            <td class="text-end">@product.SalePrice.ToString("N0")</td>
-                            <td class="text-end">@product.CostPrice.ToString("N0")</td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill bg-info text-dark">
+                                    @(product.Variants?.Count ?? 0) SKU
+                                </span>
+                            </td>
+                            <td class="text-end">@product.BaseSalePrice.ToString("N0")</td> <!-- CẬP NHẬT PROPERTY -->
+                            <td class="text-end">@product.BaseCostPrice.ToString("N0")</td> <!-- CẬP NHẬT PROPERTY -->
                             <td>
                                 <span class="badge @(product.IsActive ? "bg-success" : "bg-secondary")">
                                     @(product.IsActive ? "Yes" : "No")
@@ -111,7 +89,7 @@
                             </td>
                             <td>@product.Employee?.FullName</td>
                             <td>
-                                @product.Barcode
+                                <small class="text-muted">@product.Barcode</small>
                             </td>
                         </tr>
                     }
@@ -119,10 +97,30 @@
                 else
                 {
                     <tr>
-                        <td colspan="9" class="text-center py-5 text-muted">Chưa có dữ liệu sản phẩm.</td>
+                        <td colspan="10" class="text-center py-5 text-muted">Chưa có dữ liệu sản phẩm.</td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+    @{
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "Index";
+        var query = ViewContext.HttpContext.Request.Query;
+        var currentPage = ViewData["CurrentPage"] as int? ?? 1;
+        var hasNext = ViewData["HasNext"] as bool? ?? false;
+    }
+    <div>
+        @if (currentPage > 1)
+        {
+            <a class="btn btn-sm btn-outline-primary me-2" href="@Url.Action(currentAction, "Product", new { area = "Products", page = currentPage - 1, searchTerm = query["searchTerm"].ToString(), category = query["category"].ToString(), isActive = query["isActive"].ToString(), onSale = query["onSale"].ToString() })">&laquo; Previous</a>
+        }
+        @if (hasNext)
+        {
+            <a class="btn btn-sm btn-outline-primary" href="@Url.Action(currentAction, "Product", new { area = "Products", page = currentPage + 1, searchTerm = query["searchTerm"].ToString(), category = query["category"].ToString(), isActive = query["isActive"].ToString(), onSale = query["onSale"].ToString() })">Next &raquo;</a>
+        }
+    </div>
+    <div class="text-muted">Page @currentPage</div>
 </div>

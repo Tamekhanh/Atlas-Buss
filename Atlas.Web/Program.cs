@@ -20,25 +20,37 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
         options.Events = new CookieAuthenticationEvents
         {
-            OnValidatePrincipal = async context =>
-            {
-                var username = context.Principal?.FindFirstValue(ClaimTypes.Name);
-                if (string.IsNullOrWhiteSpace(username))
+                OnValidatePrincipal = async context =>
                 {
-                    context.RejectPrincipal();
-                    await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                    return;
-                }
+                    var username = context.Principal?.FindFirstValue(ClaimTypes.Name);
+                    if (string.IsNullOrWhiteSpace(username))
+                    {
+                        context.RejectPrincipal();
+                        await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                        return;
+                    }
 
-                var authRepository = context.HttpContext.RequestServices.GetRequiredService<IAuthRepository>();
-                var isActive = await authRepository.IsActiveByUsernameAsync(username);
+                    // Avoid querying DB on every request: revalidate only if cookie was issued more than 15 minutes ago
+                    var issuedUtc = context.Properties?.IssuedUtc;
+                    if (issuedUtc.HasValue && DateTimeOffset.UtcNow - issuedUtc.Value < TimeSpan.FromMinutes(15))
+                    {
+                        return;
+                    }
 
-                if (!isActive)
-                {
-                    context.RejectPrincipal();
-                    await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    var authRepository = context.HttpContext.RequestServices.GetRequiredService<IAuthRepository>();
+                    var isActive = await authRepository.IsActiveByUsernameAsync(username);
+
+                    if (!isActive)
+                    {
+                        context.RejectPrincipal();
+                        await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    }
+                    else
+                    {
+                        // update issued time so we won't revalidate immediately again
+                        context.Properties!.IssuedUtc = DateTimeOffset.UtcNow;
+                    }
                 }
-            }
         };
     });
 
@@ -46,6 +58,8 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ProductCreate", policy =>
         policy.RequireClaim("permission", "PRODUCT_MANAGE", "PRODUCT_CREATE"));
+    options.AddPolicy("EmployeeManage", policy =>
+        policy.RequireClaim("permission", "HR_MANAGE"));
 });
 
 builder.Services.AddAtlasInfrastructure(builder.Configuration);
@@ -114,6 +128,12 @@ app.MapControllerRoute(
     name: "setting",
     pattern: "Setting",
     defaults: new { controller = "Setting", action = "Settings" });
+
+app.MapAreaControllerRoute(
+    name: "category",
+    areaName: "Category",
+    pattern: "Category/{action=Index}/{id?}",
+    defaults: new { controller = "Category" });
 
 app.MapGet("/", (HttpContext context) =>
     context.User.Identity?.IsAuthenticated == true

@@ -18,7 +18,6 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.Categories
                 .Include(c => c.CategoryProducts)
                 .ThenInclude(cp => cp.Product)
-                .Include(c => c.CategoryPricelists)
                 .AsNoTracking()
                 .ToListAsync();
         }

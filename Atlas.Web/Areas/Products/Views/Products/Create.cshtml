@@ -1,5 +1,6 @@
 @model ProductModelView
 @using System.Linq
+@using Atlas.Core.Entities
 
 @{
     ViewData["Title"] = "Create Product";
@@ -9,289 +10,431 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-1">Create Product</h1>
-            <p class="text-muted mb-0">Form tạo mới sản phẩm với đầy đủ các trường thông tin.</p>
+            <p class="text-muted mb-0">Thiết lập thông tin chung và các biến thể (SKU) cho sản phẩm.</p>
         </div>
-        <a asp-area="Products" asp-controller="Product" asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
-    </div>
+        <a asp-area="Products" asp-controller="Product" asp-action="Index" class="btn btn-outline-secondary">Back to
+            list</a>
+        </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <form asp-area="Products" asp-controller="Product" asp-action="Create" method="post" novalidate>
-                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <form asp-area="Products" asp-controller="Product" asp-action="Create" method="post" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                <input asp-for="EmployeeId" type="hidden" />
+                    <input asp-for="EmployeeId" type="hidden" />
 
-                @{
-                    var selectedCategoryIds = new HashSet<int>(Model.CategoryIds ?? new List<int>());
-                    var availableCategories = Model.AvailableCategories ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
-                    var selectedCategories = new List<(int Id, string Name)>();
+                    @{
+                        var selectedCategoryIds = new HashSet<int>(Model.CategoryIds ?? new List<int>());
+                        var availableCategories = Model.AvailableCategories ??
+                    Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+                        var selectedCategories = new List<(int Id, string Name)>();
 
-                    foreach (var category in availableCategories)
-                    {
-                        if (int.TryParse(category.Value, out var categoryId) && selectedCategoryIds.Contains(categoryId))
+                        foreach (var category in availableCategories)
                         {
-                            selectedCategories.Add((categoryId, category.Text));
+                            if (int.TryParse(category.Value, out var categoryId) && selectedCategoryIds.Contains(categoryId))
+                            {
+                                selectedCategories.Add((categoryId, category.Text));
+                            }
                         }
                     }
-                }
 
-                <div class="row g-3">
-                    <div class="col-12 col-md-6">
-                        <label asp-for="ProductName" class="form-label fw-semibold"></label>
-                        <input asp-for="ProductName" class="form-control" />
-                        <span asp-validation-for="ProductName" class="text-danger"></span>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label asp-for="ProductCode" class="form-label fw-semibold"></label>
-                        <input asp-for="ProductCode" class="form-control" />
-                        <span asp-validation-for="ProductCode" class="text-danger"></span>
-                    </div>
+                    <div class="row g-4">
+                        <!-- CỘT TRÁI: THÔNG TIN CHUNG -->
+                        <div class="col-12 col-md-6">
+                            <h2 class="h5 mb-3 border-bottom pb-2">General Information</h2>
+                            <div class="mb-3">
+                                <label asp-for="ProductName" class="form-label fw-semibold"></label>
+                                <input asp-for="ProductName" class="form-control" />
+                                <span asp-validation-for="ProductName" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="ProductCode" class="form-label fw-semibold"></label>
+                                <input asp-for="ProductCode" class="form-control" />
+                                <span asp-validation-for="ProductCode" class="text-danger"></span>
+                            </div>
 
-                    <div class="col-12 col-md-6">
-                        <label asp-for="UnitId" class="form-label fw-semibold"></label>
-                        <input asp-for="UnitId" class="form-control" type="number" min="1" />
-                        <small class="text-muted">Nhap ID don vi tinh trong bang Units (vi du: 1).</small>
-                        <span asp-validation-for="UnitId" class="text-danger"></span>
-                    </div>
+                            <div class="mb-3">
+                                <label asp-for="UnitId" class="form-label fw-semibold"></label>
+                                <input asp-for="UnitId" class="form-control" type="number" min="1" />
+                                <small class="text-muted">Nhập ID đơn vị tính (ví dụ: 1 cho Chiếc, 2 cho Bộ).</small>
+                                <span asp-validation-for="UnitId" class="text-danger"></span>
+                            </div>
 
-                    <div class="col-12 col-md-6">
-                        <label class="form-label fw-semibold d-block">Categories</label>
-                        <div class="dropdown w-100" id="category-picker">
-                            <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" aria-expanded="false">
-                                Chọn category để gắn vào sản phẩm
-                            </button>
-                            <div class="dropdown-menu w-100 p-2 shadow category-picker-menu">
-                                <div class="d-flex justify-content-between align-items-center gap-2 border-bottom pb-2">
-                                    <span class="fw-semibold small text-muted">Pick categories</span>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="category-picker-close">Close</button>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <label asp-for="BaseSalePrice" class="form-label fw-semibold">Base Sale Price</label>
+                                    <input asp-for="BaseSalePrice" class="form-control" type="number" step="0.01"
+                                           min="0.01" />
+                                    <span asp-validation-for="BaseSalePrice" class="text-danger"></span>
                                 </div>
-                                <input type="text" class="form-control form-control-sm mb-2" id="category-search" placeholder="Search category" autocomplete="off" />
-                                <div class="category-option-list overflow-auto pe-1" id="category-option-list">
-                                    @foreach (var category in availableCategories)
-                                    {
-                                        var categoryValue = category.Value ?? string.Empty;
-
-                                        if (int.TryParse(categoryValue, out var categoryId))
-                                        {
-                                            var categoryName = category.Text ?? string.Empty;
-                                            var isSelected = selectedCategoryIds.Contains(categoryId);
-                                            <button type="button"
-                                                    class="dropdown-item category-option @(isSelected ? "d-none" : string.Empty)"
-                                                    data-category-id="@categoryId"
-                                                    data-category-name="@categoryName">
-                                                @categoryName
-                                            </button>
-                                        }
-                                    }
+                                <div class="col-sm-6">
+                                    <label asp-for="BaseCostPrice" class="form-label fw-semibold">Base Cost Price</label>
+                                    <input asp-for="BaseCostPrice" class="form-control" type="number" step="0.01"
+                                           min="0.01" />
+                                    <span asp-validation-for="BaseCostPrice" class="text-danger"></span>
                                 </div>
-                                <div class="border-top pt-2 mt-1">
-                                    <label asp-for="NewCategoryName" class="form-label fw-semibold small mb-1">Không tìm thấy? Tạo mới ngay tại đây</label>
-                                    <input asp-for="NewCategoryName" class="form-control form-control-sm" placeholder="Type a new category name" />
-                                    <small class="text-muted d-block mt-1">Kéo xuống cuối dropdown để tạo category mới và gắn trực tiếp vào sản phẩm này.</small>
-                                    <span asp-validation-for="NewCategoryName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="row g-3 mt-2">
+                                <div class="col-sm-6">
+                                    <label asp-for="ImageUrl" class="form-label fw-semibold"></label>
+                                    <input asp-for="ImageUrl" class="form-control" placeholder="https://..." />
+                                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label asp-for="Barcode" class="form-label fw-semibold"></label>
+                                    <input asp-for="Barcode" class="form-control" />
+                                    <span asp-validation-for="Barcode" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-4 mt-4">
+                                <div class="form-check form-switch">
+                                    <input asp-for="IsActive" class="form-check-input" />
+                                    <label asp-for="IsActive" class="form-check-label fw-semibold"></label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input asp-for="Onsale" class="form-check-input" />
+                                    <label asp-for="Onsale" class="form-check-label fw-semibold"></label>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mt-2 d-flex flex-wrap gap-2" id="category-tag-container">
-                            @foreach (var category in selectedCategories)
-                            {
-                                <span class="badge rounded-pill text-bg-primary category-tag" data-category-id="@category.Id">
-                                    <span class="category-tag-text">@category.Name</span>
-                                    <button type="button" class="btn-close btn-close-white ms-2 category-remove" aria-label="Remove" data-category-id="@category.Id"></button>
-                                    <input type="hidden" name="CategoryIds" value="@category.Id" />
-                                </span>
-                            }
+                        <!-- CỘT PHẢI: CHI TIẾT & CATEGORY -->
+                        <div class="col-12 col-md-6">
+                            <h2 class="h5 mb-3 border-bottom pb-2">Specifications</h2>
+                            <div class="mb-3">
+                                <label asp-for="ProductDescription" class="form-label fw-semibold"></label>
+                                <textarea asp-for="ProductDescription" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="ProductDescription" class="text-danger"></span>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-sm-4">
+                                    <label asp-for="Weight" class="form-label fw-semibold"></label>
+                                    <input asp-for="Weight" class="form-control" type="number" step="0.01" min="0" />
+                                    <span asp-validation-for="Weight" class="text-danger"></span>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label asp-for="WarrantyPeriod" class="form-label fw-semibold"></label>
+                                    <input asp-for="WarrantyPeriod" class="form-control" type="number" min="0" />
+                                    <span asp-validation-for="WarrantyPeriod" class="text-danger"></span>
+                                </div>
+                                <div class="col-sm-4">
+                                    <label asp-for="Manufacturer" class="form-label fw-semibold"></label>
+                                    <input asp-for="Manufacturer" class="form-control" />
+                                    <span asp-validation-for="Manufacturer" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label asp-for="Dimensions" class="form-label fw-semibold"></label>
+                                <input asp-for="Dimensions" class="form-control" placeholder="L x W x H" />
+                                <span asp-validation-for="Dimensions" class="text-danger"></span>
+                            </div>
+
+                            <!-- Category Picker -->
+                            <div class="col-12 mt-4">
+                                <label class="form-label fw-semibold d-block">Categories</label>
+                                <div class="dropdown w-100" id="category-picker">
+                                    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        Chọn category để gắn vào sản phẩm
+                                    </button>
+                                    <div class="dropdown-menu w-100 p-2 shadow category-picker-menu">
+                                        <div
+                                            class="d-flex justify-content-between align-items-center gap-2 border-bottom pb-2">
+                                            <span class="fw-semibold small text-muted">Pick categories</span>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary"
+                                                    id="category-picker-close">Close</button>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm mb-2" id="category-search"
+                                               placeholder="Search category" autocomplete="off" />
+                                        <div class="category-option-list overflow-auto pe-1" id="category-option-list">
+                                            @foreach (var category in availableCategories)
+                                            {
+                                                if (int.TryParse(category.Value, out var categoryId))
+                                                {
+                                                    <button type="button"
+                                                            class="dropdown-item category-option @(selectedCategoryIds.Contains(categoryId) ? "d-none" : "")"
+                                                            data-category-id="@categoryId"
+                                                            data-category-name="@category.Text">@category.Text</button>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="border-top pt-2 mt-1">
+                                            <input asp-for="NewCategoryName" class="form-control form-control-sm"
+                                                   placeholder="Type a new category name" />
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 d-flex flex-wrap gap-2" id="category-tag-container">
+                                        @foreach (var category in selectedCategories)
+                                        {
+                                            <span class="badge rounded-pill text-bg-primary category-tag"
+                                                  data-category-id="@category.Id">
+                                                <span class="category-tag-text">@category.Name</span>
+                                                <button type="button"
+                                                        class="btn-close btn-close-white ms-2 category-remove"></button>
+                                                <input type="hidden" name="CategoryIds" value="@category.Id" />
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <small class="text-muted d-block mt-2">Chạm vào category trong danh sách để thêm tag. Bấm x để xóa tag.</small>
-                        <span asp-validation-for="CategoryIds" class="text-danger"></span>
                     </div>
 
-                    <div class="col-12 col-md-6">
-                        <label asp-for="SalePrice" class="form-label fw-semibold"></label>
-                        <input asp-for="SalePrice" class="form-control" type="number" step="0.01" min="0.01" />
-                        <span asp-validation-for="SalePrice" class="text-danger"></span>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label asp-for="CostPrice" class="form-label fw-semibold"></label>
-                        <input asp-for="CostPrice" class="form-control" type="number" step="0.01" min="0.01" />
-                        <span asp-validation-for="CostPrice" class="text-danger"></span>
-                    </div>
+                    <!-- PHẦN TẠO BIẾN THỂ (VARIANTS) -->
+                    <div class="mt-5 p-3 bg-light rounded-3 border">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h2 class="h5 mb-0">Product Variants (SKUs)</h2>
+                                <small class="text-muted">Tạo các biến thể như Màu sắc, Kích thước cho sản phẩm này.</small>
+                            </div>
+                            <button type="button" class="btn btn-success" id="add-variant-btn">+ Add Variant</button>
+                        </div>
 
-                    <div class="col-12 col-md-6">
-                        <label asp-for="ImageUrl" class="form-label fw-semibold"></label>
-                        <input asp-for="ImageUrl" class="form-control" placeholder="https://..." />
-                        <span asp-validation-for="ImageUrl" class="text-danger"></span>
-                    </div>
-                    <div class="col-12 col-md-6">
-                        <label asp-for="Barcode" class="form-label fw-semibold"></label>
-                        <input asp-for="Barcode" class="form-control" />
-                        <span asp-validation-for="Barcode" class="text-danger"></span>
-                    </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered bg-white align-middle" id="variants-table">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 25%;">SKU</th>
+                                        <th style="width: 15%;">Price</th>
+                                        <th style="width: 15%;">Cost</th>
+                                        <th style="width: 35%;">Attributes</th>
+                                        <th style="width: 10%;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Sẽ được render bằng JS hoặc lặp Model.Variants nếu có error trả về -->
+                                    @for (int i = 0; i < Model.Variants.Count; i++)
+                                    {
+                                        <tr>
+                                            <td><input name="Variants[@i].SKU" value="@Model.Variants[i].SKU"
+                                                           class="form-control" required /></td>
+                                                <td><input name="Variants[@i].Price" value="@Model.Variants[i].Price"
+                                                               class="form-control" type="number" step="0.01" required /></td>
+                                                    <td><input name="Variants[@i].Cost" value="@Model.Variants[i].Cost"
+                                                                   class="form-control" type="number" step="0.01" required /></td>
+                                                        <td>
+                                                            <div class="variant-attr-container d-flex flex-wrap gap-1">
+                                                                @foreach (var attrId in Model.Variants[i].AttributeValueIds)
+                                                                {
+                                                                    <span class="badge bg-secondary rounded-pill attr-tag">
+                                                                        @attrId
+                                                                        <button type="button"
+                                                                                class="btn-close btn-close-white ms-1 btn-sm remove-attr"></button>
+                                                                        <input type="hidden" name="Variants[@i].AttributeValueIds"
+                                                                               value="@attrId" />
+                                                                    </span>
+                                                                }
+                                                            </div>
+                                                            <select class="form-select form-select-sm mt-2 attr-selector">
+                                                                <option value="">+ Add Attribute</option>
+                                                                @foreach (var attrType in ViewBag.AttributeTypes as
+                                                            IEnumerable<AttributeType>)
+                                                                {
+                                                                    <optgroup label="@attrType.AttributeName">
+                                                                        @foreach (var val in attrType.Values)
+                                                                        {
+                                                                            <option value="@val.Id">@val.Value</option>
+                                                                        }
+                                                                    </optgroup>
+                                                                }
+                                                            </select>
+                                                        </td>
+                                                        <td class="text-center"><button type="button"
+                                                                                            class="btn btn-outline-danger btn-sm remove-variant">Remove</button></td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        @if (Model.Variants.Count == 0)
+                                        {
+                                            <div class="text-center py-3 text-muted">
+                                                <i class="bi bi-info-circle"></i> Chưa có biến thể nào. Vui lòng nhấn "Add Variant" để tạo SKU.
+                                            </div>
+                                        }
+                                    </div>
 
-                    <div class="col-12 col-md-4">
-                        <div class="form-check mt-4 pt-2">
-                            <input asp-for="IsActive" class="form-check-input" />
-                            <label asp-for="IsActive" class="form-check-label fw-semibold"></label>
+                                    <div class="mt-4 d-flex gap-2">
+                                        <button type="submit" class="btn btn-primary px-5">Create Product</button>
+                                        <a href="@Url.Content("~/Products/Index")" class="btn btn-outline-secondary">Cancel</a>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-12 col-md-4">
-                        <div class="form-check mt-4 pt-2">
-                            <input asp-for="Onsale" class="form-check-input" />
-                            <label asp-for="Onsale" class="form-check-label fw-semibold"></label>
-                        </div>
-                    </div>
 
-                    <div class="col-12">
-                        <label asp-for="ProductDescription" class="form-label fw-semibold"></label>
-                        <textarea asp-for="ProductDescription" class="form-control" rows="3"></textarea>
-                        <span asp-validation-for="ProductDescription" class="text-danger"></span>
-                    </div>
+                    @section Scripts {
+                        <!-- SCRIPT QUẢN LÝ CATEGORY (Giữ nguyên của bạn) -->
+                        <script>
+                            (() => {
+                                const picker = document.getElementById('category-picker');
+                                const searchInput = document.getElementById('category-search');
+                                const optionList = document.getElementById('category-option-list');
+                                const tagContainer = document.getElementById('category-tag-container');
+                                const closeButton = document.getElementById('category-picker-close');
 
-                    <div class="col-12 col-md-4">
-                        <label asp-for="Weight" class="form-label fw-semibold"></label>
-                        <input asp-for="Weight" class="form-control" type="number" step="0.01" min="0" />
-                        <span asp-validation-for="Weight" class="text-danger"></span>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <label asp-for="WarrantyPeriod" class="form-label fw-semibold"></label>
-                        <input asp-for="WarrantyPeriod" class="form-control" type="number" min="0" />
-                        <span asp-validation-for="WarrantyPeriod" class="text-danger"></span>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <label asp-for="Manufacturer" class="form-label fw-semibold"></label>
-                        <input asp-for="Manufacturer" class="form-control" />
-                        <span asp-validation-for="Manufacturer" class="text-danger"></span>
-                    </div>
+                                if (!picker || !searchInput || !optionList || !tagContainer) return;
 
-                    <div class="col-12">
-                        <label asp-for="Dimensions" class="form-label fw-semibold"></label>
-                        <input asp-for="Dimensions" class="form-control" placeholder="L x W x H" />
-                        <span asp-validation-for="Dimensions" class="text-danger"></span>
-                    </div>
+                                // Sử dụng một Set để theo dõi các ID đã chọn
+                                let selectedIds = new Set(
+                                    Array.from(tagContainer.querySelectorAll('input[name="CategoryIds"]')).map(input => Number(input.value))
+                                );
 
-                </div>
+                                // Hàm cập nhật hiển thị danh sách option
+                                const refreshOptions = () => {
+                                    const query = searchInput.value.trim().toLowerCase();
+                                    optionList.querySelectorAll('.category-option').forEach(option => {
+                                        const id = Number(option.dataset.categoryId);
+                                        const name = (option.dataset.categoryName || '').toLowerCase();
 
-                <div class="mt-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">Create</button>
-                    <a href="@Url.Content("~/Products/Index")" class="btn btn-outline-secondary">Cancel</a>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+                                        // Ẩn nếu: đã chọn HOẶC không khớp từ khóa tìm kiếm
+                                        const isSelected = selectedIds.has(id);
+                                        const matchesQuery = !query || name.includes(query);
 
-@section Scripts {
-    <script>
-        (() => {
-            const picker = document.getElementById('category-picker');
-            const toggleButton = picker?.querySelector('.dropdown-toggle');
-            const closeButton = document.getElementById('category-picker-close');
-            const searchInput = document.getElementById('category-search');
-            const optionList = document.getElementById('category-option-list');
-            const tagContainer = document.getElementById('category-tag-container');
-            if (!picker || !toggleButton || !searchInput || !optionList || !tagContainer) {
-                return;
-            }
+                                        option.classList.toggle('d-none', isSelected || !matchesQuery);
+                                    });
+                                };
 
-            const getDropdown = () => bootstrap.Dropdown.getOrCreateInstance(toggleButton);
-            const hideDropdown = () => getDropdown().hide();
-            const toggleDropdown = () => getDropdown().toggle();
+                                // Hàm thêm Tag
+                                const addTag = (id, name) => {
+                                    if (selectedIds.has(id)) return;
 
-            const selectedIds = new Set(Array.from(tagContainer.querySelectorAll('input[name="CategoryIds"]')).map(input => Number(input.value)));
+                                    selectedIds.add(id);
 
-            const hideOption = (option) => option.classList.add('d-none');
-            const showOption = (option) => option.classList.remove('d-none');
+                                    const tag = document.createElement('span');
+                                    tag.className = 'badge rounded-pill text-bg-primary category-tag';
+                                    tag.dataset.categoryId = id;
+                                    tag.innerHTML = `
+                                        <span class="category-tag-text">${name}</span>
+                                        <button type="button" class="btn-close btn-close-white ms-2 category-remove" aria-label="Close"></button>
+                                        <input type="hidden" name="CategoryIds" value="${id}" />
+                                    `;
 
-            const refreshOptions = () => {
-                const query = searchInput.value.trim().toLowerCase();
-                Array.from(optionList.querySelectorAll('.category-option')).forEach(option => {
-                    const id = Number(option.dataset.categoryId);
-                    const name = (option.dataset.categoryName || '').toLowerCase();
-                    if (selectedIds.has(id) || (query && !name.includes(query))) {
-                        hideOption(option);
-                    } else {
-                        showOption(option);
+                                    // Sự kiện xóa tag
+                                    tag.querySelector('.category-remove').addEventListener('click', (e) => {
+                                        e.preventDefault();
+                                        selectedIds.delete(id);
+                                        tag.remove();
+                                        refreshOptions();
+                                    });
+
+                                    tagContainer.appendChild(tag);
+                                    refreshOptions();
+
+                                    // Đóng dropdown sau khi chọn (Tùy chọn)
+                                    const toggleBtn = picker.querySelector('.dropdown-toggle');
+                                    bootstrap.Dropdown.getInstance(toggleBtn)?.hide();
+                                };
+
+                                // Sự kiện click chọn option
+                                optionList.addEventListener('click', (e) => {
+                                    const option = e.target.closest('.category-option');
+                                    if (option) {
+                                        addTag(Number(option.dataset.categoryId), option.dataset.categoryName);
+                                    }
+                                });
+
+                                // Sự kiện tìm kiếm
+                                searchInput.addEventListener('input', refreshOptions);
+
+                                // Ngăn dropdown đóng khi click vào ô search hoặc list
+                                picker.addEventListener('click', (e) => {
+                                    if (e.target === searchInput || picker.contains(e.target)) {
+                                        // e.stopPropagation(); // Bỏ comment nếu muốn giữ menu mở khi click vào bên trong
+                                    }
+                                });
+
+                                // Nút Close thủ công
+                                closeButton?.addEventListener('click', (e) => {
+                                    e.preventDefault();
+                                    const toggleBtn = picker.querySelector('.dropdown-toggle');
+                                    bootstrap.Dropdown.getInstance(toggleBtn)?.hide();
+                                });
+
+                                // Focus vào ô search khi mở dropdown
+                                picker.addEventListener('shown.bs.dropdown', () => {
+                                    searchInput.focus();
+                                    refreshOptions();
+                                });
+
+                                // Khởi tạo lần đầu
+                                refreshOptions();
+                            })();
+                        </script>
+
+                        <!-- SCRIPT QUẢN LÝ VARIANTS (SKU) -->
+                        <script>
+                            (() => {
+                                const addBtn = document.getElementById('add-variant-btn');
+                                const tableBody = document.querySelector('#variants-table tbody');
+
+                                const createVariantRow = (index, sku = '', price = '', cost = '', attrIds = []) => {
+                                    const tr = document.createElement('tr');
+                                    tr.innerHTML = `
+                                            <td><input name="Variants[${index}].SKU" value="${sku}" class="form-control" required /></td>
+                                            <td><input name="Variants[${index}].Price" value="${price}" class="form-control" type="number" step="0.01" required /></td>
+                                            <td><input name="Variants[${index}].Cost" value="${cost}" class="form-control" type="number" step="0.01" required /></td>
+                                            <td>
+                                                <div class="variant-attr-container d-flex flex-wrap gap-1">
+                                                    ${attrIds.map(id => `
+                                                        <span class="badge bg-secondary rounded-pill attr-tag">
+                                                            ${id}
+                                                            <button type="button" class="btn-close btn-close-white ms-1 btn-sm remove-attr"></button>
+                                                            <input type="hidden" name="Variants[${index}].AttributeValueIds" value="${id}" />
+                                                        </span>`).join('')}
+                                                </div>
+                                                <select class="form-select form-select-sm mt-2 attr-selector">
+                                                    <option value="">+ Add Attribute</option>
+                                                    ${Array.from(document.querySelectorAll('.attr-selector option')).filter(opt => opt.value !== "").map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('')}
+                                                </select>
+                                            </td>
+                                            <td class="text-center"><button type="button" class="btn btn-outline-danger btn-sm remove-variant">Remove</button></td>
+                                        `;
+                                    return tr;
+                                };
+
+                                addBtn?.addEventListener('click', () => {
+                                    const index = tableBody.querySelectorAll('tr').length;
+                                    tableBody.appendChild(createVariantRow(index));
+                                });
+
+                                tableBody?.addEventListener('click', (e) => {
+                                    if (e.target.classList.contains('remove-variant')) {
+                                        e.target.closest('tr').remove();
+                                        reIndexVariants();
+                                    }
+                                    if (e.target.classList.contains('remove-attr')) {
+                                        e.target.closest('.attr-tag').remove();
+                                    }
+                                });
+
+                                tableBody?.addEventListener('change', (e) => {
+                                    if (e.target.classList.contains('attr-selector')) {
+                                        const val = e.target.value;
+                                        if (!val) return;
+                                        const row = e.target.closest('tr');
+                                        const index = row.rowIndex - 1; // index trong body
+                                        const container = row.querySelector('.variant-attr-container');
+
+                                        const tag = document.createElement('span');
+                                        tag.className = 'badge bg-secondary rounded-pill attr-tag';
+                                        tag.innerHTML = `${val} <button type="button" class="btn-close btn-close-white ms-1 btn-sm remove-attr"></button> <input type="hidden" name="Variants[${index}].AttributeValueIds" value="${val}" />`;
+                                        tag.querySelector('.remove-attr').addEventListener('click', () => tag.remove());
+                                        container.appendChild(tag);
+                                        e.target.value = "";
+                                    }
+                                });
+
+                                const reIndexVariants = () => {
+                                    tableBody.querySelectorAll('tr').forEach((tr, idx) => {
+                                        tr.querySelectorAll('input').forEach(input => {
+                                            const name = input.name;
+                                            if (name) input.name = name.replace(/Variants\[\d+\]/, `Variants[${idx}]`);
+                                        });
+                                    });
+                                };
+                            })();
+                        </script>
                     }
-                });
-            };
-
-            const addTag = (id, name) => {
-                if (selectedIds.has(id)) {
-                    return;
-                }
-
-                selectedIds.add(id);
-
-                const tag = document.createElement('span');
-                tag.className = 'badge rounded-pill text-bg-primary category-tag';
-                tag.dataset.categoryId = String(id);
-                tag.innerHTML = `
-                    <span class="category-tag-text"></span>
-                    <button type="button" class="btn-close btn-close-white ms-2 category-remove" aria-label="Remove"></button>
-                    <input type="hidden" name="CategoryIds" value="${id}" />
-                `;
-
-                tag.querySelector('.category-tag-text').textContent = name;
-                tag.querySelector('.category-remove').addEventListener('click', () => removeTag(id));
-                tagContainer.appendChild(tag);
-                refreshOptions();
-                hideDropdown();
-            };
-
-            const removeTag = (id) => {
-                selectedIds.delete(id);
-                const tag = tagContainer.querySelector(`.category-tag[data-category-id="${id}"]`);
-                if (tag) {
-                    tag.remove();
-                }
-                refreshOptions();
-            };
-
-            optionList.addEventListener('click', (event) => {
-                const option = event.target.closest('.category-option');
-                if (!option) {
-                    return;
-                }
-
-                addTag(Number(option.dataset.categoryId), option.dataset.categoryName || option.textContent.trim());
-                searchInput.value = '';
-                refreshOptions();
-            });
-
-            searchInput.addEventListener('input', refreshOptions);
-
-            toggleButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                toggleDropdown();
-            });
-
-            closeButton?.addEventListener('click', (event) => {
-                event.preventDefault();
-                hideDropdown();
-            });
-
-            tagContainer.addEventListener('click', (event) => {
-                const removeButton = event.target.closest('.category-remove');
-                if (!removeButton) {
-                    return;
-                }
-
-                removeTag(Number(removeButton.dataset.categoryId));
-            });
-
-            picker.addEventListener('shown.bs.dropdown', () => {
-                searchInput.focus();
-                refreshOptions();
-            });
-
-            picker.addEventListener('hidden.bs.dropdown', () => {
-                searchInput.value = '';
-                refreshOptions();
-            });
-
-            refreshOptions();
-        })();
-    </script>
-}

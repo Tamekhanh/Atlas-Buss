@@ -55,20 +55,11 @@ CREATE TABLE dbo.PurchaseOrderStatuses(
 )
 GO
 
--- BỔ SUNG: Đơn vị tính (Rất quan trọng cho sản phẩm)
 CREATE TABLE dbo.Units(
     id int identity(1,1) primary key,
-    UnitName nvarchar(50) not null UNIQUE, -- Ví dụ: 'Chiếc', 'Kg', 'Thùng'
+    UnitName nvarchar(50) not null UNIQUE, 
     ShortName nvarchar(10) null
 )
-GO
-
-IF NOT EXISTS (SELECT 1 FROM dbo.Units WHERE UnitName = N'Chiếc')
-    INSERT INTO dbo.Units(UnitName, ShortName) VALUES (N'Chiếc', N'Cái');
-IF NOT EXISTS (SELECT 1 FROM dbo.Units WHERE UnitName = N'Bộ')
-    INSERT INTO dbo.Units(UnitName, ShortName) VALUES (N'Bộ', N'Bộ');
-IF NOT EXISTS (SELECT 1 FROM dbo.Units WHERE UnitName = N'Kilogram')
-    INSERT INTO dbo.Units(UnitName, ShortName) VALUES (N'Kilogram', N'Kg');
 GO
 
 -- =============================================
@@ -83,7 +74,7 @@ CREATE TABLE dbo.Addresses(
     State nvarchar(100),
     Country nvarchar(100),
     IsDeleted bit default 0,
-    CreatedAt datetime default GETDATE() -- Audit
+    CreatedAt datetime default GETDATE()
 )
 GO
 
@@ -92,7 +83,7 @@ CREATE TABLE dbo.Contacts(
 	Phone nvarchar(20),
 	Email nvarchar(50) null,
     IsDeleted bit default 0,
-    CreatedAt datetime default GETDATE() -- Audit
+    CreatedAt datetime default GETDATE()
 )
 GO
 
@@ -106,7 +97,7 @@ CREATE TABLE dbo.Persons(
 	FOREIGN KEY (AddressId) REFERENCES dbo.Addresses(id),
     FOREIGN KEY (ContactId) REFERENCES dbo.Contacts(id),
     IsDeleted bit default 0,
-    CreatedAt datetime default GETDATE() -- Audit
+    CreatedAt datetime default GETDATE()
 )
 GO
 
@@ -119,7 +110,7 @@ CREATE TABLE dbo.Companies(
     FOREIGN KEY (AddressId) REFERENCES dbo.Addresses(id),
     FOREIGN KEY (ContactId) REFERENCES dbo.Contacts(id),
     IsDeleted bit default 0,
-    CreatedAt datetime default GETDATE() -- Audit
+    CreatedAt datetime default GETDATE()
 )
 GO
 
@@ -163,14 +154,14 @@ CREATE TABLE dbo.Employee(
     PersonId int not null UNIQUE,
     FOREIGN KEY (PersonId) REFERENCES dbo.Persons(id),
     IsDeleted bit default 0,
-    CreatedAt datetime default GETDATE() -- Audit
+    CreatedAt datetime default GETDATE()
 )
 GO
 
 CREATE TABLE dbo.EmployeeAccounts(
     EmployeeId int primary key,
     Username nvarchar(50) not null UNIQUE,
-    PasswordHash varchar(255) not null, -- Tối ưu: dùng varchar(255) thay vì nvarchar(max) cho hash
+    PasswordHash varchar(255) not null,
     IsActive bit not null default 1,
     LastLogin datetime null,
     RoleId int null,
@@ -185,7 +176,7 @@ CREATE TABLE dbo.Departments(
     Description nvarchar(255) null,
     ParentDepartmentId int null,
     FOREIGN KEY (ParentDepartmentId) REFERENCES dbo.Departments(id),
-    CreatedAt datetime default GETDATE() -- Audit
+    CreatedAt datetime default GETDATE()
 )
 GO
 
@@ -208,7 +199,7 @@ CREATE TABLE dbo.Logs(
 GO
 
 -- =============================================
--- 4. QUẢN LÝ SẢN PHẨM & GIÁ
+-- 4. QUẢN LÝ SẢN PHẨM, THUỘC TÍNH & BIẾN THỂ
 -- =============================================
 
 CREATE TABLE dbo.Taxes(
@@ -217,30 +208,75 @@ CREATE TABLE dbo.Taxes(
     TaxRate decimal(18,4) not null,
     Description nvarchar(255) null,
     IsActive bit not null default 1,
-    IsStackable bit not null default 0
+    IsStackable bit not null default 0,
+    EffectiveDate datetime null, 
+    ExpiryDate datetime null
 )
 GO
 
+-- 4.1. Sản phẩm chính (Parent Product)
 CREATE TABLE dbo.Products(
     id int identity(1,1) primary key,
     ProductName nvarchar(100) not null,
     ProductCode nvarchar(50) not null UNIQUE,
-    UnitId int null, -- Could be serviced by a default unit if null, but allowing null for flexibility
+    UnitId int null, 
     ImageUrl nvarchar(255) null,
-    SalePrice decimal(18,2) not null,
-    CostPrice decimal(18,2) not null,
+    BaseSalePrice decimal(18,2) not null, -- Giá bán cơ sở
+    BaseCostPrice decimal(18,2) not null, -- Giá vốn cơ sở
     Barcode nvarchar(50) null,
     isActive bit not null default 1,
     Onsale bit not null default 0,
     EmployeeId int not null,
     IsDeleted bit default 0,
-    CreatedAt datetime default GETDATE(), -- Audit
-    UpdatedAt datetime null, -- Audit
+    CreatedAt datetime default GETDATE(),
+    UpdatedAt datetime null,
     FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id),
     FOREIGN KEY (UnitId) REFERENCES dbo.Units(id)
 )
 GO
 
+-- 4.2. Hệ thống thuộc tính động (Dynamic Attributes)
+CREATE TABLE dbo.AttributeTypes(
+    id int identity(1,1) primary key,
+    AttributeName nvarchar(50) not null UNIQUE, -- Ví dụ: 'Màu sắc', 'Kích thước', 'RAM'
+    Description nvarchar(255) null
+)
+GO
+
+CREATE TABLE dbo.AttributeValues(
+    id int identity(1,1) primary key,
+    AttributeTypeId int not null,
+    AttributeValue nvarchar(50) not null, -- Ví dụ: 'Đỏ', 'Xanh', 'L', 'XL', '16GB'
+    FOREIGN KEY (AttributeTypeId) REFERENCES dbo.AttributeTypes(id),
+    CONSTRAINT UC_AttributeValue UNIQUE (AttributeTypeId, AttributeValue)
+)
+GO
+
+-- 4.3. Biến thể sản phẩm (Product Variants / SKU)
+-- Đây là đơn vị thực tế để quản lý tồn kho và bán hàng
+CREATE TABLE dbo.ProductVariants(
+    id int identity(1,1) primary key,
+    ProductId int not null,
+    SKU nvarchar(50) not null UNIQUE, -- Mã SKU duy nhất (ví dụ: TSHIRT-RED-L)
+    VariantPrice decimal(18,2) null,  -- Giá bán riêng nếu khác giá cơ sở
+    VariantCost decimal(18,2) null,   -- Giá vốn riêng nếu khác giá cơ sở
+    IsActive bit default 1,
+    CreatedAt datetime default GETDATE(),
+    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id)
+)
+GO
+
+-- 4.4. Ánh xạ Biến thể với Giá trị thuộc tính
+CREATE TABLE dbo.VariantAttributeMappings(
+    VariantId int not null,
+    AttributeValueId int not null,
+    PRIMARY KEY (VariantId, AttributeValueId),
+    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id),
+    FOREIGN KEY (AttributeValueId) REFERENCES dbo.AttributeValues(id)
+)
+GO
+
+-- Bổ sung các bảng chi tiết sản phẩm
 CREATE TABLE dbo.ProductTaxes(
     ProductId int not null,
     TaxId int not null,
@@ -268,6 +304,19 @@ CREATE TABLE dbo.Categories(
 )
 GO
 
+CREATE TABLE dbo.CategoryProducts(
+    CategoryId int not null,
+    ProductId int not null,
+    PRIMARY KEY (CategoryId, ProductId),
+    FOREIGN KEY (CategoryId) REFERENCES dbo.Categories(id),
+    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id)
+)
+GO
+
+-- =============================================
+-- 5. QUẢN LÝ GIÁ (PRICELIST) - Áp dụng cho Variant
+-- =============================================
+
 CREATE TABLE dbo.Pricelist(
     id int identity(1,1) primary key,
     EffectiveDate date not null,
@@ -283,38 +332,19 @@ CREATE TABLE dbo.Pricelist(
 )
 GO
 
-CREATE TABLE dbo.CategoryPricelist(
+CREATE TABLE dbo.PricelistProductVariant(
     id int identity(1,1) primary key,
-    CategoryId int not null,
     PricelistId int not null,
-    FOREIGN KEY (CategoryId) REFERENCES dbo.Categories(id),
-    FOREIGN KEY (PricelistId) REFERENCES dbo.Pricelist(id)
-)
-GO
-
-CREATE TABLE dbo.PricelistProduct(
-    id int identity(1,1) primary key,
-    IsStackable bit not null default 0,
-    PricelistId int not null,
-    ProductId int not null,
+    VariantId int not null,
     Price decimal(18,2) null,
     Discount decimal(5,2) null,
     FOREIGN KEY (PricelistId) REFERENCES dbo.Pricelist(id),
-    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id)
-)
-GO
-
-CREATE TABLE dbo.CategoryProducts(
-    CategoryId int not null,
-    ProductId int not null,
-    PRIMARY KEY (CategoryId, ProductId),
-    FOREIGN KEY (CategoryId) REFERENCES dbo.Categories(id),
-    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id)
+    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id)
 )
 GO
 
 -- =============================================
--- 5. QUẢN LÝ KHO (INVENTORY)
+-- 6. QUẢN LÝ KHO (INVENTORY) - Theo Variant
 -- =============================================
 
 CREATE TABLE dbo.Warehouses(
@@ -322,8 +352,8 @@ CREATE TABLE dbo.Warehouses(
     WarehouseName nvarchar(100) not null UNIQUE,
     AddressId int not null,
     ManagerId int null,
-    IsDeleted bit default 0, -- Bổ sung đồng bộ
-    CreatedAt datetime default GETDATE(), -- Audit
+    IsDeleted bit default 0,
+    CreatedAt datetime default GETDATE(),
     FOREIGN KEY (AddressId) REFERENCES dbo.Addresses(id),
     FOREIGN KEY (ManagerId) REFERENCES dbo.Employee(id)
 )
@@ -331,34 +361,34 @@ GO
 
 CREATE TABLE dbo.InventoryStock(
     WarehouseId int not null,
-    ProductId int not null,
+    VariantId int not null, -- Quản lý tồn kho theo SKU/Variant
     Quantity int not null default 0,
     ReservedQuantity int not null default 0,
     LastUpdated datetime not null default GETDATE(),
-    PRIMARY KEY (WarehouseId, ProductId),
+    PRIMARY KEY (WarehouseId, VariantId),
     FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id),
-    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id)
+    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id)
 )
 GO
 
 CREATE TABLE dbo.InventoryTransactions(
     id bigint identity(1,1) primary key,
-    ProductId int not null,
+    VariantId int not null,
     WarehouseId int not null,
     Quantity int not null,
-    TransactionType nvarchar(50),
+    TransactionType nvarchar(50), -- 'IN', 'OUT', 'TRANSFER', 'ADJUST'
     ReferenceId nvarchar(50),
     EmployeeId int not null,
     TransactionDate datetime default GETDATE(),
     Note nvarchar(255),
-    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id),
+    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id),
     FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id),
     FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id)
 )
 GO
 
 -- =============================================
--- 6. QUẢN LÝ BÁN HÀNG (SALES)
+-- 7. QUẢN LÝ BÁN HÀNG (SALES) - Theo Variant
 -- =============================================
 
 CREATE TABLE dbo.SalesOrders(
@@ -369,8 +399,8 @@ CREATE TABLE dbo.SalesOrders(
     CustomerCompanyId int null,
     CustomerPersonId int null,
     OrderStatusId int not null default 1,
-    IsDeleted bit default 0, -- Bổ sung để đồng bộ xóa mềm
-    CreatedAt datetime default GETDATE(), -- Audit
+    IsDeleted bit default 0,
+    CreatedAt datetime default GETDATE(),
     FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id),
     FOREIGN KEY (CustomerCompanyId) REFERENCES dbo.CustomerCompany(id),
     FOREIGN KEY (CustomerPersonId) REFERENCES dbo.CustomerPerson(id),
@@ -385,18 +415,20 @@ GO
 CREATE TABLE dbo.SalesOrderDetails(
     id int identity(1,1) primary key,
     OrderId int not null,
-    ProductId int not null,
+    VariantId int not null, -- Khách mua Variant cụ thể
     WarehouseId int not null,
     Quantity int not null CHECK (Quantity > 0),
     UnitPrice decimal(18,2) not null, 
-    Discount decimal(18,2) not null default 0, -- Lưu ý: Đây là số tiền giảm
-    TaxRate decimal(18,4) not null default 0,
+    Discount decimal(18,2) not null default 0,
+    AppliedTaxRate decimal(18,4) not null default 0,
+    TaxId int null,
     SubTotal AS ((Quantity * UnitPrice) - Discount), 
-    TaxAmount AS (((Quantity * UnitPrice) - Discount) * (TaxRate / 100.0)),
-    LineTotal AS (((Quantity * UnitPrice) - Discount) * (1 + TaxRate / 100.0)), 
+    TaxAmount AS (((Quantity * UnitPrice) - Discount) * (AppliedTaxRate / 100.0)),
+    LineTotal AS (((Quantity * UnitPrice) - Discount) * (1 + AppliedTaxRate / 100.0)), 
     FOREIGN KEY (OrderId) REFERENCES dbo.SalesOrders(id),
-    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id),
-    FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id)
+    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id),
+    FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id),
+    FOREIGN KEY (TaxId) REFERENCES dbo.Taxes(id)
 )
 GO
 
@@ -408,7 +440,7 @@ CREATE TABLE dbo.Invoices(
     DueDate date null,
     TotalAmount decimal(18,2) not null,
     IsPaid bit default 0,
-    CreatedAt datetime default GETDATE(), -- Audit
+    CreatedAt datetime default GETDATE(),
     FOREIGN KEY (OrderId) REFERENCES dbo.SalesOrders(id)
 )
 GO
@@ -425,7 +457,7 @@ CREATE TABLE dbo.Payments(
 GO
 
 -- =============================================
--- 7. QUẢN LÝ NHẬP HÀNG (PURCHASE)
+-- 8. QUẢN LÝ NHẬP HÀNG (PURCHASE) - Theo Variant
 -- =============================================
 
 CREATE TABLE dbo.PurchaseOrders(
@@ -436,8 +468,8 @@ CREATE TABLE dbo.PurchaseOrders(
     VendorCompanyId int null,
     VendorPersonId int null,
     OrderStatusId int not null default 1,
-    IsDeleted bit default 0, -- Bổ sung để đồng bộ xóa mềm
-    CreatedAt datetime default GETDATE(), -- Audit
+    IsDeleted bit default 0,
+    CreatedAt datetime default GETDATE(),
     FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id),
     FOREIGN KEY (VendorCompanyId) REFERENCES dbo.VendorsCompany(id),
     FOREIGN KEY (VendorPersonId) REFERENCES dbo.VendorsPerson(id),
@@ -452,7 +484,7 @@ GO
 CREATE TABLE dbo.PurchaseOrderDetails(
     id int identity(1,1) primary key,
     POId int not null,
-    ProductId int not null,
+    VariantId int not null, -- Nhập Variant cụ thể
     WarehouseId int not null,
     Quantity int not null CHECK (Quantity > 0),
     UnitPrice decimal(18,2) not null, 
@@ -461,16 +493,17 @@ CREATE TABLE dbo.PurchaseOrderDetails(
     TaxAmount AS ((Quantity * UnitPrice) * (TaxRate / 100.0)),
     LineTotal AS ((Quantity * UnitPrice) * (1 + TaxRate / 100.0)),
     FOREIGN KEY (POId) REFERENCES dbo.PurchaseOrders(id),
-    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id),
+    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id),
     FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id)
 )
 GO
 
 -- =============================================
--- 8. TỐI ƯU HÓA (INDEXING)
+-- 9. TỐI ƯU HÓA (INDEXING)
 -- =============================================
 CREATE INDEX IX_Products_ProductName ON dbo.Products(ProductName);
+CREATE INDEX IX_ProductVariants_SKU ON dbo.ProductVariants(SKU);
 CREATE INDEX IX_SalesOrders_OrderNumber ON dbo.SalesOrders(OrderNumber);
 CREATE INDEX IX_PurchaseOrders_PONumber ON dbo.PurchaseOrders(PONumber);
-CREATE INDEX IX_Inventory_ProductWarehouse ON dbo.InventoryStock(ProductId, WarehouseId);
+CREATE INDEX IX_Inventory_VariantWarehouse ON dbo.InventoryStock(VariantId, WarehouseId);
 GO
