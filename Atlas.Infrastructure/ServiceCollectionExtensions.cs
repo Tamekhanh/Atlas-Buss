@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICustomerPersonRepository, CustomerPersonRepository>();
         services.AddScoped<IAuthRepository, AuthRepository>();
         services.AddScoped<ILogRepository, LogRepository>();
+        services.AddScoped<IStorageProvider, LocalStorageProvider>();
 
         return services;
     }

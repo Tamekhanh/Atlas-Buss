@@ -15,15 +15,17 @@ namespace Atlas.Web.Areas.Products.Controllers
     {
         private readonly IProductService _productService;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IStorageProvider _storageProvider;
         private readonly ILogService _logService;
 
         const int pageSize = 20;
 
-        public ProductController(IProductService productService, ICategoryRepository categoryRepository, ILogService logService)
+        public ProductController(IProductService productService, ICategoryRepository categoryRepository, IStorageProvider storageProvider, ILogService logService)
         {
             _productService = productService;
             _categoryRepository = categoryRepository;
             _logService = logService;
+            _storageProvider = storageProvider;
         }
 
         public async Task<IActionResult> Index(int? page)
@@ -64,20 +66,32 @@ namespace Atlas.Web.Areas.Products.Controllers
         public async Task<IActionResult> Detail(int id, ProductModelView model)
         {
             var product = await _productService.GetProductByIdAsync(id);
-            if (product is null)
-            {
-                return NotFound();
-            }
+            if (product is null) return NotFound();
 
             model.Id = id;
 
-            // Cập nhật thông tin cha (Sử dụng BaseSalePrice)
-            product.ProductName = model.ProductName.Trim();
-            product.ProductCode = model.ProductCode.Trim();
-            product.UnitId = model.UnitId > 0 ? model.UnitId : product.UnitId;
-            product.ImageUrl = string.IsNullOrWhiteSpace(model.ImageUrl) ? null : model.ImageUrl.Trim();
-            product.BaseSalePrice = model.BaseSalePrice; // Đổi tên
-            product.BaseCostPrice = model.BaseCostPrice; // Đổi tên
+            // 1. XỬ LÝ LƯU FILE ẢNH
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                using (var stream = model.ImageFile.OpenReadStream())
+                {
+                    var relativeImagePath = await _storageProvider.SaveFileAsync(stream, "Products", model.ImageFile.FileName);
+                    product.ImageUrl = relativeImagePath;
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(model.ImageUrl))
+            {
+                product.ImageUrl = model.ImageUrl.Trim();
+            }
+            else
+            {
+                product.ImageUrl = null;
+            }
+
+            // 🔥 MÌNH ĐÃ XÓA DÒNG GHI ĐÈ Ở ĐÂY RỒI NHÉ 🔥
+
+            product.BaseSalePrice = model.BaseSalePrice;
+            product.BaseCostPrice = model.BaseCostPrice;
             product.Barcode = string.IsNullOrWhiteSpace(model.Barcode) ? null : model.Barcode.Trim();
             product.IsActive = model.IsActive;
             product.Onsale = model.Onsale;
@@ -88,9 +102,6 @@ namespace Atlas.Web.Areas.Products.Controllers
             product.ProductDetail.WarrantyPeriod = model.WarrantyPeriod;
             product.ProductDetail.Dimensions = string.IsNullOrWhiteSpace(model.Dimensions) ? null : model.Dimensions.Trim();
             product.ProductDetail.Manufacturer = string.IsNullOrWhiteSpace(model.Manufacturer) ? null : model.Manufacturer.Trim();
-
-            // Logic cập nhật biến thể (Variants) có thể được triển khai tại đây hoặc trong Service
-            // Ở đây ta tạm thời tập trung vào update thông tin cha
 
             var updated = await _productService.UpdateProductAsync(product, model.CategoryIds);
             if (!updated)

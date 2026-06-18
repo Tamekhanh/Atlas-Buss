@@ -39,6 +39,7 @@ namespace Atlas.Web.Areas.Products.Models
         [StringLength(255)]
         public string? ImageUrl { get; set; }
 
+        public IFormFile? ImageFile { get; set; }
         // ĐỔI TÊN: SalePrice -> BaseSalePrice để khớp với Entity mới
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Base sale price must be greater than 0.")]

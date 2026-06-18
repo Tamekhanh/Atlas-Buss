@@ -4,6 +4,8 @@ using Atlas.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +56,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         };
     });
 
+    
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ProductCreate", policy =>
@@ -76,6 +80,26 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+var folderName = builder.Configuration.GetSection("StorageSettings:FolderName").Value ?? "AtlasStorage";
+var currentDir = builder.Environment.ContentRootPath;
+
+// Ép buộc lùi ra thư mục cha (ra ngoài project Atlas.Web)
+var parentDir = Directory.GetParent(currentDir)?.FullName ?? currentDir;
+var absoluteStoragePath = Path.Combine(parentDir, folderName);
+
+// Đảm bảo thư mục tồn tại để tránh crash ứng dụng khi khởi động
+if (!Directory.Exists(absoluteStoragePath))
+{
+    Directory.CreateDirectory(absoluteStoragePath);
+}
+
+// Cho phép truy cập qua đường dẫn ảo "/file-storage"
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(absoluteStoragePath),
+    RequestPath = "/file-storage" 
+});
 
 app.UseRouting();
 
