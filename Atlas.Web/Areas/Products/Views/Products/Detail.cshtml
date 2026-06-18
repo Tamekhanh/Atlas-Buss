@@ -100,7 +100,10 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                                     {
                                         <div class="mt-2">
                                             <small class="text-muted d-block mb-1">Current image:</small>
-                                            <img src="/file-storage/@Model.ImageUrl" alt="Product Image" />
+                                            <div style="width: 100px; height: 100px; overflow: hidden; border-radius: 4px;">
+                                                <img src="/file-storage/@Model.ImageUrl" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
+
+                                            </div>
                                         </div>
                                     }
                                 </div>
@@ -289,8 +292,7 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                                 @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
                                 {
                                     <a href="/@Model.ImageUrl" target="_blank" class="text-decoration-none">
-                                        <img src="/@Model.ImageUrl" alt="Product Image" class="img-thumbnail"
-                                             style="max-height: 100px;" />
+                                        <img src="/file-storage/@Model.ImageUrl" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
                                     </a>
                                 }
                                 else
@@ -304,8 +306,7 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                         <h2 class="h5 mb-3 border-bottom pb-2">Product Details</h2>
                         <dl class="row mb-0">
                             <dt class="col-sm-4">Description</dt>
-                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDescription) ? "N/A" :
-                                                                                                                                                                                            Model.ProductDescription)</dd>
+                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDescription) ? "N/A" : Model.ProductDescription)</dd>
                                 <dt class="col-sm-4">Weight</dt>
                                 <dd class="col-sm-8">@(Model.Weight.HasValue ? Model.Weight.Value.ToString("N2") : "N/A")</dd>
                                 <dt class="col-sm-4">Warranty</dt>
@@ -315,8 +316,7 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                                 <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Dimensions) ? "N/A" : Model.Dimensions)
                                 </dd>
                                 <dt class="col-sm-4">Manufacturer</dt>
-                                <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Manufacturer) ? "N/A" :
-                                                                                                                                                                                                                Model.Manufacturer)</dd>
+                                <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Manufacturer) ? "N/A" : Model.Manufacturer)</dd>
                                 </dl>
                                 <h3 class="h6 mt-4 mb-2">Categories</h3>
                                 <div class="d-flex flex-wrap gap-2">

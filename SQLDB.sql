@@ -97,7 +97,8 @@ CREATE TABLE dbo.Persons(
 	FOREIGN KEY (AddressId) REFERENCES dbo.Addresses(id),
     FOREIGN KEY (ContactId) REFERENCES dbo.Contacts(id),
     IsDeleted bit default 0,
-    CreatedAt datetime default GETDATE()
+    CreatedAt datetime default GETDATE(),
+    ImageUrl nvarchar(255) null
 )
 GO
 
@@ -110,7 +111,8 @@ CREATE TABLE dbo.Companies(
     FOREIGN KEY (AddressId) REFERENCES dbo.Addresses(id),
     FOREIGN KEY (ContactId) REFERENCES dbo.Contacts(id),
     IsDeleted bit default 0,
-    CreatedAt datetime default GETDATE()
+    CreatedAt datetime default GETDATE(),
+    ImageUrl nvarchar(255) null
 )
 GO
 
@@ -154,7 +156,7 @@ CREATE TABLE dbo.Employee(
     PersonId int not null UNIQUE,
     FOREIGN KEY (PersonId) REFERENCES dbo.Persons(id),
     IsDeleted bit default 0,
-    CreatedAt datetime default GETDATE()
+    CreatedAt datetime default GETDATE(),
 )
 GO
 
