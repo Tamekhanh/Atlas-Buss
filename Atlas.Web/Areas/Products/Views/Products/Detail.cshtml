@@ -40,6 +40,22 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
 
                     <div class="row g-4">
                         <!-- CỘT TRÁI: THÔNG TIN CƠ BẢN -->
+                        <div class="col-sm-6">
+
+                            <div class="mt-2" id="imagePreviewContainer"
+                                 style="display: @(!string.IsNullOrWhiteSpace(Model.ImageUrl) ? "block" : "none"); width: 100%; aspect-ratio: 1/1; overflow: hidden; border-radius: 4px; background-color: #f8f9fa; border: 1px dashed #ced4da;">
+
+                                <small class="text-muted d-block mb-1">Image Preview:</small>
+
+                                <img id="imagePreview"
+                                     src="@(!string.IsNullOrWhiteSpace(Model.ImageUrl) ? $"/file-storage/{Model.ImageUrl}" : "")"
+                                     data-original-src="@(!string.IsNullOrWhiteSpace(Model.ImageUrl) ? $"/file-storage/{Model.ImageUrl}" : "")"
+                                     alt="Product Image" style="width: 100%; height: 100%; object-fit: contain;" />
+                            </div>
+                            <input asp-for="ImageFile" type="file" id="imageInput" class="form-control mt-2" accept="image/*" />
+
+                            <input type="hidden" asp-for="ImageUrl" />
+                        </div>
                         <div class="col-md-6">
                             <h2 class="h5 mb-3 border-bottom pb-2">Basic Information</h2>
                             <div class="mb-3">
@@ -89,23 +105,6 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                                 <div class="col-sm-4">
                                     <label asp-for="WarrantyPeriod" class="form-label"></label>
                                     <input asp-for="WarrantyPeriod" class="form-control" />
-                                </div>
-                                <div class="col-sm-4">
-                                    <label asp-for="ImageFile" class="form-label">Product Image</label>
-                                    <input asp-for="ImageFile" type="file" class="form-control" accept="image/*" />
-
-                                    <input type="hidden" asp-for="ImageUrl" />
-
-                                    @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
-                                    {
-                                        <div class="mt-2">
-                                            <small class="text-muted d-block mb-1">Current image:</small>
-                                            <div style="width: 100px; height: 100px; overflow: hidden; border-radius: 4px;">
-                                                <img src="/file-storage/@Model.ImageUrl" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
-
-                                            </div>
-                                        </div>
-                                    }
                                 </div>
                             </div>
                             <div class="mb-3 mt-3">
@@ -292,7 +291,8 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                                 @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
                                 {
                                     <a href="/@Model.ImageUrl" target="_blank" class="text-decoration-none">
-                                        <img src="/file-storage/@Model.ImageUrl" alt="Product Image" style="width: 100%; height: 100%; object-fit: cover;" />
+                                        <img src="/file-storage/@Model.ImageUrl" alt="Product Image"
+                                             style="width: 100%; height: 100%; object-fit: cover;" />
                                     </a>
                                 }
                                 else
@@ -306,7 +306,8 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                         <h2 class="h5 mb-3 border-bottom pb-2">Product Details</h2>
                         <dl class="row mb-0">
                             <dt class="col-sm-4">Description</dt>
-                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDescription) ? "N/A" : Model.ProductDescription)</dd>
+                            <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDescription) ? "N/A" :
+                                                                                                                                                                                            Model.ProductDescription)</dd>
                                 <dt class="col-sm-4">Weight</dt>
                                 <dd class="col-sm-8">@(Model.Weight.HasValue ? Model.Weight.Value.ToString("N2") : "N/A")</dd>
                                 <dt class="col-sm-4">Warranty</dt>
@@ -316,7 +317,8 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                                 <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Dimensions) ? "N/A" : Model.Dimensions)
                                 </dd>
                                 <dt class="col-sm-4">Manufacturer</dt>
-                                <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Manufacturer) ? "N/A" : Model.Manufacturer)</dd>
+                                <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Manufacturer) ? "N/A" :
+                                                                                                                                                                                                                Model.Manufacturer)</dd>
                                 </dl>
                                 <h3 class="h6 mt-4 mb-2">Categories</h3>
                                 <div class="d-flex flex-wrap gap-2">
@@ -414,10 +416,10 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                         tag.className = 'badge rounded-pill text-bg-primary category-tag';
                         tag.dataset.categoryId = id;
                         tag.innerHTML = `
-                                                    <span class="category-tag-text">${name}</span>
-                                                    <button type="button" class="btn-close btn-close-white ms-2 category-remove" aria-label="Close"></button>
-                                                    <input type="hidden" name="CategoryIds" value="${id}" />
-                                                `;
+                                                                                                                <span class="category-tag-text">${name}</span>
+                                                                                                                <button type="button" class="btn-close btn-close-white ms-2 category-remove" aria-label="Close"></button>
+                                                                                                                <input type="hidden" name="CategoryIds" value="${id}" />
+                                                                                                            `;
 
                         // Sự kiện xóa tag
                         tag.querySelector('.category-remove').addEventListener('click', (e) => {
@@ -473,26 +475,26 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                     const createVariantRow = (index, sku = '', price = '', cost = '', attrIds = []) => {
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-                                                                                <td><input name="Variants[${index}].SKU" value="${sku}" class="form-control" required /></td>
-                                                                                <td><input name="Variants[${index}].Price" value="${price}" class="form-control" type="number" step="0.01" required /></td>
-                                                                                <td><input name="Variants[${index}].Cost" value="${cost}" class="form-control" type="number" step="0.01" required /></td>
-                                                                                <td>
-                                                                                    <div class="variant-attr-container d-flex flex-wrap gap-1">
-                                                                                        ${attrIds.map(id => `
-                                                                                            <span class="badge bg-secondary rounded-pill attr-tag">
-                                                                                                ${id}
-                                                                                                <button type="button" class="btn-close btn-close-white ms-1 btn-sm remove-attr"></button>
-                                                                                                <input type="hidden" name="Variants[${index}].AttributeValueIds" value="${id}" />
-                                                                                            </span>`).join('')}
-                                                                                    </div>
-                                                                                    <select class="form-select form-select-sm mt-2 attr-selector">
-                                                                                        <option value="">+ Add Attribute</option>
-                                                                                        ${Array.from(document.querySelectorAll('.attr-selector option')).filter(opt => opt.value !== "").map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('')}
-                                                                                        <!-- Nếu là row mới hoàn toàn, ta copy options từ row đầu tiên hoặc từ ViewBag -->
-                                                                                    </select>
-                                                                                </td>
-                                                                                <td class="text-center"><button type="button" class="btn btn-outline-danger btn-sm remove-variant">Remove</button></td>
-                                                                            `;
+                        <td><input name="Variants[${index}].SKU" value="${sku}" class="form-control" required /></td>
+                        <td><input name="Variants[${index}].Price" value="${price}" class="form-control" type="number" step="0.01" required /></td>
+                        <td><input name="Variants[${index}].Cost" value="${cost}" class="form-control" type="number" step="0.01" required /></td>
+                        <td>
+                        <div class="variant-attr-container d-flex flex-wrap gap-1">
+                        ${attrIds.map(id => `
+                        <span class="badge bg-secondary rounded-pill attr-tag">
+                        ${id}
+                        <button type="button" class="btn-close btn-close-white ms-1 btn-sm remove-attr"></button>
+                        <input type="hidden" name="Variants[${index}].AttributeValueIds" value="${id}" />
+                        </span>`).join('')}
+                        </div>
+                        <select class="form-select form-select-sm mt-2 attr-selector">
+                         <option value="">+ Add Attribute</option>
+                         ${Array.from(document.querySelectorAll('.attr-selector option')).filter(opt => opt.value !== "").map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('')}
+                        <!-- Nếu là row mới hoàn toàn, ta copy options từ row đầu tiên hoặc từ ViewBag -->
+                        </select>
+                         </td>
+                        <td class="text-center"><button type="button" class="btn btn-outline-danger btn-sm remove-variant">Remove</button></td>
+                        `;
                         return tr;
                     };
 
@@ -539,5 +541,34 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                         });
                     };
                 })();
+
+                document.getElementById('imageInput').addEventListener('change', function (event) {
+                    const input = event.target;
+                    const file = input.files[0];
+                    const previewImg = document.getElementById('imagePreview');
+                    const previewContainer = document.getElementById('imagePreviewContainer');
+
+                    if (file) {
+                        // -- TRƯỜNG HỢP 1: CÓ CHỌN FILE MỚI --
+                        // 1. Tạo URL tạm thời cho preview và gán cho src
+                        previewImg.src = URL.createObjectURL(file);
+                        // 2. Hiển thị khung chứa ảnh (xử lý trường hợp ban đầu không có ảnh)
+                        previewContainer.style.display = 'block';
+                    } else {
+                        // -- TRƯỜNG HỢP 2: HỦY CHỌN FILE (ẤN CANCEL TRÊN DIALOG) --
+                        // Lấy lại đường dẫn ảnh gốc từ thuộc tính data-original-src
+                        const originalSrc = previewImg.dataset.originalSrc;
+
+                        if (originalSrc) {
+                            // Nếu có ảnh gốc, gán lại để khôi phục
+                            previewImg.src = originalSrc;
+                            previewContainer.style.display = 'block';
+                        } else {
+                            // Nếu ban đầu không có ảnh, khi hủy chọn file ta lại ẩn khung đi
+                            previewContainer.style.display = 'none';
+                            previewImg.src = ''; // Xóa sạch src
+                        }
+                    }
+                });
             </script>
         }

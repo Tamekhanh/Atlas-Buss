@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Atlas.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f66b515efe97629529ec7e46038e5f4c32e22d46")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b85b6c8b369daf3ef7e94dc08d3864c9d27784e5")]
 [assembly: System.Reflection.AssemblyProductAttribute("Atlas.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Atlas.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

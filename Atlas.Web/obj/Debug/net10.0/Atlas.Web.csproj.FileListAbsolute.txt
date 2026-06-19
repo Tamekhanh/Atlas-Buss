@@ -355,4 +355,3 @@ d:\MyWebsite\Atlas\_build_temp\Atlas.Web.deps.json
 d:\MyWebsite\Atlas\_build_temp\Atlas.Web.runtimeconfig.json
 d:\MyWebsite\Atlas\_build_temp\Atlas.Web.dll
 d:\MyWebsite\Atlas\_build_temp\Atlas.Web.pdb
-D:\MyWebsite\Atlas\Atlas.Web\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

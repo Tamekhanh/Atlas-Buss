@@ -41,6 +41,10 @@
     <Folder Include="Areas\HRM\Models\" />
     <Folder Include="Areas\HRM\Views\" />
     <Folder Include="Areas\Account\Data\" />
+    <Folder Include="Areas\Purrchase\Controllers\" />
+    <Folder Include="Areas\Purrchase\Data\" />
+    <Folder Include="Areas\Purrchase\Models\" />
+    <Folder Include="Areas\Purrchase\Views\" />
     <Folder Include="Areas\Setting\Controllers\" />
     <Folder Include="Areas\Setting\Data\" />
     <Folder Include="Areas\Setting\Models\" />
