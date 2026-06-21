@@ -10,10 +10,10 @@ namespace Atlas.Core.Entities
         public int Id { get; set; }
         public string ProductName { get; set; } = null!;
         public string ProductCode { get; set; } = null!;
-        public int? UnitId { get; set; } // Cho phép null nếu variant có đơn vị khác
+        public int? UnitId { get; set; } 
         public string? ImageUrl { get; set; }
-        public decimal BaseSalePrice { get; set; } // Đổi tên từ SalePrice -> BaseSalePrice
-        public decimal BaseCostPrice { get; set; } // Đổi tên từ CostPrice -> BaseCostPrice
+        public decimal BaseSalePrice { get; set; } 
+        public decimal BaseCostPrice { get; set; } 
         public string? Barcode { get; set; }
         public bool IsActive { get; set; } = true;
         public bool Onsale { get; set; } = false;
@@ -38,22 +38,26 @@ namespace Atlas.Core.Entities
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
-        public string SKU { get; set; } = null!; // Mã SKU duy nhất (ví dụ: ATSHIRT-RED-L)
-        public decimal? VariantPrice { get; set; } // Giá riêng cho biến thể này
-        public decimal? VariantCost { get; set; }  // Giá vốn riêng cho biến thể này
+        public string SKU { get; set; } = null!; 
+        public decimal? VariantPrice { get; set; } 
+        public decimal? VariantCost { get; set; }  
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Navigation Properties
         public Products? Product { get; set; }
         public ICollection<VariantAttributeMapping> AttributeMappings { get; set; } = new List<VariantAttributeMapping>();
+        
+        // BỔ SUNG 2 DÒNG NÀY ĐỂ KẾT NỐI VỚI MODULE KHO (Tránh lỗi biên dịch)
+        public ICollection<InventoryTransaction> InventoryTransactions { get; set; } = new List<InventoryTransaction>();
+        public ICollection<InventoryStock> InventoryStocks { get; set; } = new List<InventoryStock>();
     }
 
     // 3. Loại thuộc tính (ví dụ: Màu sắc, Kích thước)
     public class AttributeType
     {
         public int Id { get; set; }
-        public string AttributeName { get; set; } = null!; // Tên thuộc tính: 'Color', 'Size'
+        public string AttributeName { get; set; } = null!; 
         public string? Description { get; set; }
     
         public ICollection<AttributeValue> Values { get; set; } = new List<AttributeValue>();
@@ -65,13 +69,12 @@ namespace Atlas.Core.Entities
         public int Id { get; set; }
         public int AttributeTypeId { get; set; }
 
-        [Column("AttributeValue")] // <--- THÊM DÒNG NÀY
+        [Column("AttributeValue")] 
         public string Value { get; set; } = null!;
 
         public AttributeType? AttributeType { get; set; }
         public ICollection<VariantAttributeMapping> VariantMappings { get; set; } = new List<VariantAttributeMapping>();
     }
-
 
     // 5. Bảng trung gian nối Biến thể với Giá trị thuộc tính
     public class VariantAttributeMapping

@@ -1,9 +1,7 @@
 using Atlas.Core.Interfaces;
 using Atlas.Services.Auth;
-using Atlas.Services.Customer;
 using Atlas.Services.HRM;
 using Atlas.Services.Inventory;
-using Atlas.Services.Vendor;
 using Atlas.Services.Category;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,13 +13,10 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IEmployeeService, EmployeeService>();
-        services.AddScoped<IVendorCompanyService, VendorCompanyService>();
-        services.AddScoped<ICustomerCompanyService, CustomerCompanyService>();
-        services.AddScoped<IVendorPersonService, VendorPersonService>();
-        services.AddScoped<ICustomerPersonService, CustomerPersonService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ILogService, LogService>();
         services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IPartyService, PartyService>();
 
         return services;
     }

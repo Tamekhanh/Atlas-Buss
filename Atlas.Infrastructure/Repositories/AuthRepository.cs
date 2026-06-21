@@ -27,8 +27,10 @@ namespace Atlas.Infrastructure.Repositories
                     IsActive = account.IsActive,
                     RoleId = account.RoleId,
                     RoleName = account.Role != null ? account.Role.RoleName : null,
-                    FirstName = account.Employee != null && account.Employee.Person != null ? account.Employee.Person.FirstName : string.Empty,
-                    LastName = account.Employee != null && account.Employee.Person != null ? account.Employee.Person.LastName : string.Empty
+                    
+                    // Lấy trực tiếp từ FullName của Employee do Person đã bị xóa
+                    FirstName = account.Employee != null ? account.Employee.FullName : string.Empty,
+                    LastName = string.Empty // Bạn có thể cân nhắc sửa class AuthAccountSnapshot để chỉ dùng 1 biến FullName
                 })
                 .FirstOrDefaultAsync();
         }
@@ -61,7 +63,7 @@ namespace Atlas.Infrastructure.Repositories
         {
             return await _context.Employees
                 .Include(employee => employee.Account)
-                .Include(employee => employee.Person)
+                // Đã xóa dòng Include Person
                 .FirstOrDefaultAsync(employee => employee.EmployeeNumber == employeeNumber);
         }
 

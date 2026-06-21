@@ -1,6 +1,10 @@
 using Atlas.Core.Entities;
 using Atlas.Core.Interfaces;
 using Atlas.Core.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Atlas.Services
 {
@@ -54,11 +58,15 @@ namespace Atlas.Services
             {
                 Id = log.Id,
                 EmployeeId = log.EmployeeId,
-                Username = log.Employee?.Account?.Username,
+                
+                // Lưu ý: Đảm bảo class Employee của bạn có Navigation Property "Account" (trỏ tới EmployeeAccounts)
+                Username = log.Employee?.Account?.Username, 
+                
                 EmployeeNumber = log.Employee?.EmployeeNumber,
-                EmployeeName = log.Employee?.Person is null
-                    ? null
-                    : $"{log.Employee.Person.FirstName} {log.Employee.Person.LastName}".Trim(),
+                
+                // SỬA TẠI ĐÂY: Dùng trực tiếp FullName thay vì Person.FirstName/LastName
+                EmployeeName = log.Employee?.FullName, 
+                
                 Action = log.Action,
                 Timestamp = log.Timestamp
             };

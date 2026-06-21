@@ -137,16 +137,10 @@ app.MapAreaControllerRoute(
     defaults: new { controller = "HRM" });
 
 app.MapAreaControllerRoute(
-    name: "vendor",
-    areaName: "Vendor",
-    pattern: "Vendor/{action=Index}/{id?}",
-    defaults: new { controller = "Vendor" });
-
-app.MapAreaControllerRoute(
-    name: "customer",
-    areaName: "Customer",
-    pattern: "Customer/{action=Index}/{id?}",
-    defaults: new { controller = "Customer" });
+    name: "party",
+    areaName: "Party",
+    pattern: "Party/{action=Index}/{id?}",
+    defaults: new { controller = "Party" });
 
 app.MapControllerRoute(
     name: "setting",

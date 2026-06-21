@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace Atlas.Core.Entities
@@ -7,16 +9,24 @@ namespace Atlas.Core.Entities
     {
         public int Id { get; set; }
         public string EmployeeNumber { get; set; } = null!;
-        public int PersonId { get; set; }
+        
+        // Các trường dữ liệu đã được gộp trực tiếp vào Employee thay vì qua Person
+        public string FullName { get; set; } = null!;
+        public DateTime DoB { get; set; }
+        public int AddressId { get; set; }
+        public int ContactId { get; set; }
+        
         public bool IsDeleted { get; set; } = false;
+        public DateTime CreatedAt { get; set; }
 
-        public Person? Person { get; set; }
+        // Navigation properties mới
+        public Addresses? Address { get; set; }
+        public Contacts? Contact { get; set; }
+
+        // Navigation properties hiện có
         public EmployeeAccount? Account { get; set; }
         public ICollection<Products> Products { get; set; } = new List<Products>();
         public ICollection<EmployeeDepartment> EmployeeDepartments { get; set; } = new List<EmployeeDepartment>();
-
-        [NotMapped]
-        public string FullName => Person is null ? string.Empty : $"{Person.FirstName} {Person.LastName}".Trim();
     }
 
     public class EmployeeAccount
@@ -31,6 +41,7 @@ namespace Atlas.Core.Entities
         public Employee? Employee { get; set; }
         public Role? Role { get; set; }
 
+        // Logic kiểm tra phân quyền không bị ảnh hưởng bởi thay đổi Database
         [NotMapped]
         public bool CanProduct => HasPermission("PRODUCT");
 

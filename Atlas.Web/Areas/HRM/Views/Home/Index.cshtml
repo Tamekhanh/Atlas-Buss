@@ -8,7 +8,7 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
             <h1 class="h3 mb-1">Employees</h1>
-            <p class="text-muted mb-0">Danh sách nhân viên nối từ bảng Employee và Persons.</p>
+            <p class="text-muted mb-0">Danh sách nhân viên toàn hệ thống.</p>
         </div>
         @if (User.HasClaim("permission", "HR_MANAGE"))
         {
@@ -19,7 +19,7 @@
     <div class="mb-3">
         <form method="get" asp-area="HRM" asp-controller="HRM" asp-action="Search" class="row g-2">
             <div class="col-md-5">
-                <input name="searchTerm" class="form-control" placeholder="Tìm theo tên (Firstname hoặc Lastname)" value="@ViewContext.HttpContext.Request.Query["searchTerm"]" />
+                <input name="searchTerm" class="form-control" placeholder="Tìm theo tên (Full Name)" value="@ViewContext.HttpContext.Request.Query["searchTerm"]" />
             </div>
             <div class="col-md-3">
                 <input name="employeeNumber" class="form-control" placeholder="Employee Number" value="@ViewContext.HttpContext.Request.Query["employeeNumber"]" />
@@ -52,25 +52,25 @@
                             <td>@employee.Id</td>
                             <td>@employee.EmployeeNumber</td>
                             <td>@employee.FullName</td>
-                            <td>@employee.Person?.DoB.ToString("yyyy-MM-dd")</td>
+                            <td>@employee.DoB.ToString("yyyy-MM-dd")</td>
                             <td>
-                                @if (employee.Person?.Address != null)
+                                @if (employee.Address != null)
                                 {
-                                    @($"{employee.Person.Address.Street}, {employee.Person.Address.City}, {employee.Person.Address.State}, {employee.Person.Address.Country}")
+                                    @($"{employee.Address.Street}, {employee.Address.City}, {employee.Address.State}, {employee.Address.Country}")
                                 }
                                 else
                                 {
                                     @:N/A
                                 }
                             </td>
-                            <td>@employee.Person?.ContactId</td>
+                            <td>@employee.ContactId</td>
                         </tr>
                     }
                 }
                 else
                 {
                     <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">Chưa có dữ liệu nhân viên.</td>
+                        <td colspan="6" class="text-center py-5 text-muted">Chưa có dữ liệu nhân viên.</td>
                     </tr>
                 }
             </tbody>

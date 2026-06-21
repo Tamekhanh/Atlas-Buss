@@ -19,8 +19,8 @@ namespace Atlas.Infrastructure.Repositories
         public async Task<IEnumerable<Employee>> GetAllAsync(int pageNumber, int pageSize)
         {
             return await _context.Employees
-                .Include(employee => employee.Person)
-                    .ThenInclude(person => person!.Address)
+                // Trỏ thẳng tới Address thay vì qua Person
+                .Include(employee => employee.Address)
                 .Include(employee => employee.Account)
                     .ThenInclude(account => account!.Role)
                         .ThenInclude(role => role!.RolePermissions)
@@ -34,12 +34,10 @@ namespace Atlas.Infrastructure.Repositories
 
         public async Task<Employee?> GetByIdAsync(int id)
         {
-            // TỐI ƯU: Gộp các Include của Person lại với nhau để tránh lặp lại
             return await _context.Employees
-                .Include(employee => employee.Person)
-                    .ThenInclude(person => person!.Address)
-                .Include(employee => employee.Person)
-                    .ThenInclude(person => person!.Contact)
+                // Trỏ thẳng tới Address và Contact thay vì qua Person
+                .Include(employee => employee.Address)
+                .Include(employee => employee.Contact)
                 .Include(employee => employee.Account)
                     .ThenInclude(account => account!.Role)
                         .ThenInclude(role => role!.RolePermissions)
@@ -56,7 +54,6 @@ namespace Atlas.Infrastructure.Repositories
 
         public async Task<bool> UpdateAsync(Employee employee)
         {
-            // Sử dụng Update của EF Core
             _context.Employees.Update(employee);
             return await _context.SaveChangesAsync() > 0;
         }
@@ -73,22 +70,20 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        // SỬA: Đổi tên tham số EmployeeNumber -> employeeNumber (quy chuẩn camelCase của C#)
         public async Task<IEnumerable<Employee>> SearchEmployeesAsync(string? searchTerm = null, string? employeeNumber = null)
         {
             searchTerm = searchTerm?.Trim();
             employeeNumber = employeeNumber?.Trim();
 
             var query = _context.Employees
-                .Include(employee => employee.Person)
-                    .ThenInclude(person => person!.Address)
+                // Trỏ thẳng tới Address
+                .Include(employee => employee.Address)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                query = query.Where(employee =>
-                    employee.Person!.FirstName.Contains(searchTerm) ||
-                    employee.Person!.LastName.Contains(searchTerm));
+                // Thay thế tìm kiếm FirstName/LastName qua Person bằng FullName trực tiếp
+                query = query.Where(employee => employee.FullName.Contains(searchTerm));
             }
 
             if (!string.IsNullOrWhiteSpace(employeeNumber))

@@ -8,9 +8,13 @@
 
   <ItemGroup>
     <Compile Remove="Areas\Log\**" />
+    <Compile Remove="Areas\Vendor\**" />
     <Content Remove="Areas\Log\**" />
+    <Content Remove="Areas\Vendor\**" />
     <EmbeddedResource Remove="Areas\Log\**" />
+    <EmbeddedResource Remove="Areas\Vendor\**" />
     <None Remove="Areas\Log\**" />
+    <None Remove="Areas\Vendor\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,14 +37,14 @@
     <Folder Include="Areas\Category\Data\" />
     <Folder Include="Areas\Category\Models\" />
     <Folder Include="Areas\Category\Views\" />
-    <Folder Include="Areas\Customer\Controllers\" />
-    <Folder Include="Areas\Customer\Data\" />
-    <Folder Include="Areas\Customer\Models\" />
-    <Folder Include="Areas\Customer\Views\" />
     <Folder Include="Areas\HRM\Data\" />
     <Folder Include="Areas\HRM\Models\" />
     <Folder Include="Areas\HRM\Views\" />
     <Folder Include="Areas\Account\Data\" />
+    <Folder Include="Areas\Party\Controllers\" />
+    <Folder Include="Areas\Party\Data\" />
+    <Folder Include="Areas\Party\Models\" />
+    <Folder Include="Areas\Party\Views\" />
     <Folder Include="Areas\Purrchase\Controllers\" />
     <Folder Include="Areas\Purrchase\Data\" />
     <Folder Include="Areas\Purrchase\Models\" />
@@ -49,10 +53,6 @@
     <Folder Include="Areas\Setting\Data\" />
     <Folder Include="Areas\Setting\Models\" />
     <Folder Include="Areas\Setting\Views\" />
-    <Folder Include="Areas\Vendor\Controllers\" />
-    <Folder Include="Areas\Vendor\Data\" />
-    <Folder Include="Areas\Vendor\Models\" />
-    <Folder Include="Areas\Vendor\Views\" />
   </ItemGroup>
 
 </Project>

@@ -20,15 +20,21 @@
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                         <div class="mb-3">
-                            <label asp-for="EmployeeNumber" class="form-label"></label>
+                            <label asp-for="EmployeeNumber" class="form-label">Employee Number</label>
                             <input asp-for="EmployeeNumber" class="form-control" />
                             <span asp-validation-for="EmployeeNumber" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="PersonId" class="form-label"></label>
-                            <input asp-for="PersonId" class="form-control" type="number" min="1" />
-                            <span asp-validation-for="PersonId" class="text-danger"></span>
+                            <label asp-for="FullName" class="form-label">Full Name</label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DoB" class="form-label">Date of Birth</label>
+                            <input asp-for="DoB" type="date" class="form-control" />
+                            <span asp-validation-for="DoB" class="text-danger"></span>
                         </div>
 
                         <div class="d-flex gap-2">

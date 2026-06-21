@@ -5,26 +5,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\scaffoldingreadme.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\scaffoldingreadme.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2ADAD8E2-2F7A-EFA1-DC86-C019DE6F76A2}|Atlas.Infrastructure\\Atlas.Infrastructure.csproj|d:\\mywebsite\\atlas\\atlas.infrastructure\\repositories\\productrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2ADAD8E2-2F7A-EFA1-DC86-C019DE6F76A2}|Atlas.Infrastructure\\Atlas.Infrastructure.csproj|solutionrelative:atlas.infrastructure\\repositories\\productrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2ADAD8E2-2F7A-EFA1-DC86-C019DE6F76A2}|Atlas.Infrastructure\\Atlas.Infrastructure.csproj|d:\\mywebsite\\atlas\\atlas.infrastructure\\repositories\\categoryrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2ADAD8E2-2F7A-EFA1-DC86-C019DE6F76A2}|Atlas.Infrastructure\\Atlas.Infrastructure.csproj|solutionrelative:atlas.infrastructure\\repositories\\categoryrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\areas\\products\\views\\products\\detail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\areas\\products\\views\\products\\detail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\areas\\customer\\controllers\\customercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\areas\\customer\\controllers\\customercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|d:\\mywebsite\\atlas\\atlas.web\\areas\\account\\controllers\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E8A53236-6012-EC52-F609-8AE08E0E52F6}|Atlas.Web\\Atlas.Web.csproj|solutionrelative:atlas.web\\areas\\account\\controllers\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,44 +14,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 0,
           "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Detail.cshtml",
-              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Products\\Views\\Products\\Detail.cshtml",
-              "RelativeDocumentMoniker": "Atlas.Web\\Areas\\Products\\Views\\Products\\Detail.cshtml",
-              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Products\\Views\\Products\\Detail.cshtml",
-              "RelativeToolTip": "Atlas.Web\\Areas\\Products\\Views\\Products\\Detail.cshtml",
-              "ViewState": "AgIAALsAAAAAAAAAAADwv9IAAAA1AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2026-06-09T18:39:35.028Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "CategoryRepository.cs",
-              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Infrastructure\\Repositories\\CategoryRepository.cs",
-              "RelativeDocumentMoniker": "Atlas.Infrastructure\\Repositories\\CategoryRepository.cs",
-              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Infrastructure\\Repositories\\CategoryRepository.cs",
-              "RelativeToolTip": "Atlas.Infrastructure\\Repositories\\CategoryRepository.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAuAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-09T18:37:27.387Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ProductRepository.cs",
-              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Infrastructure\\Repositories\\ProductRepository.cs",
-              "RelativeDocumentMoniker": "Atlas.Infrastructure\\Repositories\\ProductRepository.cs",
-              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Infrastructure\\Repositories\\ProductRepository.cs",
-              "RelativeToolTip": "Atlas.Infrastructure\\Repositories\\ProductRepository.cs",
-              "ViewState": "AgIAAGkAAAAAAAAAAAAtwGQAAABJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-06-09T18:34:36.964Z"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -80,34 +24,10 @@
               "RelativeDocumentMoniker": "Atlas.Web\\ScaffoldingReadMe.txt",
               "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\ScaffoldingReadMe.txt",
               "RelativeToolTip": "Atlas.Web\\ScaffoldingReadMe.txt",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2026-04-29T18:26:11.049Z",
+              "WhenOpened": "2026-06-21T11:51:47.888Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "CustomerController.cs",
-              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Customer\\Controllers\\CustomerController.cs",
-              "RelativeDocumentMoniker": "Atlas.Web\\Areas\\Customer\\Controllers\\CustomerController.cs",
-              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Customer\\Controllers\\CustomerController.cs",
-              "RelativeToolTip": "Atlas.Web\\Areas\\Customer\\Controllers\\CustomerController.cs",
-              "ViewState": "AgIAADkAAAAAAAAAAAAlwEgAAAAzAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-27T13:33:56.197Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "LoginController.cs",
-              "DocumentMoniker": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Account\\Controllers\\LoginController.cs",
-              "RelativeDocumentMoniker": "Atlas.Web\\Areas\\Account\\Controllers\\LoginController.cs",
-              "ToolTip": "D:\\MyWebsite\\Atlas\\Atlas.Web\\Areas\\Account\\Controllers\\LoginController.cs",
-              "RelativeToolTip": "Atlas.Web\\Areas\\Account\\Controllers\\LoginController.cs",
-              "ViewState": "AgIAAF4AAAAAAAAAAAAkwIUAAAAuAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-27T14:48:24.018Z"
             }
           ]
         }

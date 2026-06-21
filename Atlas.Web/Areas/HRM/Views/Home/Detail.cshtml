@@ -3,16 +3,17 @@
 @{
     ViewData["Title"] = "Employee Detail";
 
-    var person = Model.Person;
-    var address = person?.Address;
-    var contact = person?.Contact;
+    // Truy cập trực tiếp từ Model (Employee) thay vì qua Person
+    var address = Model.Address;
+    var contact = Model.Contact;
 
     var displayName = string.IsNullOrWhiteSpace(Model.FullName) ? "Unknown Employee" : Model.FullName;
-    var doB = person?.DoB;
-    var doBText = doB.HasValue ? doB.Value.ToString("dd MMM yyyy") : "N/A";
-    var ageText = doB.HasValue
-        ? $"{Math.Max(0, (int)((DateTime.Today - doB.Value.Date).TotalDays / 365.2425))} years"
+    var doB = Model.DoB; // DoB giờ là thuộc tính trực tiếp và là kiểu DateTime (không nullable trong config mới)
+    var doBText = doB != default(DateTime) ? doB.ToString("dd MMM yyyy") : "N/A";
+    var ageText = doB != default(DateTime)
+        ? $"{Math.Max(0, (int)((DateTime.Today - doB.Date).TotalDays / 365.2425))} years"
         : "N/A";
+        
     var addressText = address is null
         ? "N/A"
         : $"{address.Street}, {address.City}, {address.State}, {address.Country}";
@@ -66,10 +67,6 @@
                             <strong>@Model.Id</strong>
                         </article>
                         <article>
-                            <span>Person Id</span>
-                            <strong>@Model.PersonId</strong>
-                        </article>
-                        <article>
                             <span>Date of birth</span>
                             <strong>@doBText</strong>
                         </article>
@@ -115,7 +112,7 @@
                             <div class="col-12 col-md-6">
                                 <div class="data-block">
                                     <span>Contact Id</span>
-                                    <p>@(person?.ContactId.ToString() ?? "N/A")</p>
+                                    <p>@(Model.ContactId.ToString() ?? "N/A")</p>
                                 </div>
                             </div>
                         </div>

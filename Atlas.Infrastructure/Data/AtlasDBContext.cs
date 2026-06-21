@@ -6,7 +6,6 @@ namespace Atlas.Infrastructure
     public class AtlasDBContext : DbContext
     {
         public AtlasDBContext(DbContextOptions<AtlasDBContext> options) : base(options) { }
-        public DbSet<Person> Persons { get; set; }
         public DbSet<Addresses> Addresses { get; set; }
         public DbSet<Contacts> Contacts { get; set; }
         public DbSet<Role> Roles { get; set; }
@@ -18,11 +17,6 @@ namespace Atlas.Infrastructure
         public DbSet<EmployeeDepartment> EmployeeDepartments { get; set; }
         public DbSet<Products> Products { get; set; }
         public DbSet<ProductDetails> ProductDetails { get; set; }
-        public DbSet<Companies> Companies { get; set; }
-        public DbSet<VendorCompany> VendorCompanies { get; set; }
-        public DbSet<CustomerCompany> CustomerCompanies { get; set; }
-        public DbSet<VendorPerson> VendorPersons { get; set; }
-        public DbSet<CustomerPerson> CustomerPersons { get; set; }
         public DbSet<Log> Logs { get; set; }
         public DbSet<SalesOrderStatus> SalesOrderStatuses { get; set; }
         public DbSet<SalesOrder> SalesOrders { get; set; }
@@ -39,7 +33,7 @@ namespace Atlas.Infrastructure
         public DbSet<CategoryPricelist> CategoryPricelists { get; set; }
         public DbSet<CategoryProduct> CategoryProducts { get; set; }
         public DbSet<Pricelist> Pricelists { get; set; }
-        public DbSet<PricelistProduct> PricelistProducts { get; set; }
+        public DbSet<PricelistProductVariant> PricelistProductsVariants { get; set; }
         public DbSet<Tax> Taxes { get; set; }
         public DbSet<ProductTax> ProductTaxes { get; set; }
         public DbSet<Units> Units { get; set; }
@@ -47,6 +41,7 @@ namespace Atlas.Infrastructure
         public DbSet<AttributeType> AttributeTypes { get; set; } = null!;
         public DbSet<AttributeValue> AttributeValues { get; set; } = null!;
         public DbSet<VariantAttributeMapping> VariantAttributeMappings { get; set; } = null!;
+        public DbSet<Party> Parties { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -149,81 +144,44 @@ namespace Atlas.Infrastructure
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<Person>(entity =>
+            modelBuilder.Entity<Party>(entity =>
             {
-                entity.ToTable("Persons", "dbo");
-                entity.HasKey(person => person.Id);
-                entity.Property(person => person.FirstName).HasMaxLength(50).IsRequired();
-                entity.Property(person => person.LastName).HasMaxLength(50).IsRequired();
-                entity.Property(person => person.IsDeleted).HasDefaultValue(false);
+                entity.ToTable("Parties", "dbo");
+                entity.HasKey(party => party.Id);
 
-                entity.HasOne(person => person.Address)
+                // Cấu hình các trường dữ liệu
+                entity.Property(party => party.PartyType)
+                      .HasMaxLength(20)
+                      .IsRequired(); // Chứa giá trị "Person" hoặc "Company"
+
+                entity.Property(party => party.DisplayName)
+                      .HasMaxLength(200)
+                      .IsRequired();
+
+                entity.Property(party => party.FirstName).HasMaxLength(50);
+                entity.Property(party => party.LastName).HasMaxLength(50);
+                entity.Property(party => party.TaxId).HasMaxLength(20);
+
+                // Đảm bảo TaxId là duy nhất (nếu có nhập)
+                entity.HasIndex(party => party.TaxId)
+                      .IsUnique()
+                      .HasFilter("[TaxId] IS NOT NULL");
+
+                // Cấu hình các giá trị mặc định cho Cờ (Flags)
+                entity.Property(party => party.IsCustomer).HasDefaultValue(false);
+                entity.Property(party => party.IsVendor).HasDefaultValue(false);
+                entity.Property(party => party.IsDeleted).HasDefaultValue(false);
+                entity.Property(party => party.CreatedAt).HasDefaultValueSql("GETDATE()");
+
+                // Cấu hình Khóa ngoại
+                entity.HasOne(party => party.Address)
                     .WithMany()
-                    .HasForeignKey(person => person.AddressId)
+                    .HasForeignKey(party => party.AddressId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(person => person.Contact)
+                entity.HasOne(party => party.Contact)
                     .WithMany()
-                    .HasForeignKey(person => person.ContactId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            modelBuilder.Entity<Companies>(entity =>
-            {
-                entity.ToTable("Companies", "dbo");
-                entity.HasKey(company => company.Id);
-                entity.Property(company => company.CompanyName).HasMaxLength(100).IsRequired();
-                entity.Property(company => company.TaxId).HasMaxLength(20).IsRequired();
-                entity.HasOne(company => company.Address)
-                    .WithMany()
-                    .HasForeignKey(company => company.AddressId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(company => company.Contact)
-                    .WithMany()
-                    .HasForeignKey(company => company.ContactId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            modelBuilder.Entity<VendorCompany>(entity =>
-            {
-                entity.ToTable("VendorsCompany", "dbo");
-                entity.HasKey(vendorCompany => vendorCompany.Id);
-                entity.HasOne(vendorCompany => vendorCompany.Company)
-                    .WithMany()
-                    .HasForeignKey(vendorCompany => vendorCompany.CompanyId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            modelBuilder.Entity<CustomerCompany>(entity =>
-            {
-                entity.ToTable("CustomerCompany", "dbo");
-                entity.HasKey(customerCompany => customerCompany.Id);
-                entity.HasOne(customerCompany => customerCompany.Company)
-                    .WithMany()
-                    .HasForeignKey(customerCompany => customerCompany.CompanyId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            modelBuilder.Entity<VendorPerson>(entity =>
-            {
-                entity.ToTable("VendorsPerson", "dbo");
-                entity.HasKey(vendorPerson => vendorPerson.Id);
-                entity.Property(vendorPerson => vendorPerson.TaxId).HasMaxLength(20);
-                entity.HasOne(vendorPerson => vendorPerson.Person)
-                    .WithMany()
-                    .HasForeignKey(vendorPerson => vendorPerson.PersonId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            modelBuilder.Entity<CustomerPerson>(entity =>
-            {
-                entity.ToTable("CustomerPerson", "dbo");
-                entity.HasKey(customerPerson => customerPerson.Id);
-                entity.Property(customerPerson => customerPerson.TaxId).HasMaxLength(20);
-                entity.HasOne(customerPerson => customerPerson.Person)
-                    .WithMany()
-                    .HasForeignKey(customerPerson => customerPerson.PersonId)
+                    .HasForeignKey(party => party.ContactId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
@@ -259,13 +217,23 @@ namespace Atlas.Infrastructure
             modelBuilder.Entity<Employee>(entity =>
             {
                 entity.ToTable("Employee", "dbo");
-                entity.HasKey(employee => employee.Id);
-                entity.Property(employee => employee.IsDeleted).HasDefaultValue(false);
-                entity.Property(employee => employee.EmployeeNumber).HasMaxLength(20).IsRequired();
+                entity.HasKey(e => e.Id);
 
-                entity.HasOne(employee => employee.Person)
-                    .WithOne(person => person.Employee)
-                    .HasForeignKey<Employee>(employee => employee.PersonId)
+                entity.Property(e => e.EmployeeNumber).HasMaxLength(20).IsRequired();
+                entity.HasIndex(e => e.EmployeeNumber).IsUnique();
+
+                entity.Property(e => e.FullName).HasMaxLength(100).IsRequired();
+
+                entity.Property(e => e.IsDeleted).HasDefaultValue(false);
+
+                entity.HasOne(e => e.Address)
+                    .WithMany()
+                    .HasForeignKey(e => e.AddressId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Contact)
+                    .WithMany()
+                    .HasForeignKey(e => e.ContactId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
@@ -370,35 +338,36 @@ namespace Atlas.Infrastructure
             });
 
             modelBuilder.Entity<SalesOrder>(entity =>
-            {
-                entity.ToTable("SalesOrders", "dbo");
-                entity.HasKey(order => order.Id);
-                entity.Property(order => order.OrderNumber).HasMaxLength(50).IsRequired();
-                entity.Property(order => order.OrderStatusId).HasDefaultValue(1);
-                entity.Property(order => order.OrderDate).HasDefaultValueSql("GETDATE()");
+{
+    entity.ToTable("SalesOrders", "dbo");
+    entity.HasKey(order => order.Id);
+    entity.Property(order => order.OrderNumber).HasMaxLength(50).IsRequired();
+    entity.Property(order => order.OrderStatusId).HasDefaultValue(1);
+    entity.Property(order => order.OrderDate).HasDefaultValueSql("GETDATE()");
 
-                entity.HasOne(order => order.Employee)
-                    .WithMany()
-                    .HasForeignKey(order => order.EmployeeId)
-                    .OnDelete(DeleteBehavior.Restrict);
+    entity.HasOne(order => order.Employee)
+        .WithMany()
+        .HasForeignKey(order => order.EmployeeId)
+        .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(order => order.CustomerCompany)
-                    .WithMany()
-                    .HasForeignKey(order => order.CustomerCompanyId)
-                    .OnDelete(DeleteBehavior.Restrict);
+    // CHUẨN HÓA: Trỏ về Party
+    entity.HasOne(order => order.Customer)
+        .WithMany(party => party.SalesOrders)
+        .HasForeignKey(order => order.CustomerId)
+        .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(order => order.CustomerPerson)
-                    .WithMany()
-                    .HasForeignKey(order => order.CustomerPersonId)
-                    .OnDelete(DeleteBehavior.Restrict);
+    entity.HasOne(order => order.OrderStatus)
+        .WithMany(status => status.SalesOrders)
+        .HasForeignKey(order => order.OrderStatusId)
+        .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(order => order.OrderStatus)
-                    .WithMany(status => status.SalesOrders)
-                    .HasForeignKey(order => order.OrderStatusId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
+    entity.HasOne(order => order.Currency)
+        .WithMany(c => c.SalesOrders)
+        .HasForeignKey(order => order.CurrencyId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
 
-            modelBuilder.Entity<SalesOrderStatus>(entity =>
+            modelBuilder.Entity<SalesOrderStatuses>(entity =>
             {
                 entity.ToTable("SalesOrderStatuses", "dbo");
                 entity.HasKey(status => status.Id);
@@ -417,9 +386,10 @@ namespace Atlas.Infrastructure
                     .HasForeignKey(detail => detail.OrderId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(detail => detail.Product)
+                // CHUẨN HÓA: Trỏ về Variant
+                entity.HasOne(detail => detail.Variant)
                     .WithMany()
-                    .HasForeignKey(detail => detail.ProductId)
+                    .HasForeignKey(detail => detail.VariantId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(detail => detail.Warehouse)
@@ -427,6 +397,10 @@ namespace Atlas.Infrastructure
                     .HasForeignKey(detail => detail.WarehouseId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
+
+            // ==========================================
+            // 3. CẤU HÌNH PURCHASE ORDER
+            // ==========================================
 
             modelBuilder.Entity<PurchaseOrder>(entity =>
             {
@@ -441,23 +415,24 @@ namespace Atlas.Infrastructure
                     .HasForeignKey(order => order.EmployeeId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(order => order.VendorCompany)
-                    .WithMany()
-                    .HasForeignKey(order => order.VendorCompanyId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(order => order.VendorPerson)
-                    .WithMany()
-                    .HasForeignKey(order => order.VendorPersonId)
+                // CHUẨN HÓA: Trỏ về Party
+                entity.HasOne(order => order.Vendor)
+                    .WithMany(party => party.PurchaseOrders)
+                    .HasForeignKey(order => order.VendorId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(order => order.OrderStatus)
                     .WithMany(status => status.PurchaseOrders)
                     .HasForeignKey(order => order.OrderStatusId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(order => order.Currency)
+                    .WithMany(c => c.PurchaseOrders)
+                    .HasForeignKey(order => order.CurrencyId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<PurchaseOrderStatus>(entity =>
+            modelBuilder.Entity<PurchaseOrderStatuses>(entity =>
             {
                 entity.ToTable("PurchaseOrderStatuses", "dbo");
                 entity.HasKey(status => status.Id);
@@ -476,9 +451,10 @@ namespace Atlas.Infrastructure
                     .HasForeignKey(detail => detail.POId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(detail => detail.Product)
+                // CHUẨN HÓA: Trỏ về Variant
+                entity.HasOne(detail => detail.Variant)
                     .WithMany()
-                    .HasForeignKey(detail => detail.ProductId)
+                    .HasForeignKey(detail => detail.VariantId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(detail => detail.Warehouse)
@@ -539,7 +515,9 @@ namespace Atlas.Infrastructure
             modelBuilder.Entity<InventoryStock>(entity =>
             {
                 entity.ToTable("InventoryStock", "dbo");
-                entity.HasKey(stock => new { stock.WarehouseId, stock.ProductId });
+
+                // 1. SỬA TẠI ĐÂY: Đổi ProductId thành VariantId cho Khóa chính phức hợp
+                entity.HasKey(stock => new { stock.WarehouseId, stock.VariantId });
 
                 entity.Property(stock => stock.ReservedQuantity).HasDefaultValue(0);
                 entity.Property(stock => stock.LastUpdated).HasDefaultValueSql("GETDATE()");
@@ -549,9 +527,10 @@ namespace Atlas.Infrastructure
                     .HasForeignKey(stock => stock.WarehouseId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(stock => stock.Product)
-                    .WithMany()
-                    .HasForeignKey(stock => stock.ProductId)
+                // 2. SỬA TẠI ĐÂY: Trỏ Khóa ngoại về Variant thay vì Product
+                entity.HasOne(stock => stock.Variant)
+                    .WithMany(v => v.InventoryStocks) // Liên kết ngược lại danh sách trong ProductVariant
+                    .HasForeignKey(stock => stock.VariantId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
@@ -560,24 +539,31 @@ namespace Atlas.Infrastructure
                 entity.ToTable("InventoryTransactions", "dbo");
                 entity.HasKey(transaction => transaction.Id);
                 entity.Property(transaction => transaction.Id).ValueGeneratedOnAdd();
-                entity.Property(transaction => transaction.TransactionType).HasMaxLength(50);
+
                 entity.Property(transaction => transaction.ReferenceId).HasMaxLength(50);
                 entity.Property(transaction => transaction.Note).HasMaxLength(255);
                 entity.Property(transaction => transaction.TransactionDate).HasDefaultValueSql("GETDATE()");
 
-                entity.HasOne(transaction => transaction.Product)
-                    .WithMany()
-                    .HasForeignKey(transaction => transaction.ProductId)
+                // 1. SỬA ĐỔI: Trỏ tới Variant thay vì Product
+                entity.HasOne(transaction => transaction.Variant)
+                    .WithMany(v => v.InventoryTransactions)
+                    .HasForeignKey(transaction => transaction.VariantId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(transaction => transaction.Warehouse)
-                    .WithMany()
+                    .WithMany(w => w.InventoryTransactions)
                     .HasForeignKey(transaction => transaction.WarehouseId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(transaction => transaction.Employee)
                     .WithMany()
                     .HasForeignKey(transaction => transaction.EmployeeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // 2. BỔ SUNG: Khóa ngoại cho Lookup Table TransactionTypes
+                entity.HasOne(transaction => transaction.TransactionType)
+                    .WithMany(t => t.InventoryTransactions)
+                    .HasForeignKey(transaction => transaction.TransactionTypeId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
@@ -589,37 +575,21 @@ namespace Atlas.Infrastructure
                 entity.Property(category => category.CategoryDesc).HasMaxLength(255);
             });
 
-            modelBuilder.Entity<CategoryPricelist>(entity =>
-            {
-                entity.ToTable("CategoryPricelist", "dbo");
-                entity.HasKey(cp => cp.Id);
-
-                entity.HasOne(cp => cp.Category)
-                    .WithMany(category => category.CategoryPricelists)
-                    .HasForeignKey(cp => cp.CategoryId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(cp => cp.Pricelist)
-                    .WithMany(pricelist => pricelist.CategoryPricelists)
-                    .HasForeignKey(cp => cp.PricelistId)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
-
             modelBuilder.Entity<CategoryProduct>(entity =>
-            {
-                entity.ToTable("CategoryProducts", "dbo");
-                entity.HasKey(cp => new { cp.CategoryId, cp.ProductId });
+{
+    entity.ToTable("CategoryProducts", "dbo");
+    entity.HasKey(cp => new { cp.CategoryId, cp.ProductId });
 
-                entity.HasOne(cp => cp.Category)
-                    .WithMany(category => category.CategoryProducts)
-                    .HasForeignKey(cp => cp.CategoryId)
-                    .OnDelete(DeleteBehavior.Cascade);
+    entity.HasOne(cp => cp.Category)
+        .WithMany(category => category.CategoryProducts)
+        .HasForeignKey(cp => cp.CategoryId)
+        .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(cp => cp.Product)
-                    .WithMany(product => product.CategoryProducts)
-                    .HasForeignKey(cp => cp.ProductId)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
+    entity.HasOne(cp => cp.Product)
+        .WithMany(product => product.CategoryProducts)
+        .HasForeignKey(cp => cp.ProductId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
 
             modelBuilder.Entity<Pricelist>(entity =>
             {
@@ -628,30 +598,32 @@ namespace Atlas.Infrastructure
                 entity.Property(pricelist => pricelist.EffectiveDate).HasColumnType("date");
                 entity.Property(pricelist => pricelist.ExpiryDate).HasColumnType("date");
 
-                entity.HasOne(pricelist => pricelist.VendorCompany)
+                // CHUẨN HÓA: Trỏ về Party thay vì VendorCompany/Person
+                entity.HasOne(pricelist => pricelist.Vendor)
                     .WithMany()
-                    .HasForeignKey(pricelist => pricelist.VendorCompanyId)
+                    .HasForeignKey(pricelist => pricelist.VendorId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(pricelist => pricelist.VendorPerson)
-                    .WithMany()
-                    .HasForeignKey(pricelist => pricelist.VendorPersonId)
+                entity.HasOne(pricelist => pricelist.Currency)
+                    .WithMany(c => c.Pricelists)
+                    .HasForeignKey(pricelist => pricelist.CurrencyId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<PricelistProduct>(entity =>
+            modelBuilder.Entity<PricelistProductVariant>(entity =>
             {
-                entity.ToTable("PricelistProduct", "dbo");
+                entity.ToTable("PricelistProductVariant", "dbo"); // Đảm bảo tên bảng khớp SQL
                 entity.HasKey(pp => pp.Id);
 
                 entity.HasOne(pp => pp.Pricelist)
-                    .WithMany(pricelist => pricelist.PricelistProducts)
+                    .WithMany(pricelist => pricelist.PricelistVariants)
                     .HasForeignKey(pp => pp.PricelistId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(pp => pp.Product)
+                // CHUẨN HÓA: Trỏ về Variant
+                entity.HasOne(pp => pp.Variant)
                     .WithMany()
-                    .HasForeignKey(pp => pp.ProductId)
+                    .HasForeignKey(pp => pp.VariantId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 

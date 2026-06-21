@@ -8,7 +8,7 @@ namespace Atlas.Core.Interfaces
     {
         // --- Quản lý Sản phẩm Cha (Parent Product) ---
         Task<IEnumerable<Products>> GetAllAsync(int pageNumber, int pageSize);
-        Task<Products> GetByIdAsync(int id); // Nên Include Variants và ProductDetail
+        Task<Products?> GetByIdAsync(int id); // Nên Include Variants và ProductDetail
         Task<bool> AddAsync(Products product);
         Task<bool> UpdateAsync(Products product);
         Task<bool> DeleteAsync(int id);
@@ -17,7 +17,7 @@ namespace Atlas.Core.Interfaces
 
         // --- Quản lý Biến thể (Product Variants) ---
         Task<IEnumerable<ProductVariant>> GetVariantsByProductIdAsync(int productId);
-        Task<ProductVariant> GetVariantByIdAsync(int variantId);
+        Task<ProductVariant?> GetVariantByIdAsync(int variantId);
         Task<bool> AddVariantAsync(ProductVariant variant);
         Task<bool> UpdateVariantAsync(ProductVariant variant);
         Task<bool> DeleteVariantAsync(int variantId);

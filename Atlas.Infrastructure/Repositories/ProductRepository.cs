@@ -25,10 +25,10 @@ namespace Atlas.Infrastructure.Repositories
         {
             return await _context.Products
                 .Include(product => product.Employee)
-                .ThenInclude(employee => employee.Person)
+                // ĐÃ XÓA: .ThenInclude(employee => employee.Person)
                 .Include(product => product.CategoryProducts)
-                .ThenInclude(categoryProduct => categoryProduct.Category)
-                .Include(product => product.Unit) // Thêm Unit
+                    .ThenInclude(categoryProduct => categoryProduct.Category)
+                .Include(product => product.Unit) 
                 .AsNoTracking()
                 .OrderBy(product => product.Id)
                 .Skip((pageNumber - 1) * pageSize)
@@ -40,9 +40,9 @@ namespace Atlas.Infrastructure.Repositories
         {
             var query = _context.Products
                 .Include(product => product.Employee)
-                .ThenInclude(employee => employee.Person)
+                // ĐÃ XÓA: .ThenInclude(employee => employee.Person)
                 .Include(product => product.CategoryProducts)
-                .ThenInclude(categoryProduct => categoryProduct.Category)
+                    .ThenInclude(categoryProduct => categoryProduct.Category)
                 .AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -81,9 +81,9 @@ namespace Atlas.Infrastructure.Repositories
             var term = searchTerm.Trim();
             return await _context.Products
                 .Include(product => product.Employee)
-                .ThenInclude(employee => employee.Person)
+                // ĐÃ XÓA: .ThenInclude(employee => employee.Person)
                 .Include(product => product.CategoryProducts)
-                .ThenInclude(categoryProduct => categoryProduct.Category)
+                    .ThenInclude(categoryProduct => categoryProduct.Category)
                 .AsNoTracking()
                 .Where(product => product.ProductName.Contains(term) || product.ProductCode.Contains(term))
                 .OrderBy(product => product.Id)
@@ -92,16 +92,15 @@ namespace Atlas.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Products> GetByIdAsync(int id)
+        public async Task<Products?> GetByIdAsync(int id)
         {
             return await _context.Products
                 .Include(product => product.Employee)
-                .ThenInclude(employee => employee.Person)
+                // ĐÃ XÓA: .ThenInclude(employee => employee.Person)
                 .Include(product => product.CategoryProducts)
-                .ThenInclude(categoryProduct => categoryProduct.Category)
+                    .ThenInclude(categoryProduct => categoryProduct.Category)
                 .Include(product => product.ProductDetail)
                 .Include(product => product.Unit)
-                // QUAN TRỌNG: Lấy tất cả biến thể và thuộc tính của biến thể đó
                 .Include(product => product.Variants)
                     .ThenInclude(v => v.AttributeMappings)
                         .ThenInclude(m => m.AttributeValue)
@@ -124,7 +123,6 @@ namespace Atlas.Infrastructure.Repositories
 
             if (existingProduct is null) return false;
 
-            // Cập nhật thông tin cơ bản (Lưu ý tên trường BaseSalePrice/BaseCostPrice)
             existingProduct.ProductName = product.ProductName;
             existingProduct.ProductCode = product.ProductCode;
             existingProduct.UnitId = product.UnitId;
@@ -136,7 +134,6 @@ namespace Atlas.Infrastructure.Repositories
             existingProduct.Onsale = product.Onsale;
             existingProduct.UpdatedAt = DateTime.Now;
 
-            // Cập nhật chi tiết sản phẩm
             if (product.ProductDetail is not null)
             {
                 if (existingProduct.ProductDetail is null)
@@ -151,7 +148,6 @@ namespace Atlas.Infrastructure.Repositories
                 existingProduct.ProductDetail.Manufacturer = product.ProductDetail.Manufacturer;
             }
 
-            // Cập nhật Category
             existingProduct.CategoryProducts.Clear();
             if (product.CategoryProducts is not null)
             {
@@ -191,7 +187,7 @@ namespace Atlas.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<ProductVariant> GetVariantByIdAsync(int variantId)
+        public async Task<ProductVariant?> GetVariantByIdAsync(int variantId)
         {
             return await _context.ProductVariants
                 .Include(v => v.AttributeMappings)
@@ -235,7 +231,8 @@ namespace Atlas.Infrastructure.Repositories
         public async Task<IEnumerable<AttributeType>> GetAllAttributeTypesAsync()
         {
             return await _context.AttributeTypes
-                .Include(t => t.Values)
+                // Đảm bảo Navigation Property trong AttributeTypes là `Values` hoặc `AttributeValues`
+                .Include(t => t.Values) 
                 .AsNoTracking()
                 .ToListAsync();
         }

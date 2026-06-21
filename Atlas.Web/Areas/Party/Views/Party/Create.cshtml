@@ -1,0 +1,106 @@
+@model Atlas.Web.Areas.Party.Models.PartyCreateViewModel
+@{
+    ViewData["Title"] = "Thêm Đối tác mới";
+}
+
+<div class="container mt-4">
+    <h2>Thêm Đối tác mới</h2>
+    <hr />
+
+    <form asp-action="Create" method="post">
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="mb-3">Thông tin cơ bản</h4>
+                
+                <div class="mb-3">
+                    <label class="form-label">Loại đối tác</label>
+                    <select asp-for="PartyType" class="form-select">
+                        <option value="Person">Cá nhân (Person)</option>
+                        <option value="Company">Doanh nghiệp (Company)</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tên hiển thị <span class="text-danger">*</span></label>
+                    <input asp-for="DisplayName" class="form-control" placeholder="Tên công ty hoặc Tên gọi" />
+                    <span asp-validation-for="DisplayName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Mã số thuế</label>
+                    <input asp-for="TaxId" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Vai trò</label>
+                    <div class="form-check">
+                        <input asp-for="IsCustomer" class="form-check-input" />
+                        <label class="form-check-label">Là Khách hàng</label>
+                    </div>
+                    <div class="form-check">
+                        <input asp-for="IsVendor" class="form-check-input" />
+                        <label class="form-check-label">Là Nhà cung cấp</label>
+                    </div>
+                </div>
+
+                <div class="card p-3 mb-3 bg-light">
+                    <h6>Dành riêng cho Cá nhân:</h6>
+                    <div class="row">
+                        <div class="col-6 mb-2">
+                            <label class="form-label">Họ</label>
+                            <input asp-for="LastName" class="form-control" />
+                        </div>
+                        <div class="col-6 mb-2">
+                            <label class="form-label">Tên</label>
+                            <input asp-for="FirstName" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Ngày sinh</label>
+                            <input asp-for="DoB" type="date" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h4 class="mb-3">Liên hệ & Địa chỉ</h4>
+
+                <div class="mb-3">
+                    <label class="form-label">Điện thoại <span class="text-danger">*</span></label>
+                    <input asp-for="Phone" class="form-control" />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input asp-for="Email" type="email" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Địa chỉ (Số nhà, Đường)</label>
+                    <input asp-for="Street" class="form-control" />
+                </div>
+
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Quận/Huyện/Thành phố</label>
+                        <input asp-for="City" class="form-control" />
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Tỉnh/Thành</label>
+                        <input asp-for="State" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 mb-5 border-top pt-3">
+            <button type="submit" class="btn btn-success px-4">Lưu Đối tác</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Hủy bỏ</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

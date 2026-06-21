@@ -1,6 +1,9 @@
 using Atlas.Core.Entities;
 using Atlas.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Atlas.Infrastructure.Repositories
 {
@@ -16,47 +19,33 @@ namespace Atlas.Infrastructure.Repositories
         public async Task<IEnumerable<Pricelist>> GetAllAsync()
         {
             return await _context.Pricelists
-                .Include(p => p.VendorCompany)
-                .ThenInclude(vc => vc.Company)
-                .Include(p => p.VendorPerson)
-                .ThenInclude(vp => vp.Person)
-                .Include(p => p.CategoryPricelists)
-                .Include(p => p.PricelistProducts)
-                .ThenInclude(pp => pp.Product)
+                .Include(p => p.Vendor)
+                .Include(p => p.Currency)
+                .Include(p => p.PricelistVariants)
+                    .ThenInclude(pv => pv.Variant)
                 .AsNoTracking()
                 .ToListAsync();
         }
 
-        public async Task<Pricelist> GetByIdAsync(int id)
+        public async Task<Pricelist?> GetByIdAsync(int id)
         {
             return await _context.Pricelists
-                .Include(p => p.VendorCompany)
-                .ThenInclude(vc => vc.Company)
-                .Include(p => p.VendorPerson)
-                .ThenInclude(vp => vp.Person)
-                .Include(p => p.CategoryPricelists)
-                .Include(p => p.PricelistProducts)
-                .ThenInclude(pp => pp.Product)
+                .Include(p => p.Vendor)
+                .Include(p => p.Currency)
+                .Include(p => p.PricelistVariants)
+                    .ThenInclude(pv => pv.Variant)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IEnumerable<Pricelist>> GetByVendorCompanyAsync(int vendorCompanyId)
+        public async Task<IEnumerable<Pricelist>> GetByVendorAsync(int vendorId)
         {
             return await _context.Pricelists
-                .Where(p => p.VendorCompanyId == vendorCompanyId)
-                .Include(p => p.PricelistProducts)
-                .ThenInclude(pp => pp.Product)
-                .AsNoTracking()
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Pricelist>> GetByVendorPersonAsync(int vendorPersonId)
-        {
-            return await _context.Pricelists
-                .Where(p => p.VendorPersonId == vendorPersonId)
-                .Include(p => p.PricelistProducts)
-                .ThenInclude(pp => pp.Product)
+                .Where(p => p.VendorId == vendorId)
+                .Include(p => p.Vendor)
+                .Include(p => p.Currency)
+                .Include(p => p.PricelistVariants)
+                    .ThenInclude(pv => pv.Variant)
                 .AsNoTracking()
                 .ToListAsync();
         }

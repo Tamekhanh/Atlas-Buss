@@ -1,6 +1,9 @@
 using Atlas.Core.Entities;
 using Atlas.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Atlas.Infrastructure.Repositories
 {
@@ -16,44 +19,33 @@ namespace Atlas.Infrastructure.Repositories
         public async Task<IEnumerable<SalesOrder>> GetAllAsync()
         {
             return await _context.SalesOrders
-                .Include(o => o.Employee)
-                .ThenInclude(e => e.Person)
-                .Include(o => o.CustomerCompany)
-                .ThenInclude(cc => cc.Company)
-                .Include(o => o.CustomerPerson)
-                .ThenInclude(cp => cp.Person)
+                .Include(o => o.Employee) // Đã bỏ ThenInclude(Person)
+                .Include(o => o.Customer) // Trỏ về Party
                 .Include(o => o.SalesOrderDetails)
-                .ThenInclude(d => d.Product)
+                    .ThenInclude(d => d.Variant) // Trỏ về Variant thay vì Product
                 .AsNoTracking()
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
 
-        public async Task<SalesOrder> GetByIdAsync(int id)
+        public async Task<SalesOrder?> GetByIdAsync(int id)
         {
             return await _context.SalesOrders
                 .Include(o => o.Employee)
-                .ThenInclude(e => e.Person)
-                .Include(o => o.CustomerCompany)
-                .ThenInclude(cc => cc.Company)
-                .Include(o => o.CustomerPerson)
-                .ThenInclude(cp => cp.Person)
+                .Include(o => o.Customer)
                 .Include(o => o.SalesOrderDetails)
-                .ThenInclude(d => d.Product)
+                    .ThenInclude(d => d.Variant)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        public async Task<SalesOrder> GetByOrderNumberAsync(string orderNumber)
+        public async Task<SalesOrder?> GetByOrderNumberAsync(string orderNumber)
         {
             return await _context.SalesOrders
                 .Include(o => o.Employee)
-                .ThenInclude(e => e.Person)
-                .Include(o => o.CustomerCompany)
-                .ThenInclude(cc => cc.Company)
-                .Include(o => o.CustomerPerson)
-                .ThenInclude(cp => cp.Person)
+                .Include(o => o.Customer)
                 .Include(o => o.SalesOrderDetails)
+                    .ThenInclude(d => d.Variant)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(o => o.OrderNumber == orderNumber);
         }

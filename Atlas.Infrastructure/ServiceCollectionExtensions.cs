@@ -17,7 +17,6 @@ public static class ServiceCollectionExtensions
                 configuration.GetConnectionString("DefaultConnection"),
                 sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
-        services.AddScoped<ICompanyRepository, CompanyRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IDepartmentRepository, DepartmentRepository>();
@@ -28,13 +27,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ITaxRepository, TaxRepository>();
         services.AddScoped<IPricelistRepository, PricelistRepository>();
-        services.AddScoped<IVendorCompanyRepository, VendorCompanyRepository>();
-        services.AddScoped<ICustomerCompanyRepository, CustomerCompanyRepository>();
-        services.AddScoped<IVendorPersonRepository, VendorPersonRepository>();
-        services.AddScoped<ICustomerPersonRepository, CustomerPersonRepository>();
         services.AddScoped<IAuthRepository, AuthRepository>();
         services.AddScoped<ILogRepository, LogRepository>();
         services.AddScoped<IStorageProvider, LocalStorageProvider>();
+        services.AddScoped<IPartyRepository, PartyRepository>();
 
         return services;
     }

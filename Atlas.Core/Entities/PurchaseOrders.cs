@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace Atlas.Core.Entities
 {
     public class PurchaseOrder
@@ -6,33 +9,60 @@ namespace Atlas.Core.Entities
         public string PONumber { get; set; } = string.Empty;
         public DateTime OrderDate { get; set; } = DateTime.Now;
         public int EmployeeId { get; set; }
-        public int? VendorCompanyId { get; set; }
-        public int? VendorPersonId { get; set; }
-        public int OrderStatusId { get; set; } = 1;
 
+        // CHUẨN HÓA: Thay thế VendorCompanyId và VendorPersonId bằng VendorId duy nhất
+        public int VendorId { get; set; }
+
+        public int OrderStatusId { get; set; } = 1;
+        public int CurrencyId { get; set; } = 1; // Thêm CurrencyId cho đa tiền tệ
+        public decimal ExchangeRate { get; set; } = 1.0m;
+        public bool IsDeleted { get; set; } = false;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        // Navigation Properties
         public Employee? Employee { get; set; }
-        public VendorCompany? VendorCompany { get; set; }
-        public VendorPerson? VendorPerson { get; set; }
-        public PurchaseOrderStatus? OrderStatus { get; set; }
+
+        // CHUẨN HÓA: Trỏ về Party thay vì VendorCompany/VendorPerson
+        public Party? Vendor { get; set; }
+
+        public PurchaseOrderStatuses? OrderStatus { get; set; }
+        public Currencies? Currency { get; set; }
         public ICollection<PurchaseOrderDetail> PurchaseOrderDetails { get; set; } = new List<PurchaseOrderDetail>();
+    }
+
+    public class PurchaseOrderStatuses
+    {
+        public int Id { get; set; }
+        public string StatusName { get; set; } = null!;
+        public string? Description { get; set; }
+
+        public ICollection<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>();
     }
 
     public class PurchaseOrderDetail
     {
         public int Id { get; set; }
         public int POId { get; set; }
-        public int ProductId { get; set; }
+
+        // CHUẨN HÓA: Mua hàng theo Biến thể thay vì Sản phẩm cha
+        public int VariantId { get; set; }
+
         public int WarehouseId { get; set; }
         public int Quantity { get; set; }
-        public decimal UnitPrice { get; set; }
-        public decimal TaxRate { get; set; }
+        public decimal UnitPrice { get; set; } // Kiểu decimal
+        public decimal Discount { get; set; } = 0;
+        public decimal TaxAmount { get; set; } = 0; // Thay TaxRate bằng TaxAmount để tính toán chính xác nhiều thuế
 
-        public decimal SubTotal => Quantity * UnitPrice;
-        public decimal TaxAmount => (Quantity * UnitPrice) * (TaxRate / 100.0m);
-        public decimal LineTotal => (Quantity * UnitPrice) * (1 + TaxRate / 100.0m);
+        // Các computed properties
+        public decimal SubTotal => (Quantity * UnitPrice) - Discount;
+        public decimal LineTotal => ((Quantity * UnitPrice) - Discount) + TaxAmount;
 
+        // Navigation Properties
         public PurchaseOrder? PurchaseOrder { get; set; }
-        public Products? Product { get; set; }
+
+        // CHUẨN HÓA: Trỏ về ProductVariant
+        public ProductVariant? Variant { get; set; }
+
         public Warehouse? Warehouse { get; set; }
     }
 }

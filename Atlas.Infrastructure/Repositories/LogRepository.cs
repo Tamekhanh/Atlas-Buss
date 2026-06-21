@@ -24,8 +24,7 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.Logs
                 .Include(log => log.Employee)
                     .ThenInclude(employee => employee!.Account)
-                .Include(log => log.Employee)
-                    .ThenInclude(employee => employee!.Person)
+                // Đã bỏ Include Person
                 .Where(log => log.EmployeeId == employeeId)
                 .OrderByDescending(log => log.Timestamp)
                 .ToListAsync();
@@ -36,8 +35,7 @@ namespace Atlas.Infrastructure.Repositories
             var query = _context.Logs
                 .Include(log => log.Employee)
                     .ThenInclude(employee => employee!.Account)
-                .Include(log => log.Employee)
-                    .ThenInclude(employee => employee!.Person)
+                // Đã bỏ Include Person
                 .Where(log => (startDate == null || log.Timestamp >= startDate) && (endDate == null || log.Timestamp <= endDate));
 
             if (employeeId.HasValue)
@@ -48,16 +46,14 @@ namespace Atlas.Infrastructure.Repositories
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 var term = searchTerm.Trim();
+                
+                // Logic search đã được tinh gọn, dùng trực tiếp FullName
                 query = query.Where(log =>
                     log.Action.Contains(term) ||
                     (log.Employee != null && (
                         (log.Employee.EmployeeNumber != null && log.Employee.EmployeeNumber.Contains(term)) ||
                         (log.Employee.Account != null && log.Employee.Account.Username != null && log.Employee.Account.Username.Contains(term)) ||
-                        (log.Employee.Person != null && (
-                            ((log.Employee.Person.FirstName ?? string.Empty) + " " + (log.Employee.Person.LastName ?? string.Empty)).Contains(term) ||
-                            (log.Employee.Person.FirstName != null && log.Employee.Person.FirstName.Contains(term)) ||
-                            (log.Employee.Person.LastName != null && log.Employee.Person.LastName.Contains(term))
-                        ))
+                        (log.Employee.FullName != null && log.Employee.FullName.Contains(term))
                     )));
             }
 
@@ -71,8 +67,7 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.Logs
                 .Include(log => log.Employee)
                     .ThenInclude(employee => employee!.Account)
-                .Include(log => log.Employee)
-                    .ThenInclude(employee => employee!.Person)
+                // Đã bỏ Include Person
                 .OrderByDescending(log => log.Timestamp)
                 .ToListAsync();
         }

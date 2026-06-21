@@ -2,7 +2,9 @@ namespace Atlas.Core.Models
 {
     public class LogModel
     {
-        public int Id { get; set; }
+        // SỬA TẠI ĐÂY: int -> long
+        public long Id { get; set; } 
+        
         public int? EmployeeId { get; set; }
         public string? Username { get; set; }
         public string? EmployeeNumber { get; set; }
