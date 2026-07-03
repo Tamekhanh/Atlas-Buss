@@ -90,6 +90,28 @@ CREATE TABLE dbo.Currencies (
 )
 GO
 
+CREATE TABLE dbo.Images (
+    id int identity(1,1) primary key,
+    ImageUrl nvarchar(255) not null,
+    CreatedAt datetime default GETDATE(),
+)
+
+-- =============================================
+-- 1.1 Basic Information
+-- =============================================
+
+CREATE TABLE dbo.MyCompanyInfo(
+    id int identity(1,1) primary key,
+    CompanyName nvarchar(100) not null,
+    TaxId nvarchar(20) null,
+    Address nvarchar(255) null,
+    Phone nvarchar(20) null,
+    Email nvarchar(50) null,
+    LogoId int null,
+    FOREIGN KEY (LogoId) REFERENCES dbo.Images(id)
+)
+
+
 -- =============================================
 -- 2. UNIFIED PARTY MODEL (QUẢN LÝ ĐỐI TÁC TINH GỌN)
 -- =============================================
@@ -130,9 +152,10 @@ CREATE TABLE dbo.Parties(
     IsVendor bit not null default 0,     -- Đóng vai trò Nhà cung cấp
     IsDeleted bit default 0,
     CreatedAt datetime default GETDATE(),
-    ImageUrl nvarchar(255) null,
+    ImageID int null,
     FOREIGN KEY (AddressId) REFERENCES dbo.Addresses(id),
-    FOREIGN KEY (ContactId) REFERENCES dbo.Contacts(id)
+    FOREIGN KEY (ContactId) REFERENCES dbo.Contacts(id),
+    FOREIGN KEY (ImageID) REFERENCES dbo.Images(id)
 )
 GO
 
@@ -147,10 +170,12 @@ CREATE TABLE dbo.Employee(
     DoB date not null,
     AddressId int not null,
     ContactId int not null,
+    ImageID int null,
     IsDeleted bit default 0,
     CreatedAt datetime default GETDATE(),
     FOREIGN KEY (AddressId) REFERENCES dbo.Addresses(id),
-    FOREIGN KEY (ContactId) REFERENCES dbo.Contacts(id)
+    FOREIGN KEY (ContactId) REFERENCES dbo.Contacts(id),
+    FOREIGN KEY (ImageID) REFERENCES dbo.Images(id)
 )
 GO
 
@@ -189,10 +214,16 @@ CREATE TABLE dbo.Logs(
     id bigint identity(1,1) primary key,
     EmployeeId int null,
     Action nvarchar(255) not null,
-    OldValue nvarchar(max) null, -- Hỗ trợ Audit Trail lưu JSON trạng thái cũ
-    NewValue nvarchar(max) null, -- Hỗ trợ Audit Trail lưu JSON trạng thái mới
     Timestamp datetime not null default GETDATE(),
     FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id)
+)
+GO
+
+CREATE TABLE dbo.LogsDetails(
+    LogId bigint not null,
+    JsonChangeUrl nvarchar(255) not null, -- Lưu chi tiết thay đổi ở dạng JSON
+    PRIMARY KEY (LogId),
+    FOREIGN KEY (LogId) REFERENCES dbo.Logs(id)
 )
 GO
 
@@ -217,7 +248,6 @@ CREATE TABLE dbo.Products(
     ProductName nvarchar(100) not null,
     ProductCode nvarchar(50) not null UNIQUE,
     UnitId int null, 
-    ImageUrl nvarchar(255) null,
     BaseSalePrice decimal(19,4) not null, -- Chuẩn hóa kiểu tiền tệ kế toán
     BaseCostPrice decimal(19,4) not null, 
     Barcode nvarchar(50) null,
@@ -231,6 +261,14 @@ CREATE TABLE dbo.Products(
     FOREIGN KEY (UnitId) REFERENCES dbo.Units(id)
 )
 GO
+
+CREATE TABLE dbo.ProductImages(
+
+    ProductId int not null,
+    ImageId int not null,
+    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id),
+    FOREIGN KEY (ImageId) REFERENCES dbo.Images(id)
+)
 
 CREATE TABLE dbo.AttributeTypes(
     id int identity(1,1) primary key,

@@ -52,7 +52,8 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                                      data-original-src="@(!string.IsNullOrWhiteSpace(Model.ImageUrl) ? $"/file-storage/{Model.ImageUrl}" : "")"
                                      alt="Product Image" style="width: 100%; height: 100%; object-fit: contain;" />
                             </div>
-                            <input asp-for="ImageFile" type="file" id="imageInput" class="form-control mt-2" accept="image/*" />
+                            <input asp-for="ImageFile" type="file" id="imageInput" class="form-control mt-2"
+                                   accept="image/*" />
 
                             <input type="hidden" asp-for="ImageUrl" />
                         </div>
@@ -204,16 +205,13 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                                             </td>
                                             <td>
                                                 <div class="variant-attr-container d-flex flex-wrap gap-1">
-                                                    @foreach (var attrId in Model.Variants[i].AttributeValueIds)
-                                                    {
-                                                        <span class="badge bg-secondary rounded-pill attr-tag">
-                                                            @attrId
-                                                            <button type="button"
-                                                                    class="btn-close btn-close-white ms-1 btn-sm remove-attr"></button>
-                                                            <input type="hidden" name="Variants[@i].AttributeValueIds"
-                                                                   value="@attrId" />
-                                                        </span>
-                                                    }
+                                                    <div class="d-flex flex-wrap gap-1">
+                                                        @foreach (var desc in Model.Variants[i].AttributeDescriptions)
+                                                        {
+                                                            <!-- Thay đổi từ ID thành Tên mô tả -->
+                                                            <span class="badge bg-info text-dark rounded-pill">@desc</span>
+                                                        }
+                                                    </div>
                                                 </div>
                                                 <!-- Nơi render dropdown chọn attribute cho variant này -->
                                                 <select class="form-select form-select-sm mt-2 attr-selector">
@@ -307,7 +305,7 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                         <dl class="row mb-0">
                             <dt class="col-sm-4">Description</dt>
                             <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.ProductDescription) ? "N/A" :
-                                                                                                                                                                                            Model.ProductDescription)</dd>
+                                                                                                                                                                                                                                                                                                                                                                                                                            Model.ProductDescription)</dd>
                                 <dt class="col-sm-4">Weight</dt>
                                 <dd class="col-sm-8">@(Model.Weight.HasValue ? Model.Weight.Value.ToString("N2") : "N/A")</dd>
                                 <dt class="col-sm-4">Warranty</dt>
@@ -318,7 +316,7 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                                 </dd>
                                 <dt class="col-sm-4">Manufacturer</dt>
                                 <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Manufacturer) ? "N/A" :
-                                                                                                                                                                                                                Model.Manufacturer)</dd>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            Model.Manufacturer)</dd>
                                 </dl>
                                 <h3 class="h6 mt-4 mb-2">Categories</h3>
                                 <div class="d-flex flex-wrap gap-2">
@@ -330,6 +328,7 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                             </div>
                         </div>
 
+                        <!-- HIỂN THỊ BẢNG BIẾN THỂ (READ-ONLY) -->
                         <!-- HIỂN THỊ BẢNG BIẾN THỂ (READ-ONLY) -->
                         <div class="mt-5">
                             <h2 class="h5 mb-3 border-bottom pb-2">Variants List</h2>
@@ -352,9 +351,10 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                                                 <td class="text-end">@v.Cost.ToString("N0")</td>
                                                 <td>
                                                     <div class="d-flex flex-wrap gap-1">
-                                                        @foreach (var attrId in v.AttributeValueIds)
+                                                        @foreach (var desc in v.AttributeDescriptions)
                                                         {
-                                                            <span class="badge bg-secondary rounded-pill">ID: @attrId</span>
+                                                            <!-- Thay đổi từ ID thành Tên mô tả -->
+                                                            <span class="badge bg-info text-dark rounded-pill">@desc</span>
                                                         }
                                                     </div>
                                                 </td>
@@ -416,10 +416,10 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                         tag.className = 'badge rounded-pill text-bg-primary category-tag';
                         tag.dataset.categoryId = id;
                         tag.innerHTML = `
-                                                                                                                <span class="category-tag-text">${name}</span>
-                                                                                                                <button type="button" class="btn-close btn-close-white ms-2 category-remove" aria-label="Close"></button>
-                                                                                                                <input type="hidden" name="CategoryIds" value="${id}" />
-                                                                                                            `;
+                                                <span class="category-tag-text">${name}</span>
+                                                <button type="button" class="btn-close btn-close-white ms-2 category-remove" aria-label="Close"></button>
+                                                <input type="hidden" name="CategoryIds" value="${id}" />
+                                                `;
 
                         // Sự kiện xóa tag
                         tag.querySelector('.category-remove').addEventListener('click', (e) => {
@@ -474,8 +474,7 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
 
                     const createVariantRow = (index, sku = '', price = '', cost = '', attrIds = []) => {
                         const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                        <td><input name="Variants[${index}].SKU" value="${sku}" class="form-control" required /></td>
+                        tr.innerHTML = ` <td><input name="Variants[${index}].SKU" value="${sku}" class="form-control" required /></td>
                         <td><input name="Variants[${index}].Price" value="${price}" class="form-control" type="number" step="0.01" required /></td>
                         <td><input name="Variants[${index}].Cost" value="${cost}" class="form-control" type="number" step="0.01" required /></td>
                         <td>
@@ -488,11 +487,11 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                         </span>`).join('')}
                         </div>
                         <select class="form-select form-select-sm mt-2 attr-selector">
-                         <option value="">+ Add Attribute</option>
-                         ${Array.from(document.querySelectorAll('.attr-selector option')).filter(opt => opt.value !== "").map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('')}
+                        <option value="">+ Add Attribute</option>
+                        ${Array.from(document.querySelectorAll('.attr-selector option')).filter(opt => opt.value !== "").map(opt => `<option value="${opt.value}">${opt.text}</option>`).join('')}
                         <!-- Nếu là row mới hoàn toàn, ta copy options từ row đầu tiên hoặc từ ViewBag -->
                         </select>
-                         </td>
+                        </td>
                         <td class="text-center"><button type="button" class="btn btn-outline-danger btn-sm remove-variant">Remove</button></td>
                         `;
                         return tr;

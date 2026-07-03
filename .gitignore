@@ -19,6 +19,9 @@
 # Mono auto generated files
 mono_crash.*
 
+.vs/
+_build_temp/
+
 AtlasStorage/
 
 # Build results

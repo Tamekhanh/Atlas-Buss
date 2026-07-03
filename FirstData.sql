@@ -224,8 +224,119 @@ GO
 -- =============================================
 -- 8. LOGS (Đã hỗ trợ chuẩn Audit Trail)
 -- =============================================
-INSERT INTO dbo.Logs (EmployeeId, Action, OldValue, NewValue) VALUES 
-(1, 'Initialize database', NULL, '{"Status":"Success", "Version":"2.0"}'),
-(2, 'Create sales order SO-2024-001', NULL, '{"OrderId": 1, "Status": "Pending"}'),
-(2, 'Update sales order SO-2024-001', '{"Status": "Pending"}', '{"Status": "Completed"}');
+INSERT INTO dbo.Logs (EmployeeId, Action) VALUES 
+(1, 'Initialize database'),
+(2, 'Create sales order SO-2024-001'),
+(2, 'Update sales order SO-2024-001');
 GO
+
+
+-- Thêm Thuế
+INSERT INTO dbo.Taxes (TaxName, TaxRate, Description, IsStackable) VALUES
+('Import Tax 3%', 3.00, 'Thuế nhập khẩu hàng điện tử', 1),
+('Eco Tax 1%', 1.00, 'Thuế bảo vệ môi trường', 1);
+
+-- Thêm Loại thuộc tính mới
+INSERT INTO dbo.AttributeTypes (AttributeName, Description) VALUES
+('Material', 'Chất liệu sản phẩm'), 
+('Processor', 'Chip xử lý'),
+('Generation', 'Thế hệ sản phẩm');
+
+-- Thêm Giá trị thuộc tính (Tiếp nối ID cũ)
+INSERT INTO dbo.AttributeValues (AttributeTypeId, AttributeValue) VALUES
+(5, 'Leather'), (5, 'Mesh'), (5, 'Fabric'),        -- Material (5)
+(6, 'Intel i5'), (6, 'Intel i7'), (6, 'Apple M3'),  -- Processor (6)
+(7, 'Gen 12'), (7, 'Gen 13'), (7, 'Gen 14');       -- Generation (7)
+
+
+INSERT INTO dbo.Products (ProductName, ProductCode, UnitId, BaseSalePrice, BaseCostPrice, EmployeeId) VALUES
+-- Laptops (Tiếp tục)
+('Dell XPS 13', 'LAP-DEL-01', 1, 32000000, 27000000, 1),
+('HP Spectre x360', 'LAP-HP-01', 1, 30000000, 25000000, 1),
+('Asus ROG Zephyrus', 'LAP-ASU-01', 1, 42000000, 36000000, 1),
+('Surface Laptop 5', 'LAP-MS-01', 1, 28000000, 23000000, 1),
+('Gaming Laptop Acer', 'LAP-ACE-01', 1, 25000000, 20000000, 1),
+
+-- Smartphones
+('iPhone 15 Pro', 'PHO-APP-15P', 1, 28000000, 22000000, 1),
+('iPhone 15', 'PHO-APP-15', 1, 20000000, 16000000, 1),
+('Samsung S23 Ultra', 'PHO-SAM-S23U', 1, 25000000, 20000000, 1),
+('Samsung S23', 'PHO-SAM-S23', 1, 18000000, 14000000, 1),
+('Google Pixel 8', 'PHO-GOG-P8', 1, 17000000, 13000000, 1),
+
+-- Monitors
+('LG UltraFine 4K', 'MON-LG-4K', 1, 15000000, 12000000, 1),
+('Samsung Odyssey G7', 'MON-SAM-G7', 1, 12000000, 9000000, 1),
+('Dell UltraSharp 27', 'MON-DEL-27', 1, 11000000, 8000000, 1),
+('Asus ProArt', 'MON-ASU-PA', 1, 18000000, 14000000, 1),
+('ViewSonic VG24', 'MON-VWS-24', 1, 5000000, 3500000, 1),
+
+-- Peripherals (Chuột/Bàn phím)
+('Logitech MX Master 3S', 'MOU-LOG-MX3', 1, 2500000, 1500000, 1),
+('Razer DeathAdder V3', 'MOU-RAZ-DV3', 1, 2000000, 1200000, 1),
+('Keychron K2', 'KBD-KEY-K2', 1, 2200000, 1400000, 1),
+('Logitech G Pro X', 'KBD-LOG-GPX', 1, 3500000, 2200000, 1),
+('Corsair K70', 'KBD-COR-K70', 1, 4000000, 2800000, 1),
+
+-- Furniture (Ghế/Bàn)
+('Herman Miller Aeron', 'CHR-HM-AER', 1, 35000000, 25000000, 1),
+('Sihoo M57', 'CHR-SIH-M57', 1, 5000000, 3500000, 1),
+('Gaming Chair DX', 'CHR-GAM-DX', 1, 4000000, 2500000, 1),
+('Standing Desk Pro', 'DSK-STD-PRO', 1, 8000000, 5000000, 1),
+('Wooden Desk Minimal', 'DSK-WDN-MIN', 1, 3000000, 1800000, 1),
+
+-- Accessories
+('Magic Mouse 2', 'ACC-APP-MOU', 1, 2200000, 1500000, 1),
+('Magic Keyboard', 'ACC-APP-KBD', 1, 3000000, 2000000, 1),
+('AirPods Max', 'AUD-APP-MAX', 1, 12000000, 9000000, 1),
+('Sony WH-1000XM5', 'AUD-SON-XM5', 1, 8000000, 6000000, 1),
+('SteelSeries Arctis 7', 'AUD-STE-A7', 1, 5000000, 3500000, 1);
+
+
+INSERT INTO dbo.ProductVariants (ProductId, SKU, VariantPrice, VariantCost) VALUES
+-- Laptops
+(6, 'DEL-XPS13-SLV-I5', 32000000, 27000000),
+(6, 'DEL-XPS13-SLV-I7', 36000000, 31000000),
+(7, 'HP-SPEC-WHT-I5', 30000000, 25000000),
+(8, 'ASU-ROG-BLK-I9', 42000000, 36000000),
+(9, 'MS-SURF-PLT-I5', 28000000, 23000000),
+(10, 'ACE-GAM-BLK-I7', 25000000, 20000000),
+
+-- Smartphones
+(11, 'IPH-15P-NAT-128', 28000000, 22000000),
+(11, 'IPH-15P-NAT-256', 31000000, 25000000),
+(12, 'IPH-15-BLU-128', 20000000, 16000000),
+(13, 'SAM-S23U-BLK-256', 25000000, 20000000),
+(13, 'SAM-S23U-BLK-512', 28000000, 23000000),
+(14, 'SAM-S23-WHT-128', 18000000, 14000000),
+(15, 'GOG-P8-OBS-128', 17000000, 13000000),
+
+-- Monitors
+(16, 'LG-UF-4K-SILV', 15000000, 12000000),
+(17, 'SAM-OD-G7-CURV', 12000000, 9000000),
+(18, 'DEL-US-27-BLK', 11000000, 8000000),
+(19, 'ASU-PA-27-BLK', 18000000, 14000000),
+(20, 'VWS-VG-24-BLK', 5000000, 3500000),
+
+-- Peripherals
+(21, 'LOG-MX3-GRY', 2500000, 1500000),
+(21, 'LOG-MX3-BLK', 2500000, 1500000),
+(22, 'RAZ-DV3-WHT', 2000000, 1200000),
+(23, 'KEY-K2-RGB', 2200000, 1400000),
+(24, 'LOG-GPX-BLK', 3500000, 2200000),
+(25, 'COR-K70-RGB', 4000000, 2800000),
+
+-- Furniture
+(26, 'HM-AER-GRY', 35000000, 25000000),
+(27, 'SIH-M57-BLK', 5000000, 3500000),
+(28, 'GAM-DX-RED', 4000000, 2500000),
+(29, 'DSK-STD-WHT', 8000000, 5000000),
+(30, 'DSK-WDN-OAK', 3000000, 1800000),
+
+-- Accessories
+(31, 'APP-MOU-SILV', 2200000, 1500000),
+(32, 'APP-KBD-SILV', 3000000, 2000000),
+(33, 'APP-MAX-SILV', 12000000, 9000000),
+(34, 'SON-XM5-BLK', 8000000, 6000000),
+(34, 'SON-XM5-SLV', 8000000, 6000000),
+(35, 'STE-A7-BLK', 5000000, 3500000);

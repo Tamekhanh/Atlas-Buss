@@ -20,5 +20,7 @@ namespace Atlas.Core.Interfaces
         
         Task<bool> UpdateAsync(Party party);
         Task<bool> DeleteAsync(int id);
+
+        Task<bool> GetDeletedStatusAsync(int id);
     }
 }

@@ -6,29 +6,35 @@
 
 <h1>Log</h1>
 
-<form method="get" asp-area="LogPage" asp-controller="Log" asp-action="Index" class="mb-3">
-    <div class="row g-2 align-items-end">
-        <div class="col-md-3">
-            <label class="form-label" for="searchTerm">Search</label>
-            <input class="form-control" type="text" id="searchTerm" name="searchTerm" placeholder="Action, username, employee..." />
+<div class="container py-4">
+    <form method="get" asp-area="LogPage" asp-controller="Log" asp-action="Index" class="mb-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label" for="searchTerm">Search</label>
+                <input class="form-control" type="text" id="searchTerm" name="searchTerm"
+                       placeholder="Action, username, employee..." />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" for="startDate">Start date</label>
+                <input class="form-control" type="date" id="startDate" name="startDate" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" for="endDate">End date</label>
+                <input class="form-control" type="date" id="endDate" name="endDate" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" for="employeeId">Employee ID</label>
+                <input class="form-control" type="number" id="employeeId" name="employeeId" />
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a class="btn btn-outline-secondary" asp-area="LogPage" asp-controller="Log"
+                   asp-action="Index">Reset</a>
+            </div>
         </div>
-        <div class="col-md-2">
-            <label class="form-label" for="startDate">Start date</label>
-            <input class="form-control" type="date" id="startDate" name="startDate" />
-        </div>
-        <div class="col-md-2">
-            <label class="form-label" for="endDate">End date</label>
-            <input class="form-control" type="date" id="endDate" name="endDate" />
-        </div>
-        <div class="col-md-2">
-            <label class="form-label" for="employeeId">Employee ID</label>
-            <input class="form-control" type="number" id="employeeId" name="employeeId" />
-        </div>
-        <div class="col-md-3 d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Search</button>
-            <a class="btn btn-outline-secondary" asp-area="LogPage" asp-controller="Log" asp-action="Index">Reset</a>
-        </div>
-    </div>
-</form>
+    </form>
 
-@await Html.PartialAsync("~/Areas/LogPage/Views/LogPage/_LogTable.cshtml", Model)
+    <div class="table-responsive shadow-sm rounded-3 bg-white">
+        @await Html.PartialAsync("~/Areas/LogPage/Views/LogPage/_LogTable.cshtml", Model)
+    </div>
+</div>

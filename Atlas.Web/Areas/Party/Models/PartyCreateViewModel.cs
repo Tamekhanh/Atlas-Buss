@@ -5,10 +5,10 @@ namespace Atlas.Web.Areas.Party.Models
 {
     public class PartyCreateViewModel
     {
-        [Required(ErrorMessage = "Vui lòng chọn loại đối tác")]
+        [Required(ErrorMessage = "Please select party type")]
         public string PartyType { get; set; } = "Person"; // "Person" hoặc "Company"
 
-        [Required(ErrorMessage = "Tên hiển thị là bắt buộc")]
+        [Required(ErrorMessage = "Display name is required")]
         public string DisplayName { get; set; } = null!;
 
         // Dành cho Person
@@ -21,7 +21,7 @@ namespace Atlas.Web.Areas.Party.Models
         public bool IsVendor { get; set; }
 
         // Thông tin liên hệ
-        [Required(ErrorMessage = "Số điện thoại là bắt buộc")]
+        [Required(ErrorMessage = "Phone is required")]
         public string Phone { get; set; } = null!;
         public string? Email { get; set; }
 
@@ -31,5 +31,10 @@ namespace Atlas.Web.Areas.Party.Models
         public string? City { get; set; }
         public string? State { get; set; }
         public string? Country { get; set; } = "Vietnam";
+    }
+
+    public class PartyEditViewModel : PartyCreateViewModel
+    {
+        public int Id { get; set; }
     }
 }

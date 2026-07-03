@@ -22,6 +22,7 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.Parties
                 .Include(p => p.Address)
                 .Include(p => p.Contact)
+                .Where(p => !p.IsDeleted)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -36,7 +37,7 @@ namespace Atlas.Infrastructure.Repositories
         public async Task<IEnumerable<Party>> GetCustomersAsync()
         {
             return await _context.Parties
-                .Where(p => p.IsCustomer)
+                .Where(p => p.IsCustomer && !p.IsDeleted)
                 .Include(p => p.Address)
                 .Include(p => p.Contact)
                 .AsNoTracking()
@@ -46,7 +47,7 @@ namespace Atlas.Infrastructure.Repositories
         public async Task<IEnumerable<Party>> GetVendorsAsync()
         {
             return await _context.Parties
-                .Where(p => p.IsVendor)
+                .Where(p => p.IsVendor && !p.IsDeleted)
                 .Include(p => p.Address)
                 .Include(p => p.Contact)
                 .AsNoTracking()
@@ -58,8 +59,15 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.Parties
                 .Include(p => p.Address)
                 .Include(p => p.Contact)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(p => p.Id == id && !p.IsDeleted);
         }
+
+        public async Task<bool> GetDeletedStatusAsync(int id)
+        {
+            var party = await _context.Parties.FindAsync(id);
+            return party?.IsDeleted ?? false;
+        }
+
 
         // Hàm Create duy nhất thay thế cho 4 hàm Create cũ
         public async Task<bool> CreateAsync(PartyRegistrationRequest request)

@@ -28,7 +28,7 @@ namespace Atlas.Infrastructure.Repositories
                 // ĐÃ XÓA: .ThenInclude(employee => employee.Person)
                 .Include(product => product.CategoryProducts)
                     .ThenInclude(categoryProduct => categoryProduct.Category)
-                .Include(product => product.Unit) 
+                .Include(product => product.Unit)
                 .AsNoTracking()
                 .OrderBy(product => product.Id)
                 .Skip((pageNumber - 1) * pageSize)
@@ -104,6 +104,7 @@ namespace Atlas.Infrastructure.Repositories
                 .Include(product => product.Variants)
                     .ThenInclude(v => v.AttributeMappings)
                         .ThenInclude(m => m.AttributeValue)
+                            .ThenInclude(av => av.AttributeType)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(product => product.Id == id);
         }
@@ -232,7 +233,7 @@ namespace Atlas.Infrastructure.Repositories
         {
             return await _context.AttributeTypes
                 // Đảm bảo Navigation Property trong AttributeTypes là `Values` hoặc `AttributeValues`
-                .Include(t => t.Values) 
+                .Include(t => t.Values)
                 .AsNoTracking()
                 .ToListAsync();
         }

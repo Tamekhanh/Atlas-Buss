@@ -463,6 +463,20 @@ namespace Atlas.Infrastructure
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            modelBuilder.Entity<LogDetail>(entity =>
+            {
+                entity.ToTable("LogsDetails", "dbo");
+
+                // Khóa chính
+                entity.HasKey(ld => ld.LogId);
+
+                // Cấu hình quan hệ 1-1 với Logs
+                entity.HasOne(ld => ld.Log)
+                    .WithOne(l => l.LogDetail)
+                    .HasForeignKey<LogDetail>(ld => ld.LogId)
+                    .OnDelete(DeleteBehavior.Cascade); // Xóa Log thì tự động xóa LogDetail
+            });
+
             modelBuilder.Entity<Invoice>(entity =>
             {
                 entity.ToTable("Invoices", "dbo");

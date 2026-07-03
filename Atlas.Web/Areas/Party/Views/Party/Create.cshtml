@@ -1,61 +1,61 @@
 @model Atlas.Web.Areas.Party.Models.PartyCreateViewModel
 @{
-    ViewData["Title"] = "Thêm Đối tác mới";
+    ViewData["Title"] = "Create New Party";
 }
 
 <div class="container mt-4">
-    <h2>Thêm Đối tác mới</h2>
+    <h2>Create New Party</h2>
     <hr />
 
     <form asp-action="Create" method="post">
         <div class="row">
             <div class="col-md-6">
-                <h4 class="mb-3">Thông tin cơ bản</h4>
-                
+                <h4 class="mb-3">Basic Information</h4>
+
                 <div class="mb-3">
-                    <label class="form-label">Loại đối tác</label>
+                    <label class="form-label">Party Type</label>
                     <select asp-for="PartyType" class="form-select">
-                        <option value="Person">Cá nhân (Person)</option>
-                        <option value="Company">Doanh nghiệp (Company)</option>
+                        <option value="Person">Individual (Person)</option>
+                        <option value="Company">Company</option>
                     </select>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Tên hiển thị <span class="text-danger">*</span></label>
-                    <input asp-for="DisplayName" class="form-control" placeholder="Tên công ty hoặc Tên gọi" />
+                    <label class="form-label">Display Name <span class="text-danger">*</span></label>
+                    <input asp-for="DisplayName" class="form-control" placeholder="Company name or Display name" />
                     <span asp-validation-for="DisplayName" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Mã số thuế</label>
+                    <label class="form-label">Tax ID</label>
                     <input asp-for="TaxId" class="form-control" />
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Vai trò</label>
+                    <label class="form-label">Roles</label>
                     <div class="form-check">
                         <input asp-for="IsCustomer" class="form-check-input" />
-                        <label class="form-check-label">Là Khách hàng</label>
+                        <label class="form-check-label">Customer</label>
                     </div>
                     <div class="form-check">
                         <input asp-for="IsVendor" class="form-check-input" />
-                        <label class="form-check-label">Là Nhà cung cấp</label>
+                        <label class="form-check-label">Vendor</label>
                     </div>
                 </div>
 
                 <div class="card p-3 mb-3 bg-light">
-                    <h6>Dành riêng cho Cá nhân:</h6>
+                    <h6>For Individuals</h6>
                     <div class="row">
                         <div class="col-6 mb-2">
-                            <label class="form-label">Họ</label>
+                            <label class="form-label">Last Name</label>
                             <input asp-for="LastName" class="form-control" />
                         </div>
                         <div class="col-6 mb-2">
-                            <label class="form-label">Tên</label>
+                            <label class="form-label">First Name</label>
                             <input asp-for="FirstName" class="form-control" />
                         </div>
                         <div class="col-12">
-                            <label class="form-label">Ngày sinh</label>
+                            <label class="form-label">Date of Birth</label>
                             <input asp-for="DoB" type="date" class="form-control" />
                         </div>
                     </div>
@@ -63,10 +63,10 @@
             </div>
 
             <div class="col-md-6">
-                <h4 class="mb-3">Liên hệ & Địa chỉ</h4>
+                <h4 class="mb-3">Contact & Address</h4>
 
                 <div class="mb-3">
-                    <label class="form-label">Điện thoại <span class="text-danger">*</span></label>
+                    <label class="form-label">Phone <span class="text-danger">*</span></label>
                     <input asp-for="Phone" class="form-control" />
                     <span asp-validation-for="Phone" class="text-danger"></span>
                 </div>
@@ -77,17 +77,17 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Địa chỉ (Số nhà, Đường)</label>
+                    <label class="form-label">Address</label>
                     <input asp-for="Street" class="form-control" />
                 </div>
 
                 <div class="row">
                     <div class="col-6 mb-3">
-                        <label class="form-label">Quận/Huyện/Thành phố</label>
+                        <label class="form-label">City/District/Province</label>
                         <input asp-for="City" class="form-control" />
                     </div>
                     <div class="col-6 mb-3">
-                        <label class="form-label">Tỉnh/Thành</label>
+                        <label class="form-label">State/Province</label>
                         <input asp-for="State" class="form-control" />
                     </div>
                 </div>
@@ -95,12 +95,30 @@
         </div>
 
         <div class="mt-4 mb-5 border-top pt-3">
-            <button type="submit" class="btn btn-success px-4">Lưu Đối tác</button>
-            <a asp-action="Index" class="btn btn-secondary ms-2">Hủy bỏ</a>
+            <button type="submit" class="btn btn-success px-4">Save</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
         </div>
     </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            function togglePersonFields() {
+                var type = $('#PartyType').val();
+                if (type === 'Company') {
+                    $('.person-only').slideUp();
+                } else {
+                    $('.person-only').slideDown();
+                }
+            }
+
+            // Gắn class 'person-only' vào thẻ div bao quanh các trường Họ, Tên, Ngày sinh
+            $('.card.bg-light').addClass('person-only'); 
+
+            $('#PartyType').change(togglePersonFields);
+            togglePersonFields(); // Chạy lần đầu khi load trang
+        });
+    </script>
 }

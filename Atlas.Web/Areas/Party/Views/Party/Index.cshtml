@@ -3,44 +3,104 @@
     ViewData["Title"] = "Danh sách Đối tác";
 }
 
-<div class="container mt-4">
+<div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Danh sách Đối tác</h2>
-        <a asp-action="Create" class="btn btn-primary">Thêm Đối tác mới</a>
+        <h2>Party List</h2>
+        <a asp-action="Create" class="btn btn-primary">Create New Party</a>
     </div>
 
-    <table class="table table-bordered table-hover">
-        <thead class="table-light">
-            <tr>
-                <th>Tên hiển thị</th>
-                <th>Phân loại</th>
-                <th>Vai trò</th>
-                <th>Điện thoại</th>
-                <th>Email</th>
-                <th>Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+    <div class="table-responsive shadow-sm rounded-3 bg-white">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
                 <tr>
-                    <td><strong>@item.DisplayName</strong></td>
-                    <td>
-                        <span class="badge @(item.PartyType == "Company" ? "bg-primary" : "bg-success")">
-                            @item.PartyType
-                        </span>
-                    </td>
-                    <td>
-                        @if (item.IsCustomer) { <span class="badge bg-info text-dark">Khách hàng</span> }
-                        @if (item.IsVendor) { <span class="badge bg-warning text-dark">Nhà cung cấp</span> }
-                    </td>
-                    <td>@item.Phone</td>
-                    <td>@item.Email</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white">Chi tiết</a>
-                    </td>
+                    <th>Display Name</th>
+                    <th>Party Type</th>
+                    <th>Roles</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Actions</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td><strong>@item.DisplayName</strong></td>
+                        <td>
+                            <span class="badge @(item.PartyType == "Company" ? "bg-primary" : "bg-success")">
+                                @item.PartyType
+                            </span>
+                        </td>
+                        <td>
+                            @if (item.IsCustomer)
+                            {
+                                <span class="badge bg-info text-dark">Customer</span>
+                            }
+                            @if (item.IsVendor)
+                            {
+                                <span class="badge bg-warning text-dark">Vendor</span>
+                            }
+                        </td>
+                        <td>@item.Phone</td>
+                        <td>@item.Email</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-info text-white">Details</a>
+
+                            <!-- THAY ĐỔI Ở ĐÂY: dùng nút bấm và truyền ID vào hàm JS -->
+                            <button type="button" class="btn btn-sm btn-danger"
+                                    onclick="confirmDelete(@item.Id, '@item.DisplayName')">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<!-- Form ẩn để gửi request DELETE bằng phương thức POST (để bảo mật) -->
+<form id="deleteForm" asp-action="DeleteConfirmed" method="post" style="display:none;">
+    <input type="hidden" name="id" id="deletePartyId" />
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    <!-- Import SweetAlert2 từ CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function confirmDelete(id, name) {
+        // CÁCH 1: Dùng confirm() mặc định (Bỏ comment nếu muốn dùng cách này)
+        /*
+        if (confirm("Are you sure you want to delete " + name + "?")) {
+        submitDeleteForm(id);
+        }
+        return;
+        */
+
+        // CÁCH 2: Dùng SweetAlert2 (Đẹp và chuyên nghiệp hơn)
+        Swal.fire({
+        title: 'Are you sure?',
+        text: `You are about to delete ${name}. This action cannot be undone!`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+        }).then((result) => {
+        if (result.isConfirmed) {
+        submitDeleteForm(id);
+        }
+        })
+        }
+
+        function submitDeleteForm(id) {
+        // Gán ID vào form ẩn và submit
+        document.getElementById('deletePartyId').value = id;
+        document.getElementById('deleteForm').submit();
+        }
+    </script>
+}

@@ -96,5 +96,15 @@ namespace Atlas.Services
 
             return await _partyRepository.DeleteAsync(id);
         }
+
+        public async Task<bool> GetDeletedStatusAsync(int id)
+        {
+            if (id <= 0)
+            {
+                return false;
+            }
+
+            return await _partyRepository.GetDeletedStatusAsync(id);
+        }
     }
 }

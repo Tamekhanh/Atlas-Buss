@@ -4,24 +4,24 @@
 }
 
 <div class="container mt-4">
-    <h2>Chi tiết: @Model.DisplayName</h2>
+    <h2>Details: @Model.DisplayName</h2>
     <hr />
     <div class="row">
         <div class="col-md-6">
             <div class="card mb-3">
-                <div class="card-header bg-light"><strong>Thông tin chung</strong></div>
+                <div class="card-header bg-light"><strong>Basic Information</strong></div>
                 <div class="card-body">
-                    <p><strong>Loại đối tác:</strong> @Model.PartyType</p>
-                    <p><strong>Mã số thuế:</strong> @(Model.TaxId ?? "N/A")</p>
+                    <p><strong>Party Type:</strong> @Model.PartyType</p>
+                    <p><strong>Tax ID:</strong> @(Model.TaxId ?? "N/A")</p>
                     <p>
-                        <strong>Vai trò:</strong> 
-                        @(Model.IsCustomer ? "Khách hàng " : "") 
-                        @(Model.IsVendor ? "Nhà cung cấp" : "")
+                        <strong>Roles:</strong> 
+                        @(Model.IsCustomer ? "Customer" : "") 
+                        @(Model.IsVendor ? "Vendor" : "")
                     </p>
                     @if(Model.PartyType == "Person")
                     {
-                        <p><strong>Họ và tên:</strong> @Model.LastName @Model.FirstName</p>
-                        <p><strong>Ngày sinh:</strong> @Model.DoB?.ToString("dd/MM/yyyy")</p>
+                        <p><strong>Full Name:</strong> @Model.LastName @Model.FirstName</p>
+                        <p><strong>Date of Birth:</strong> @Model.DoB?.ToString("dd/MM/yyyy")</p>
                     }
                 </div>
             </div>
@@ -29,17 +29,17 @@
         
         <div class="col-md-6">
             <div class="card mb-3">
-                <div class="card-header bg-light"><strong>Liên hệ & Địa chỉ</strong></div>
+                <div class="card-header bg-light"><strong>Contact & Address</strong></div>
                 <div class="card-body">
-                    <p><strong>Điện thoại:</strong> @Model.Contact?.Phone</p>
+                    <p><strong>Phone:</strong> @Model.Contact?.Phone</p>
                     <p><strong>Email:</strong> @Model.Contact?.Email</p>
-                    <p><strong>Địa chỉ:</strong> @Model.Address?.Street, @Model.Address?.City, @Model.Address?.State, @Model.Address?.Country</p>
+                    <p><strong>Address:</strong> @Model.Address?.Street, @Model.Address?.City, @Model.Address?.State, @Model.Address?.Country</p>
                 </div>
             </div>
         </div>
     </div>
     
     <div>
-        <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
     </div>
 </div>

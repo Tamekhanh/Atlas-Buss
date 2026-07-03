@@ -65,59 +65,68 @@ namespace Atlas.Web.Areas.Products.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Detail(int id, ProductModelView model)
         {
-            var product = await _productService.GetProductByIdAsync(id);
-            if (product is null) return NotFound();
 
-            model.Id = id;
-
-            // 1. XỬ LÝ LƯU FILE ẢNH
-            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            try
             {
-                using (var stream = model.ImageFile.OpenReadStream())
+                var product = await _productService.GetProductByIdAsync(id);
+                if (product is null) return NotFound();
+
+                model.Id = id;
+
+                // 1. XỬ LÝ LƯU FILE ẢNH
+                if (model.ImageFile != null && model.ImageFile.Length > 0)
                 {
-                    var relativeImagePath = await _storageProvider.SaveFileAsync(stream, "Products", model.ImageFile.FileName);
-                    product.ImageUrl = relativeImagePath;
+                    using (var stream = model.ImageFile.OpenReadStream())
+                    {
+                        var relativeImagePath = await _storageProvider.SaveFileAsync(stream, "Products", model.ImageFile.FileName);
+                        product.ImageUrl = relativeImagePath;
+                    }
                 }
+                else if (!string.IsNullOrWhiteSpace(model.ImageUrl))
+                {
+                    product.ImageUrl = model.ImageUrl.Trim();
+                }
+                else
+                {
+                    product.ImageUrl = null;
+                }
+
+
+                product.BaseSalePrice = model.BaseSalePrice;
+                product.BaseCostPrice = model.BaseCostPrice;
+                product.Barcode = string.IsNullOrWhiteSpace(model.Barcode) ? null : model.Barcode.Trim();
+                product.IsActive = model.IsActive;
+                product.Onsale = model.Onsale;
+
+                product.ProductDetail ??= new ProductDetails();
+                product.ProductDetail.ProductDescription = string.IsNullOrWhiteSpace(model.ProductDescription) ? null : model.ProductDescription.Trim();
+                product.ProductDetail.Weight = model.Weight;
+                product.ProductDetail.WarrantyPeriod = model.WarrantyPeriod;
+                product.ProductDetail.Dimensions = string.IsNullOrWhiteSpace(model.Dimensions) ? null : model.Dimensions.Trim();
+                product.ProductDetail.Manufacturer = string.IsNullOrWhiteSpace(model.Manufacturer) ? null : model.Manufacturer.Trim();
+
+                var updated = await _productService.UpdateProductAsync(product, model.CategoryIds);
+                if (!updated)
+                {
+                    ModelState.AddModelError(string.Empty, "Could not update product.");
+                    await PopulateCategoriesAsync(model);
+                    return View("~/Areas/Products/Views/Products/Detail.cshtml", model);
+                }
+
+                var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (int.TryParse(employeeIdValue, out var employeeId))
+                {
+                    await _logService.AddLogAsync(employeeId, $"Updated product: {product.ProductName} (ID: {product.Id})");
+                }
+                
+                return RedirectToRoute("products", new { action = "Detail", id = product.Id });
             }
-            else if (!string.IsNullOrWhiteSpace(model.ImageUrl))
+            catch (Exception ex)
             {
-                product.ImageUrl = model.ImageUrl.Trim();
+                // Ghi log ra file hoặc console để xem
+                Console.WriteLine(ex.ToString());
+                throw;
             }
-            else
-            {
-                product.ImageUrl = null;
-            }
-
-            // 🔥 MÌNH ĐÃ XÓA DÒNG GHI ĐÈ Ở ĐÂY RỒI NHÉ 🔥
-
-            product.BaseSalePrice = model.BaseSalePrice;
-            product.BaseCostPrice = model.BaseCostPrice;
-            product.Barcode = string.IsNullOrWhiteSpace(model.Barcode) ? null : model.Barcode.Trim();
-            product.IsActive = model.IsActive;
-            product.Onsale = model.Onsale;
-
-            product.ProductDetail ??= new ProductDetails();
-            product.ProductDetail.ProductDescription = string.IsNullOrWhiteSpace(model.ProductDescription) ? null : model.ProductDescription.Trim();
-            product.ProductDetail.Weight = model.Weight;
-            product.ProductDetail.WarrantyPeriod = model.WarrantyPeriod;
-            product.ProductDetail.Dimensions = string.IsNullOrWhiteSpace(model.Dimensions) ? null : model.Dimensions.Trim();
-            product.ProductDetail.Manufacturer = string.IsNullOrWhiteSpace(model.Manufacturer) ? null : model.Manufacturer.Trim();
-
-            var updated = await _productService.UpdateProductAsync(product, model.CategoryIds);
-            if (!updated)
-            {
-                ModelState.AddModelError(string.Empty, "Could not update product.");
-                await PopulateCategoriesAsync(model);
-                return View("~/Areas/Products/Views/Products/Detail.cshtml", model);
-            }
-
-            var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (int.TryParse(employeeIdValue, out var employeeId))
-            {
-                await _logService.AddLogAsync(employeeId, $"Updated product: {product.ProductName} (ID: {product.Id})");
-            }
-
-            return RedirectToRoute("products", new { action = "Detail", id = product.Id });
         }
 
         [HttpGet]
@@ -257,8 +266,16 @@ namespace Atlas.Web.Areas.Products.Controllers
                     SKU = v.SKU,
                     Price = v.VariantPrice ?? product.BaseSalePrice,
                     Cost = v.VariantCost ?? product.BaseCostPrice,
-                    // SỬA TẠI ĐÂY: Thêm ?. và ?? để tránh lỗi NullReferenceException nếu AttributeMappings bị null
-                    AttributeValueIds = v.AttributeMappings?.Select(m => m.AttributeValueId).ToList() ?? new List<int>()
+
+                    // Giữ lại IDs để phục vụ việc Update/Edit sau này
+                    AttributeValueIds = v.AttributeMappings?.Select(m => m.AttributeValueId).ToList() ?? new List<int>(),
+
+                    // MỚI: Map từ ID sang Tên hiển thị
+                    // Giả sử AttributeValue có navigation property dẫn về AttributeType
+                    AttributeDescriptions = v.AttributeMappings?
+                    .Where(m => m.AttributeValue != null)
+                    .Select(m => $"{m.AttributeValue?.AttributeType?.AttributeName ?? "Attr"}: {m.AttributeValue?.Value}")
+                    .ToList() ?? new List<string>()
                 }).ToList() ?? new List<VariantModel>()
             };
         }

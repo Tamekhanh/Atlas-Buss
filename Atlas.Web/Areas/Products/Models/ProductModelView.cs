@@ -18,6 +18,8 @@ namespace Atlas.Web.Areas.Products.Models
 
         // Danh sách ID của các giá trị thuộc tính (Ví dụ: ID của 'Màu Đỏ' và 'Size L')
         public List<int> AttributeValueIds { get; set; } = new();
+
+        public List<string> AttributeDescriptions { get; set; } = new();
     }
 
     public class ProductModelView

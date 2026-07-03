@@ -21,7 +21,7 @@ namespace Atlas.Web.Areas.Party.Controllers
         public async Task<IActionResult> Index()
         {
             var parties = await _partyRepository.GetAllAsync();
-            
+
             var viewModel = parties.Select(p => new PartyListViewModel
             {
                 Id = p.Id,
@@ -73,7 +73,7 @@ namespace Atlas.Web.Areas.Party.Controllers
                 TaxId = string.IsNullOrWhiteSpace(model.TaxId) ? null : model.TaxId,
                 IsCustomer = model.IsCustomer,
                 IsVendor = model.IsVendor,
-                
+
                 // EF Core sẽ tự động tạo Address và Contact mới khi lưu Party
                 Address = new Addresses
                 {
@@ -93,5 +93,37 @@ namespace Atlas.Web.Areas.Party.Controllers
             await _partyRepository.AddAsync(newParty);
             return RedirectToAction(nameof(Index));
         }
+
+        // GET: /Party/Party/Delete/5 
+        // (Hàm này bây giờ không cần thiết nếu bạn dùng JavaScript confirm, 
+        // nhưng bạn có thể giữ lại nếu muốn có một trang xác nhận riêng)
+        // public async Task<IActionResult> Delete(int id)
+        // {
+        //     var party = await _partyRepository.GetByIdAsync(id);
+        //     if (party == null) return NotFound();
+        //     return View(party);
+        // }
+
+        // POST: /Party/Party/Delete/5
+        // Đây là hàm thực sự thực hiện việc xóa
+        [HttpPost]
+        [ValidateAntiForgeryToken] // Bảo mật chống tấn công CSRF
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            try
+            {
+                await _partyRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Party deleted successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu Party đang được sử dụng ở bảng khác (Foreign Key)
+                TempData["ErrorMessage"] = "Cannot delete this party because it is linked to other data.";
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        
     }
 }
