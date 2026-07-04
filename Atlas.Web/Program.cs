@@ -60,10 +60,39 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("ProductCreate", policy =>
-        policy.RequireClaim("permission", "PRODUCT_MANAGE", "PRODUCT_CREATE"));
-    options.AddPolicy("EmployeeManage", policy =>
+    options.AddPolicy("ProductManage", policy =>
+        policy.RequireClaim("permission", "PRODUCT_MANAGE"));
+    options.AddPolicy("ProductView", policy =>
+        policy.RequireClaim("permission", "PRODUCT_MANAGE", "PRODUCT_VIEW"));
+
+    options.AddPolicy("HRManage", policy =>
         policy.RequireClaim("permission", "HR_MANAGE"));
+    options.AddPolicy("HRMView", policy =>
+        policy.RequireClaim("permission", "HR_MANAGE", "HR_VIEW"));
+
+    options.AddPolicy("PartyManage", policy =>
+        policy.RequireClaim("permission", "PARTY_MANAGE"));
+    options.AddPolicy("PartyView", policy =>
+        policy.RequireClaim("permission", "PARTY_MANAGE", "PARTY_VIEW"));
+
+    options.AddPolicy("CategoryManage", policy =>
+        policy.RequireClaim("permission", "CATEGORY_MANAGE"));
+    options.AddPolicy("CategoryView", policy =>
+        policy.RequireClaim("permission", "CATEGORY_MANAGE", "CATEGORY_VIEW"));
+
+    options.AddPolicy("Administration", policy =>
+        policy.RequireClaim("permission", "ADMIN"));
+    
+    options.AddPolicy("PurchaseManage", policy =>
+        policy.RequireClaim("permission", "PURCHASE_MANAGE"));
+    options.AddPolicy("PurchaseView", policy =>
+        policy.RequireClaim("permission", "PURCHASE_MANAGE", "PURCHASE_VIEW"));
+    
+    options.AddPolicy("SaleManage", policy =>
+        policy.RequireClaim("permission", "SALE_MANAGE"));
+    options.AddPolicy("SaleView", policy =>
+        policy.RequireClaim("permission", "SALE_MANAGE", "SALE_VIEW"));
+    
 });
 
 builder.Services.AddAtlasInfrastructure(builder.Configuration);

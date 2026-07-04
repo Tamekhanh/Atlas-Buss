@@ -9,19 +9,23 @@ namespace Atlas.Core.Entities
     {
         public int Id { get; set; }
         public string EmployeeNumber { get; set; } = null!;
-        
+
         // Các trường dữ liệu đã được gộp trực tiếp vào Employee thay vì qua Person
         public string FullName { get; set; } = null!;
         public DateTime DoB { get; set; }
         public int AddressId { get; set; }
         public int ContactId { get; set; }
-        
+
         public bool IsDeleted { get; set; } = false;
         public DateTime CreatedAt { get; set; }
 
         // Navigation properties mới
         public Addresses? Address { get; set; }
         public Contacts? Contact { get; set; }
+
+        public int? ImageId { get; set; } 
+        [ForeignKey("ImageId")]
+        public virtual Images? Image { get; set; } 
 
         // Navigation properties hiện có
         public EmployeeAccount? Account { get; set; }

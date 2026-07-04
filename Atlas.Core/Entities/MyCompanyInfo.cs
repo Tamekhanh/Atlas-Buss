@@ -12,6 +12,8 @@ namespace Atlas.Core.Entities
         public string? PhoneNumber { get; set; }
         public string? Email { get; set; }
         public string? TaxId { get; set; }
-        public int? LogoId { get; set; }
+
+        [ForeignKey("LogoId")] 
+        public virtual Images? LogoId { get; set; }
     }
 }

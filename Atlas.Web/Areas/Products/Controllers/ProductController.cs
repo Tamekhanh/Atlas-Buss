@@ -17,15 +17,17 @@ namespace Atlas.Web.Areas.Products.Controllers
         private readonly ICategoryRepository _categoryRepository;
         private readonly IStorageProvider _storageProvider;
         private readonly ILogService _logService;
+        private readonly IImageRepository _imageRepository;
 
         const int pageSize = 20;
 
-        public ProductController(IProductService productService, ICategoryRepository categoryRepository, IStorageProvider storageProvider, ILogService logService)
+        public ProductController(IProductService productService, ICategoryRepository categoryRepository, IStorageProvider storageProvider, ILogService logService, IImageRepository imageRepository)
         {
             _productService = productService;
             _categoryRepository = categoryRepository;
             _logService = logService;
             _storageProvider = storageProvider;
+            _imageRepository = imageRepository;
         }
 
         public async Task<IActionResult> Index(int? page)
@@ -61,7 +63,7 @@ namespace Atlas.Web.Areas.Products.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProductCreate")]
+        [Authorize(Policy = "ProductManage")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Detail(int id, ProductModelView model)
         {
@@ -71,24 +73,23 @@ namespace Atlas.Web.Areas.Products.Controllers
                 var product = await _productService.GetProductByIdAsync(id);
                 if (product is null) return NotFound();
 
-                model.Id = id;
+                // 1. Lấy danh sách ImageIds từ form (Đây là những ảnh KHÔNG bị xóa)
+                List<int> finalImageIds = model.ImageIds ?? new List<int>();
 
-                // 1. XỬ LÝ LƯU FILE ẢNH
-                if (model.ImageFile != null && model.ImageFile.Length > 0)
+                // 2. Xử lý upload các file mới (nếu có)
+                if (model.ImageFile != null && model.ImageFile.Any())
                 {
-                    using (var stream = model.ImageFile.OpenReadStream())
+                    foreach (var file in model.ImageFile)
                     {
-                        var relativeImagePath = await _storageProvider.SaveFileAsync(stream, "Products", model.ImageFile.FileName);
-                        product.ImageUrl = relativeImagePath;
+                        if (file.Length > 0)
+                        {
+                            using var stream = file.OpenReadStream();
+                            var path = await _storageProvider.SaveFileAsync(stream, "Products", file.FileName);
+                            var image = new Images { ImageUrl = path };
+                            await _imageRepository.AddAsync(image);
+                            finalImageIds.Add(image.Id);
+                        }
                     }
-                }
-                else if (!string.IsNullOrWhiteSpace(model.ImageUrl))
-                {
-                    product.ImageUrl = model.ImageUrl.Trim();
-                }
-                else
-                {
-                    product.ImageUrl = null;
                 }
 
 
@@ -105,7 +106,7 @@ namespace Atlas.Web.Areas.Products.Controllers
                 product.ProductDetail.Dimensions = string.IsNullOrWhiteSpace(model.Dimensions) ? null : model.Dimensions.Trim();
                 product.ProductDetail.Manufacturer = string.IsNullOrWhiteSpace(model.Manufacturer) ? null : model.Manufacturer.Trim();
 
-                var updated = await _productService.UpdateProductAsync(product, model.CategoryIds);
+                var updated = await _productService.UpdateProductAsync(product, model.CategoryIds, finalImageIds);
                 if (!updated)
                 {
                     ModelState.AddModelError(string.Empty, "Could not update product.");
@@ -113,12 +114,14 @@ namespace Atlas.Web.Areas.Products.Controllers
                     return View("~/Areas/Products/Views/Products/Detail.cshtml", model);
                 }
 
+
+
                 var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (int.TryParse(employeeIdValue, out var employeeId))
                 {
                     await _logService.AddLogAsync(employeeId, $"Updated product: {product.ProductName} (ID: {product.Id})");
                 }
-                
+
                 return RedirectToRoute("products", new { action = "Detail", id = product.Id });
             }
             catch (Exception ex)
@@ -130,7 +133,7 @@ namespace Atlas.Web.Areas.Products.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "ProductCreate")]
+        [Authorize(Policy = "ProductManage")]
         public async Task<IActionResult> Create()
         {
             var model = new ProductModelView
@@ -149,7 +152,7 @@ namespace Atlas.Web.Areas.Products.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "ProductCreate")]
+        [Authorize(Policy = "ProductManage")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductModelView model)
         {
@@ -163,9 +166,27 @@ namespace Atlas.Web.Areas.Products.Controllers
 
             if (!ModelState.IsValid)
             {
-                // QUAN TRỌNG: Gán lại ViewBag và TRUYỀN model quay lại View để giữ dữ liệu đã nhập
                 ViewBag.AttributeTypes = await _productService.GetAvailableAttributeTypesAsync();
                 return View("~/Areas/Products/Views/Products/Create.cshtml", model);
+            }
+
+            // --- BƯỚC 1: XỬ LÝ LƯU ẢNH VÀ LẤY IMAGE IDS ---
+            List<int> imageIds = new List<int>();
+            if (model.ImageFile != null && model.ImageFile.Any())
+            {
+                foreach (var file in model.ImageFile) // Bây giờ model.ImageFiles là List nên foreach sẽ chạy được
+                {
+                    if (file.Length > 0)
+                    {
+                        using (var stream = file.OpenReadStream())
+                        {
+                            var relativeImagePath = await _storageProvider.SaveFileAsync(stream, "Products", file.FileName);
+                            var image = new Images { ImageUrl = relativeImagePath };
+                            await _imageRepository.AddAsync(image);
+                            imageIds.Add(image.Id);
+                        }
+                    }
+                }
             }
 
             // Mapping sang Entity Sản phẩm cha
@@ -174,7 +195,7 @@ namespace Atlas.Web.Areas.Products.Controllers
                 ProductName = model.ProductName.Trim(),
                 ProductCode = model.ProductCode.Trim(),
                 UnitId = model.UnitId,
-                ImageUrl = string.IsNullOrWhiteSpace(model.ImageUrl) ? null : model.ImageUrl.Trim(),
+                // Bỏ dòng product.ImageUrl = ... (Vì giờ dùng bảng Images)
                 BaseSalePrice = model.BaseSalePrice,
                 BaseCostPrice = model.BaseCostPrice,
                 Barcode = string.IsNullOrWhiteSpace(model.Barcode) ? null : model.Barcode.Trim(),
@@ -191,7 +212,7 @@ namespace Atlas.Web.Areas.Products.Controllers
                 }
             };
 
-            // Mapping sang Entity Biến thể (Variants) từ ViewModel
+            // Mapping sang Entity Biến thể
             if (model.Variants != null && model.Variants.Any())
             {
                 product.Variants = model.Variants.Select(v => new ProductVariant
@@ -206,8 +227,10 @@ namespace Atlas.Web.Areas.Products.Controllers
                 }).ToList();
             }
 
-            // Gọi Service tạo sản phẩm
-            var created = await _productService.CreateProductAsync(product, model.CategoryIds, product.Variants);
+            // --- BƯỚC 2: GỌI SERVICE VỚI ĐÚNG THỨ TỰ THAM SỐ ---
+            // Thứ tự: product, categoryIds, imageIds, variants
+            var created = await _productService.CreateProductAsync(product, model.CategoryIds, imageIds, product.Variants);
+
             if (!created)
             {
                 ModelState.AddModelError(string.Empty, "Could not create product.");
@@ -215,7 +238,7 @@ namespace Atlas.Web.Areas.Products.Controllers
                 return View("~/Areas/Products/Views/Products/Create.cshtml", model);
             }
 
-            // LOGGING: Đơn giản hóa vì đã biết 'created' là true
+            // LOGGING...
             var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (int.TryParse(employeeIdValue, out var employeeId))
             {
@@ -238,11 +261,22 @@ namespace Atlas.Web.Areas.Products.Controllers
                 Id = product.Id,
                 ProductName = product.ProductName,
                 ProductCode = product.ProductCode,
-
-                // SỬA TẠI ĐÂY: Sử dụng toán tử ?? để gán giá trị 0 nếu UnitId bị null
                 UnitId = product.UnitId ?? 0,
 
-                ImageUrl = product.ImageUrl,
+                ImageUrl = product.ProductImages?.FirstOrDefault()?.Image?.ImageUrl,
+
+                // 2. Lấy tất cả ID ảnh để lưu giữ khi Submit Form
+
+                CurrentImages = product.ProductImages?.Select(pi => new ImageItemModel
+                {
+                    Id = pi.ImageId,
+                    Url = pi.Image?.ImageUrl ?? ""
+                }).ToList() ?? new List<ImageItemModel>(),
+
+                ImageIds = product.ProductImages?
+                        .Select(pi => pi.ImageId)
+                        .ToList() ?? new List<int>(),
+
                 BaseSalePrice = product.BaseSalePrice,
                 BaseCostPrice = product.BaseCostPrice,
                 Barcode = product.Barcode,
@@ -266,16 +300,11 @@ namespace Atlas.Web.Areas.Products.Controllers
                     SKU = v.SKU,
                     Price = v.VariantPrice ?? product.BaseSalePrice,
                     Cost = v.VariantCost ?? product.BaseCostPrice,
-
-                    // Giữ lại IDs để phục vụ việc Update/Edit sau này
                     AttributeValueIds = v.AttributeMappings?.Select(m => m.AttributeValueId).ToList() ?? new List<int>(),
-
-                    // MỚI: Map từ ID sang Tên hiển thị
-                    // Giả sử AttributeValue có navigation property dẫn về AttributeType
                     AttributeDescriptions = v.AttributeMappings?
-                    .Where(m => m.AttributeValue != null)
-                    .Select(m => $"{m.AttributeValue?.AttributeType?.AttributeName ?? "Attr"}: {m.AttributeValue?.Value}")
-                    .ToList() ?? new List<string>()
+                        .Where(m => m.AttributeValue != null)
+                        .Select(m => $"{m.AttributeValue?.AttributeType?.AttributeName ?? "Attr"}: {m.AttributeValue?.Value}")
+                        .ToList() ?? new List<string>()
                 }).ToList() ?? new List<VariantModel>()
             };
         }

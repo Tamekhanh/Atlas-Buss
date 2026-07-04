@@ -17,18 +17,16 @@ namespace Atlas.Infrastructure.Repositories
             _context = context;
         }
 
-        // =============================================
-        // 1. QUẢN LÝ SẢN PHẨM CHA (PARENT PRODUCTS)
-        // =============================================
-
         public async Task<IEnumerable<Products>> GetAllAsync(int pageNumber, int pageSize)
         {
             return await _context.Products
                 .Include(product => product.Employee)
-                // ĐÃ XÓA: .ThenInclude(employee => employee.Person)
                 .Include(product => product.CategoryProducts)
                     .ThenInclude(categoryProduct => categoryProduct.Category)
                 .Include(product => product.Unit)
+                // THÊM DÒNG NÀY ĐỂ LẤY ẢNH
+                .Include(product => product.ProductImages)
+                    .ThenInclude(pi => pi.Image)
                 .AsNoTracking()
                 .OrderBy(product => product.Id)
                 .Skip((pageNumber - 1) * pageSize)
@@ -40,9 +38,12 @@ namespace Atlas.Infrastructure.Repositories
         {
             var query = _context.Products
                 .Include(product => product.Employee)
-                // ĐÃ XÓA: .ThenInclude(employee => employee.Person)
                 .Include(product => product.CategoryProducts)
                     .ThenInclude(categoryProduct => categoryProduct.Category)
+                .Include(product => product.Unit)
+                // SỬA ĐOẠN NÀY: Bỏ .Include(product => product.ImageUrl) vì ImageUrl là string
+                .Include(product => product.ProductImages)
+                    .ThenInclude(pi => pi.Image)
                 .AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -81,9 +82,11 @@ namespace Atlas.Infrastructure.Repositories
             var term = searchTerm.Trim();
             return await _context.Products
                 .Include(product => product.Employee)
-                // ĐÃ XÓA: .ThenInclude(employee => employee.Person)
                 .Include(product => product.CategoryProducts)
                     .ThenInclude(categoryProduct => categoryProduct.Category)
+                // THÊM DÒNG NÀY ĐỂ LẤY ẢNH
+                .Include(product => product.ProductImages)
+                    .ThenInclude(pi => pi.Image)
                 .AsNoTracking()
                 .Where(product => product.ProductName.Contains(term) || product.ProductCode.Contains(term))
                 .OrderBy(product => product.Id)
@@ -96,11 +99,13 @@ namespace Atlas.Infrastructure.Repositories
         {
             return await _context.Products
                 .Include(product => product.Employee)
-                // ĐÃ XÓA: .ThenInclude(employee => employee.Person)
                 .Include(product => product.CategoryProducts)
                     .ThenInclude(categoryProduct => categoryProduct.Category)
                 .Include(product => product.ProductDetail)
                 .Include(product => product.Unit)
+                // THÊM DÒNG NÀY ĐỂ LẤY ẢNH
+                .Include(product => product.ProductImages)
+                    .ThenInclude(pi => pi.Image)
                 .Include(product => product.Variants)
                     .ThenInclude(v => v.AttributeMappings)
                         .ThenInclude(m => m.AttributeValue)
@@ -120,6 +125,7 @@ namespace Atlas.Infrastructure.Repositories
             var existingProduct = await _context.Products
                 .Include(current => current.ProductDetail)
                 .Include(current => current.CategoryProducts)
+                .Include(current => current.ProductImages)
                 .FirstOrDefaultAsync(current => current.Id == product.Id);
 
             if (existingProduct is null) return false;
@@ -127,7 +133,6 @@ namespace Atlas.Infrastructure.Repositories
             existingProduct.ProductName = product.ProductName;
             existingProduct.ProductCode = product.ProductCode;
             existingProduct.UnitId = product.UnitId;
-            existingProduct.ImageUrl = product.ImageUrl;
             existingProduct.BaseSalePrice = product.BaseSalePrice;
             existingProduct.BaseCostPrice = product.BaseCostPrice;
             existingProduct.Barcode = product.Barcode;
@@ -149,15 +154,16 @@ namespace Atlas.Infrastructure.Repositories
                 existingProduct.ProductDetail.Manufacturer = product.ProductDetail.Manufacturer;
             }
 
-            existingProduct.CategoryProducts.Clear();
-            if (product.CategoryProducts is not null)
+            existingProduct.ProductImages.Clear();
+            if (product.ProductImages != null && product.ProductImages.Any())
             {
-                foreach (var cp in product.CategoryProducts)
+                existingProduct.ProductImages.Clear();
+                foreach (var pi in product.ProductImages)
                 {
-                    existingProduct.CategoryProducts.Add(new CategoryProduct
+                    existingProduct.ProductImages.Add(new ProductImages
                     {
                         ProductId = existingProduct.Id,
-                        CategoryId = cp.CategoryId
+                        ImageId = pi.ImageId
                     });
                 }
             }

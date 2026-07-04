@@ -22,20 +22,18 @@ namespace Atlas.Services.Inventory
         // 1. QUẢN LÝ SẢN PHẨM CHA (PARENT PRODUCT)
         // =============================================
 
-        public async Task<bool> CreateProductAsync(Products product, IEnumerable<int>? categoryIds = null, IEnumerable<ProductVariant>? variants = null)
+        // CẬP NHẬT: Thêm IEnumerable<int>? imageIds vào tham số
+        public async Task<bool> CreateProductAsync(Products product, IEnumerable<int>? categoryIds = null, IEnumerable<int>? imageIds = null, IEnumerable<ProductVariant>? variants = null)
         {
-            // 1. Kiểm tra logic cơ bản (Sử dụng BaseSalePrice thay vì SalePrice)
+            // 1. Kiểm tra logic cơ bản
             if (product.BaseSalePrice <= 0) return false;
             if (product.UnitId <= 0) return false;
 
-            // 2. Xử lý Danh mục (Categories) - Giữ logic cũ của bạn
+            // 2. Xử lý Danh mục (Categories)
             var distinctCategoryIds = (categoryIds ?? Enumerable.Empty<int>())
                 .Where(categoryId => categoryId > 0)
                 .Distinct()
                 .ToList();
-
-            // Lưu ý: Nếu bạn muốn hỗ trợ tạo category mới từ string trong hàm này, 
-            // hãy thêm tham số 'string? newCategoryName' vào Interface và hàm này.
 
             if (distinctCategoryIds.Count > 0)
             {
@@ -47,8 +45,23 @@ namespace Atlas.Services.Inventory
                     .ToList();
             }
 
-            // 3. Xử lý Biến thể (Variants)
-            // Nếu variants được truyền vào, chúng sẽ được lưu cùng với product (vì là Navigation Property)
+            // 3. Xử lý Hình ảnh (Images) - MỚI THÊM
+            var distinctImageIds = (imageIds ?? Enumerable.Empty<int>())
+                .Where(imageId => imageId > 0)
+                .Distinct()
+                .ToList();
+
+            if (distinctImageIds.Count > 0)
+            {
+                product.ProductImages = distinctImageIds
+                    .Select(imageId => new ProductImages
+                    {
+                        ImageId = imageId
+                    })
+                    .ToList();
+            }
+
+            // 4. Xử lý Biến thể (Variants)
             if (variants != null)
             {
                 product.Variants = variants.ToList();
@@ -57,10 +70,12 @@ namespace Atlas.Services.Inventory
             return await _productRepository.AddAsync(product);
         }
 
-        public async Task<bool> UpdateProductAsync(Products product, IEnumerable<int>? categoryIds = null)
+        // CẬP NHẬT: Thêm IEnumerable<int>? imageIds vào tham số
+        public async Task<bool> UpdateProductAsync(Products product, IEnumerable<int>? categoryIds = null, IEnumerable<int>? imageIds = null)
         {
             if (product.BaseSalePrice <= 0) return false;
 
+            // 1. Xử lý Danh mục
             var distinctCategoryIds = (categoryIds ?? Enumerable.Empty<int>())
                 .Where(categoryId => categoryId > 0)
                 .Distinct()
@@ -76,8 +91,32 @@ namespace Atlas.Services.Inventory
                     .ToList();
             }
 
+            // 2. Xử lý Hình ảnh - MỚI THÊM
+            var distinctImageIds = (imageIds ?? Enumerable.Empty<int>())
+                .Where(imageId => imageId > 0)
+                .Distinct()
+                .ToList();
+
+            if (distinctImageIds.Count > 0)
+            {
+                product.ProductImages = distinctImageIds
+                    .Select(imageId => new ProductImages
+                    {
+                        ImageId = imageId
+                    })
+                    .ToList();
+            }
+            else
+            {
+                // Nếu imageIds truyền vào là null hoặc rỗng, 
+                // có thể hiểu là xóa hết ảnh của sản phẩm
+                product.ProductImages = new List<ProductImages>();
+            }
+
             return await _productRepository.UpdateAsync(product);
         }
+
+        // ... các hàm GetAllProductsAsync, GetProductByIdAsync, SearchByNameAsync, GetProductFilterAsync giữ nguyên ...
 
         public async Task<IEnumerable<Products>> GetAllProductsAsync(int pageNumber = 1, int pageSize = 10)
         {

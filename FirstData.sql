@@ -6,27 +6,49 @@ GO
 -- =============================================
 
 -- Seed Roles & Permissions
+-- 1. Insert Roles
 INSERT INTO dbo.Roles (RoleName, Description) VALUES 
 ('Administrator', 'Full system access'),
 ('Sales Staff', 'Access to sales and inventory'),
 ('HR Manager', 'Access to personnel and administration'),
-('Product Manager', 'Can create and manage products');
+('Product Manager', 'Can create and manage products'),
+('Viewer', 'Read-only access to view data');
 
+-- 2. Insert Permissions (Aligned exactly with C# Policies)
 INSERT INTO dbo.Permissions (PermissionKey, Description) VALUES 
-('PRODUCT_MANAGE', 'Manage products and categories'),
-('SALE_CREATE', 'Create and edit sales orders'),
-('PURCHASE_CREATE', 'Create and edit purchase orders'),
-('EMPLOYEE_MANAGE', 'Manage employee records'),
-('INVENTORY_MANAGE', 'Manage warehouse and stock'),
-('ADMIN_ALL', 'Full administrative access'),
-('HR_MANAGE', 'Manage HR and departments'),
-('PRODUCT_CREATE', 'Create products');
+('ADMIN', 'Full administrative access'),                             -- Id: 1
+('PRODUCT_MANAGE', 'Create, edit, and delete products'),             -- Id: 2
+('PRODUCT_VIEW', 'View products'),                                   -- Id: 3
+('HR_MANAGE', 'Manage HR and departments'),                          -- Id: 4
+('HR_VIEW', 'View HR records'),                                      -- Id: 5
+('PARTY_MANAGE', 'Manage parties/entities'),                         -- Id: 6
+('PARTY_VIEW', 'View parties/entities'),                             -- Id: 7
+('CATEGORY_MANAGE', 'Manage product categories'),                    -- Id: 8
+('CATEGORY_VIEW', 'View product categories'),                        -- Id: 9
+('PURCHASE_MANAGE', 'Manage purchase orders'),                       -- Id: 10
+('PURCHASE_VIEW', 'View purchase orders'),                           -- Id: 11
+('SALE_MANAGE', 'Manage sales orders'),                              -- Id: 12
+('SALE_VIEW', 'View sales orders');                                  -- Id: 13
 
+-- 3. Map Roles to Permissions Logically
 INSERT INTO dbo.RolePermissions (RoleId, PermissionId) VALUES 
-(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), -- Admin
-(2, 1), (2, 2), (2, 4),                                         -- Sales
-(3, 1), (3, 3), (3, 5), (3, 6),                                 -- HR
-(4, 7);                                                         -- Product Manager
+-- Administrator (Role 1) gets ADMIN, which usually bypasses everything, 
+-- but you can explicitly grant all if your architecture requires it.
+(1, 1), (1, 2), (1, 4), (1, 6), (1, 8), (1, 10), (1, 12), -- Full access
+
+-- Sales Staff (Role 2) gets Sales and Product View permissions
+(2, 12), (2, 13), -- SALE_MANAGE, SALE_VIEW
+(2, 3),           -- PRODUCT_VIEW
+(2, 9),           -- CATEGORY_VIEW
+
+-- HR Manager (Role 3) gets HR permissions
+(3, 4), (3, 5),   -- HR_MANAGE, HR_VIEW
+
+-- Product Manager (Role 4) gets Product and Category manage permissions
+(4, 2), (4, 3),   -- PRODUCT_MANAGE, PRODUCT_VIEW
+(4, 8), (4, 9),   -- CATEGORY_MANAGE, CATEGORY_VIEW
+
+(5, 3), (5, 5), (5, 7), (5, 11), (5, 13);   -- Viewer role gets PARTY_VIEW and SALE_VIEW
 
 -- Seed Statuses & Lookups
 INSERT INTO dbo.SalesOrderStatuses (StatusName, Description) VALUES 
@@ -97,13 +119,15 @@ INSERT INTO dbo.Employee (EmployeeNumber, FullName, DoB, AddressId, ContactId) V
 ('EMP001', 'Nguyen Anh', '1990-01-15', 1, 1), 
 ('EMP002', 'Tran Binh', '1992-05-20', 2, 2), 
 ('EMP003', 'Le Cuong', '1985-11-10', 2, 3), 
-('EMP004', 'Pham Minh', '1993-08-12', 5, 5);
+('EMP004', 'Pham Minh', '1993-08-12', 5, 5),
+('EMP005', 'John Doe', '1980-03-25', 4, 4);
 
 INSERT INTO dbo.EmployeeAccounts (EmployeeId, Username, PasswordHash, RoleId) VALUES 
 (1, 'admin_atlas', 'A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3', 1),
 (2, 'sales_staff', 'hash_2', 2),
 (3, 'hr_admin', 'hash_3', 3),
-(4, 'product_manager', 'hash_4', 4);
+(4, 'product_manager', 'hash_4', 4),
+(5, 'user_viewer', 'A665A45920422F9D417E4867EFDC4FB8A04A1F3FFF1FA07E998E86F7F7A27AE3', 5);
 
 INSERT INTO dbo.Departments (DepartmentName, Description, ParentDepartmentId) VALUES 
 ('Executive Management', 'Senior management', NULL),

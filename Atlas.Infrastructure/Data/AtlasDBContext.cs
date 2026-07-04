@@ -42,6 +42,8 @@ namespace Atlas.Infrastructure
         public DbSet<AttributeValue> AttributeValues { get; set; } = null!;
         public DbSet<VariantAttributeMapping> VariantAttributeMappings { get; set; } = null!;
         public DbSet<Party> Parties { get; set; }
+        public DbSet<Images> Images { get; set; }
+        public DbSet<ProductImages> ProductImages { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -292,6 +294,31 @@ namespace Atlas.Infrastructure
                     .WithMany()
                     .HasForeignKey(product => product.UnitId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Images>(entity =>
+            {
+                entity.ToTable("Images", "dbo");
+                entity.HasKey(i => i.Id);
+                entity.Property(i => i.ImageUrl).IsRequired().HasMaxLength(255);
+                entity.Property(i => i.CreatedAt).HasDefaultValueSql("GETDATE()");
+            });
+
+
+            modelBuilder.Entity<ProductImages>(entity =>
+            {
+                entity.ToTable("ProductImages", "dbo");
+
+                entity.HasKey(pi => new { pi.ProductId, pi.ImageId });
+
+                entity.HasOne(pi => pi.Product)
+                    .WithMany(p => p.ProductImages) // Phải khớp với ICollection<ProductImages> trong class Products
+                    .HasForeignKey(pi => pi.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(pi => pi.Image)
+                    .WithMany(i => i.ProductImages) // Phải khớp với ICollection<ProductImages> trong class Images
+                    .HasForeignKey(pi => pi.ImageId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<ProductDetails>(entity =>
@@ -590,20 +617,20 @@ namespace Atlas.Infrastructure
             });
 
             modelBuilder.Entity<CategoryProduct>(entity =>
-{
-    entity.ToTable("CategoryProducts", "dbo");
-    entity.HasKey(cp => new { cp.CategoryId, cp.ProductId });
+            {
+                entity.ToTable("CategoryProducts", "dbo");
+                entity.HasKey(cp => new { cp.CategoryId, cp.ProductId });
 
-    entity.HasOne(cp => cp.Category)
-        .WithMany(category => category.CategoryProducts)
-        .HasForeignKey(cp => cp.CategoryId)
-        .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(cp => cp.Category)
+                    .WithMany(category => category.CategoryProducts)
+                    .HasForeignKey(cp => cp.CategoryId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
-    entity.HasOne(cp => cp.Product)
-        .WithMany(product => product.CategoryProducts)
-        .HasForeignKey(cp => cp.ProductId)
-        .OnDelete(DeleteBehavior.Cascade);
-});
+                entity.HasOne(cp => cp.Product)
+                    .WithMany(product => product.CategoryProducts)
+                    .HasForeignKey(cp => cp.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
 
             modelBuilder.Entity<Pricelist>(entity =>
             {

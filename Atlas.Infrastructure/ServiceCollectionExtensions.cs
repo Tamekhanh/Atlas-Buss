@@ -31,6 +31,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILogRepository, LogRepository>();
         services.AddScoped<IStorageProvider, LocalStorageProvider>();
         services.AddScoped<IPartyRepository, PartyRepository>();
+        services.AddScoped<IImageRepository, ImageRepository>();
 
         return services;
     }
