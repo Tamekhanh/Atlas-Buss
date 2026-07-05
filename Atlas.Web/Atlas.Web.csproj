@@ -49,6 +49,10 @@
     <Folder Include="Areas\Purrchase\Data\" />
     <Folder Include="Areas\Purrchase\Models\" />
     <Folder Include="Areas\Purrchase\Views\" />
+    <Folder Include="Areas\Sale\Controllers\" />
+    <Folder Include="Areas\Sale\Data\" />
+    <Folder Include="Areas\Sale\Models\" />
+    <Folder Include="Areas\Sale\Views\" />
     <Folder Include="Areas\Setting\Controllers\" />
     <Folder Include="Areas\Setting\Data\" />
     <Folder Include="Areas\Setting\Models\" />

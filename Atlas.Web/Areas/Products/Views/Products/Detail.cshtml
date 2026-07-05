@@ -4,7 +4,7 @@
 
 @{
     ViewData["Title"] = "Product Detail";
-    var canEdit = User.HasClaim("permission", "PRODUCT_CREATE") || User.HasClaim("permission", "PRODUCT_MANAGE");
+    var canEdit = User.HasClaim("permission", "PRODUCT_MANAGE");
     var selectedCategoryIds = new HashSet<int>(Model.CategoryIds ?? new List<int>());
     var availableCategories = Model.AvailableCategories ??
 Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
@@ -289,6 +289,20 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
             {
                 <!-- VIEW ONLY MODE -->
                 <div class="row g-4">
+                            <div class="row g-3 mb-4" id="image-gallery">
+                                @foreach (var img in Model.CurrentImages)
+                                {
+                                    <div class="col-6 col-sm-4 col-md-3 image-item" id="img-container-@img.Id">
+                                        <div class="position-relative border rounded shadow-sm bg-white overflow-hidden image-wrapper">
+                                            
+                                            <img src="/file-storage/@img.Url" 
+                                                class="img-fluid w-100" 
+                                                style="height: 240px; object-fit: cover;" 
+                                                alt="Hình ảnh" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
                     <div class="col-md-6">
                         <h2 class="h5 mb-3 border-bottom pb-2">Basic Information</h2>
                         <dl class="row mb-0">
@@ -308,24 +322,6 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                             <dd class="col-sm-8">@(Model.IsActive ? "Yes" : "No")</dd>
                             <dt class="col-sm-4">On Sale</dt>
                             <dd class="col-sm-8">@(Model.Onsale ? "Yes" : "No")</dd>
-                            <dt class="col-sm-4">Image</dt>
-                            <div class="col-sm-6">
-                            <h2 class="h5 mb-3 border-bottom pb-2">Product Gallery</h2>
-                            
-                            <!-- Khu vực hiển thị các ảnh hiện có -->
-                            <div class="row g-2 mb-3" id="image-gallery">
-                                @foreach (var img in Model.CurrentImages)
-                                {
-                                    <div class="col-4 col-md-3 image-item" id="img-container-@img.Id">
-                                        <div class="position-relative border rounded p-1 bg-light">
-                                            <img src="/file-storage/@img.Url" 
-                                                class="img-fluid rounded" 
-                                                style="width: 100%; height: 80px; object-fit: cover;" />
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        </div>
                         </dl>
                     </div>
                     <div class="col-md-6">
@@ -342,8 +338,7 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                                 <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Dimensions) ? "N/A" : Model.Dimensions)
                                 </dd>
                                 <dt class="col-sm-4">Manufacturer</dt>
-                                <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Manufacturer) ? "N/A" :
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            Model.Manufacturer)</dd>
+                                <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(Model.Manufacturer) ? "N/A" : Model.Manufacturer)</dd>
                                 </dl>
                                 <h3 class="h6 mt-4 mb-2">Categories</h3>
                                 <div class="d-flex flex-wrap gap-2">
@@ -638,3 +633,13 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
     });
             </script>
         }
+
+        <style>
+    .image-wrapper {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .image-wrapper:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+</style>

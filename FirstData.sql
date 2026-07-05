@@ -48,7 +48,7 @@ INSERT INTO dbo.RolePermissions (RoleId, PermissionId) VALUES
 (4, 2), (4, 3),   -- PRODUCT_MANAGE, PRODUCT_VIEW
 (4, 8), (4, 9),   -- CATEGORY_MANAGE, CATEGORY_VIEW
 
-(5, 3), (5, 5), (5, 7), (5, 11), (5, 13);   -- Viewer role gets PARTY_VIEW and SALE_VIEW
+(5, 3), (5, 5), (5, 7), (5, 9), (5, 11), (5, 13);   -- Viewer role gets PARTY_VIEW and SALE_VIEW
 
 -- Seed Statuses & Lookups
 INSERT INTO dbo.SalesOrderStatuses (StatusName, Description) VALUES 

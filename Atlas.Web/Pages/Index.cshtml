@@ -1,7 +1,18 @@
 ﻿@page
 @model IndexModel
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+
 @{
     ViewData["Title"] = "Home page";
+
+    var productView = (await AuthorizationService.AuthorizeAsync(User, "ProductView")).Succeeded;
+    var hrmView = (await AuthorizationService.AuthorizeAsync(User, "HRMView")).Succeeded;
+    var partyView = (await AuthorizationService.AuthorizeAsync(User, "PartyView")).Succeeded;
+    var categoryView = (await AuthorizationService.AuthorizeAsync(User, "CategoryView")).Succeeded;
+    var purchaseView = (await AuthorizationService.AuthorizeAsync(User, "PurchaseView")).Succeeded;
+    var saleView = (await AuthorizationService.AuthorizeAsync(User, "SaleView")).Succeeded;
+    var adminView = (await AuthorizationService.AuthorizeAsync(User, "Administration")).Succeeded;
 }
 
 @section Head {
@@ -10,28 +21,69 @@
 
 <div class="MainContent">
     <div class="card-mb-4">
-        <div class="card-body">
-            <div class="home-btn-container" onclick="location.href='/Products/Index'">
-                <button type="button" class="home-btn"><img src="~/public/Product.png" alt="Products" /></button>
-                <div class="home-btn-text">Products</div>
-            </div>
-            <div class="home-btn-container" onclick="location.href='/HRM/Index'">
-                <button type="button" class="home-btn"><img src="~/public/Employee.png" alt="Employees" /></button>
-                <div class="home-btn-text">Employees</div>
-            </div>
-            <div class="home-btn-container" onclick="location.href='/Party/Index'">
-                <button type="button" class="home-btn"><img src="~/public/Customer.png" alt="Parties" /></button>
-                <div class="home-btn-text">Parties</div>
-            </div>
-            <div class="home-btn-container" onclick="location.href='/LogPage/Index'">
-                <button type="button" class="home-btn"><img src="~/public/Log.png" alt="Log" /></button>
+        <div class="card-body" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 40px;">
+
+            @if (productView)
+            {
+                <a href="/Products/Index" class="home-btn-container text-decoration-none">
+                    <div class="home-btn"><img src="~/public/Product.png" alt="Products" /></div>
+                    <div class="home-btn-text">Products</div>
+                </a>
+            }
+
+            @if (hrmView)
+            {
+                <a href="/HRM/Index" class="home-btn-container text-decoration-none">
+                    <div class="home-btn"><img src="~/public/Employee.png" alt="Employees" /></div>
+                    <div class="home-btn-text">Employees</div>
+                </a>
+            }
+
+            @if (partyView)
+            {
+                <a href="/Party/Index" class="home-btn-container text-decoration-none">
+                    <div class="home-btn"><img src="~/public/Customer.png" alt="Parties" /></div>
+                    <div class="home-btn-text">Parties</div>
+                </a>
+            }
+
+            <a href="/LogPage/Index" class="home-btn-container text-decoration-none">
+                <div class="home-btn"><img src="~/public/Log.png" alt="Log" /></div>
                 <div class="home-btn-text">Log</div>
-            </div>
-            <div class="home-btn-container" onclick="location.href='/Category/Index'">
-                <button type="button" class="home-btn"><img src="~/public/Category.png" alt="Category" /></button>
-                <div class="home-btn-text">Category</div>
-            </div>
+            </a>
+
+            @if (categoryView)
+            {
+                <a href="/Category/Index" class="home-btn-container text-decoration-none">
+                    <div class="home-btn"><img src="~/public/Category.png" alt="Category" /></div>
+                    <div class="home-btn-text">Category</div>
+                </a>
+            }
+
+            @if(purchaseView)
+            {
+                <a href="/Purchase/Index" class="home-btn-container text-decoration-none">
+                    <div class="home-btn"><img src="~/public/Purchase.png" alt="Purchases" /></div>
+                    <div class="home-btn-text">Purchases</div>
+                </a>
+            }
+
+            @if(saleView)
+            {
+                <a href="/Sale/Index" class="home-btn-container text-decoration-none">
+                    <div class="home-btn"><img src="~/public/Sale.png" alt="Sales" /></div>
+                    <div class="home-btn-text">Sales</div>
+                </a>
+            }
+
+            @if (adminView)
+            {
+                <a href="/Setting" class="home-btn-container text-decoration-none">
+                    <div class="home-btn"><img src="~/public/Setting.png" alt="Admin" /></div>
+                    <div class="home-btn-text">Admin</div>
+                </a>
+            }
+
         </div>
     </div>
 </div>
-
