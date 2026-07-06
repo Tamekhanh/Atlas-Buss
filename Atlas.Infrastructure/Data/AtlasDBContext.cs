@@ -18,10 +18,10 @@ namespace Atlas.Infrastructure
         public DbSet<Products> Products { get; set; }
         public DbSet<ProductDetails> ProductDetails { get; set; }
         public DbSet<Log> Logs { get; set; }
-        public DbSet<SalesOrderStatus> SalesOrderStatuses { get; set; }
+        public DbSet<SalesOrderStatuses> SalesOrderStatuses { get; set; }
         public DbSet<SalesOrder> SalesOrders { get; set; }
         public DbSet<SalesOrderDetail> SalesOrderDetails { get; set; }
-        public DbSet<PurchaseOrderStatus> PurchaseOrderStatuses { get; set; }
+        public DbSet<PurchaseOrderStatuses> PurchaseOrderStatuses { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         public DbSet<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
         public DbSet<Invoice> Invoices { get; set; }

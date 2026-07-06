@@ -45,10 +45,9 @@
     <Folder Include="Areas\Party\Data\" />
     <Folder Include="Areas\Party\Models\" />
     <Folder Include="Areas\Party\Views\" />
-    <Folder Include="Areas\Purrchase\Controllers\" />
-    <Folder Include="Areas\Purrchase\Data\" />
-    <Folder Include="Areas\Purrchase\Models\" />
-    <Folder Include="Areas\Purrchase\Views\" />
+    <Folder Include="Areas\Purchase\Controllers\" />
+    <Folder Include="Areas\Purchase\Data\" />
+    <Folder Include="Areas\Purchase\Models\" />
     <Folder Include="Areas\Sale\Controllers\" />
     <Folder Include="Areas\Sale\Data\" />
     <Folder Include="Areas\Sale\Models\" />

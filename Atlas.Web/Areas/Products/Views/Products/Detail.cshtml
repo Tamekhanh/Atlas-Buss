@@ -1,10 +1,12 @@
 @model ProductModelView
 @using System.Linq
 @using Atlas.Core.Entities
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
 
 @{
     ViewData["Title"] = "Product Detail";
-    var canEdit = User.HasClaim("permission", "PRODUCT_MANAGE");
+    var productManage = (await AuthorizationService.AuthorizeAsync(User, "ProductManage")).Succeeded;
     var selectedCategoryIds = new HashSet<int>(Model.CategoryIds ?? new List<int>());
     var availableCategories = Model.AvailableCategories ??
 Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
@@ -30,7 +32,7 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            @if (canEdit)
+            @if (productManage)
             {
                 <form method="post" asp-action="Detail" asp-route-id="@Model.Id" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
@@ -391,7 +393,7 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
             </div>
         </div>
 
-        @if (canEdit)
+        @if (productManage)
         {
             <!-- JS QUẢN LÝ CATEGORY (Giữ nguyên logic của bạn) -->
             <script>

@@ -1,0 +1,34 @@
+@using Atlas.Web.Areas.PurchaseOrder.Models
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Purchase Orders</h2>
+        <a asp-action="Create" class="btn btn-primary">Create New PO</a>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>PO Number</th>
+                <th>Date</th>
+                <th>Vendor</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model) {
+            <tr>
+                <td>@item.PONumber</td>
+                <td>@item.OrderDate.ToShortDateString()</td>
+                <td>@item.VendorName</td>
+                <td><span class="badge bg-info">@item.StatusName</span></td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-secondary">View</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

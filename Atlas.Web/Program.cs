@@ -182,6 +182,12 @@ app.MapAreaControllerRoute(
     pattern: "Category/{action=Index}/{id?}",
     defaults: new { controller = "Category" });
 
+app.MapAreaControllerRoute(
+    name: "purchase",
+    areaName: "Purchase",
+    pattern: "Purchase/{action=Index}/{id?}",
+    defaults: new { controller = "PurchaseOrder" });
+
 app.MapGet("/", (HttpContext context) =>
     context.User.Identity?.IsAuthenticated == true
         ? Results.Redirect("/Index")
