@@ -135,6 +135,8 @@ namespace Atlas.Infrastructure.Repositories
                 .Include(current => current.ProductDetail)
                 .Include(current => current.CategoryProducts)
                 .Include(current => current.ProductImages)
+                .Include(current => current.Variants)
+                    .ThenInclude(variant => variant.AttributeMappings)
                 .FirstOrDefaultAsync(current => current.Id == product.Id);
 
             if (existingProduct is null) return false;
@@ -151,6 +153,71 @@ namespace Atlas.Infrastructure.Repositories
 
             if (product.ProductDetail is not null)
             {
+                        if (product.Variants != null)
+                        {
+                            var incomingVariants = product.Variants
+                                .Where(variant => !string.IsNullOrWhiteSpace(variant.SKU))
+                                .ToList();
+
+                            var incomingVariantIds = incomingVariants
+                                .Where(variant => variant.Id > 0)
+                                .Select(variant => variant.Id)
+                                .ToHashSet();
+
+                            var variantsToRemove = existingProduct.Variants
+                                .Where(variant => variant.Id > 0 && !incomingVariantIds.Contains(variant.Id))
+                                .ToList();
+
+                            foreach (var variant in variantsToRemove)
+                            {
+                                _context.VariantAttributeMappings.RemoveRange(variant.AttributeMappings);
+                            }
+
+                            _context.ProductVariants.RemoveRange(variantsToRemove);
+
+                            foreach (var incoming in incomingVariants)
+                            {
+                                if (incoming.Id > 0)
+                                {
+                                    var existingVariant = existingProduct.Variants.FirstOrDefault(variant => variant.Id == incoming.Id);
+                                    if (existingVariant != null)
+                                    {
+                                        existingVariant.SKU = incoming.SKU;
+                                        existingVariant.VariantPrice = incoming.VariantPrice;
+                                        existingVariant.VariantCost = incoming.VariantCost;
+
+                                        _context.VariantAttributeMappings.RemoveRange(existingVariant.AttributeMappings);
+                                        existingVariant.AttributeMappings.Clear();
+
+                                        foreach (var mapping in incoming.AttributeMappings)
+                                        {
+                                            existingVariant.AttributeMappings.Add(new VariantAttributeMapping
+                                            {
+                                                AttributeValueId = mapping.AttributeValueId
+                                            });
+                                        }
+
+                                        continue;
+                                    }
+                                }
+
+                                var newVariant = new ProductVariant
+                                {
+                                    ProductId = existingProduct.Id,
+                                    SKU = incoming.SKU,
+                                    VariantPrice = incoming.VariantPrice,
+                                    VariantCost = incoming.VariantCost,
+                                    AttributeMappings = incoming.AttributeMappings
+                                        .Select(mapping => new VariantAttributeMapping
+                                        {
+                                            AttributeValueId = mapping.AttributeValueId
+                                        })
+                                        .ToList()
+                                };
+
+                                existingProduct.Variants.Add(newVariant);
+                            }
+                        }
                 if (existingProduct.ProductDetail is null)
                 {
                     existingProduct.ProductDetail = new ProductDetails { ProductId = existingProduct.Id };

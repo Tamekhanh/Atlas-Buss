@@ -12,7 +12,7 @@ namespace Atlas.Core.Interfaces
 
         // Tạo sản phẩm kèm theo danh sách biến thể và phân loại
         Task<bool> CreateProductAsync(Products product, IEnumerable<int>? categoryIds = null, IEnumerable<int>? imageIds = null, IEnumerable<ProductVariant>? variants = null);
-        Task<bool> UpdateProductAsync(Products product, IEnumerable<int>? categoryIds = null, IEnumerable<int>? imageIds = null);
+        Task<bool> UpdateProductAsync(Products product, IEnumerable<int>? categoryIds = null, IEnumerable<int>? imageIds = null, IEnumerable<ProductVariant>? variants = null);
         Task<bool> DeleteProductAsync(int id);
 
         Task<IEnumerable<Products>> SearchByNameAsync(string searchTerm);

@@ -58,6 +58,7 @@ namespace Atlas.Web.Areas.Products.Controllers
             }
 
             var model = ToDetailModel(product);
+            ViewBag.AttributeTypes = await _productService.GetAvailableAttributeTypesAsync();
             await PopulateCategoriesAsync(model);
             return View("~/Areas/Products/Views/Products/Detail.cshtml", model);
         }
@@ -67,7 +68,6 @@ namespace Atlas.Web.Areas.Products.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Detail(int id, ProductModelView model)
         {
-
             try
             {
                 var product = await _productService.GetProductByIdAsync(id);
@@ -106,10 +106,13 @@ namespace Atlas.Web.Areas.Products.Controllers
                 product.ProductDetail.Dimensions = string.IsNullOrWhiteSpace(model.Dimensions) ? null : model.Dimensions.Trim();
                 product.ProductDetail.Manufacturer = string.IsNullOrWhiteSpace(model.Manufacturer) ? null : model.Manufacturer.Trim();
 
-                var updated = await _productService.UpdateProductAsync(product, model.CategoryIds, finalImageIds);
+                product.Variants = MapVariants(model.Variants, product.Id);
+
+                var updated = await _productService.UpdateProductAsync(product, model.CategoryIds, finalImageIds, product.Variants);
                 if (!updated)
                 {
                     ModelState.AddModelError(string.Empty, "Could not update product.");
+                    ViewBag.AttributeTypes = await _productService.GetAvailableAttributeTypesAsync();
                     await PopulateCategoriesAsync(model);
                     return View("~/Areas/Products/Views/Products/Detail.cshtml", model);
                 }
@@ -215,16 +218,7 @@ namespace Atlas.Web.Areas.Products.Controllers
             // Mapping sang Entity Biến thể
             if (model.Variants != null && model.Variants.Any())
             {
-                product.Variants = model.Variants.Select(v => new ProductVariant
-                {
-                    SKU = v.SKU.Trim(),
-                    VariantPrice = v.Price,
-                    VariantCost = v.Cost,
-                    AttributeMappings = v.AttributeValueIds.Select(avId => new VariantAttributeMapping
-                    {
-                        AttributeValueId = avId
-                    }).ToList()
-                }).ToList();
+                product.Variants = MapVariants(model.Variants, 0);
             }
 
             // --- BƯỚC 2: GỌI SERVICE VỚI ĐÚNG THỨ TỰ THAM SỐ ---
@@ -321,5 +315,29 @@ namespace Atlas.Web.Areas.Products.Controllers
                 })
                 .ToList();
         }
+
+        private static List<ProductVariant> MapVariants(IEnumerable<VariantModel>? variants, int productId)
+        {
+            return (variants ?? Enumerable.Empty<VariantModel>())
+                .Select(v => new ProductVariant
+                {
+                    Id = v.Id,
+                    ProductId = productId,
+                    SKU = v.SKU?.Trim() ?? string.Empty,
+                    VariantPrice = v.Price,
+                    VariantCost = v.Cost,
+                    AttributeMappings = (v.AttributeValueIds ?? new List<int>())
+                        .Where(attributeValueId => attributeValueId > 0)
+                        .Distinct()
+                        .Select(attributeValueId => new VariantAttributeMapping
+                        {
+                            AttributeValueId = attributeValueId
+                        })
+                        .ToList()
+                })
+                .Where(variant => !string.IsNullOrWhiteSpace(variant.SKU))
+                .ToList();
+        }
+
     }
 }

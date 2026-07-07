@@ -71,7 +71,7 @@ namespace Atlas.Services.Inventory
         }
 
         // CẬP NHẬT: Thêm IEnumerable<int>? imageIds vào tham số
-        public async Task<bool> UpdateProductAsync(Products product, IEnumerable<int>? categoryIds = null, IEnumerable<int>? imageIds = null)
+        public async Task<bool> UpdateProductAsync(Products product, IEnumerable<int>? categoryIds = null, IEnumerable<int>? imageIds = null, IEnumerable<ProductVariant>? variants = null)
         {
             if (product.BaseSalePrice <= 0) return false;
 
@@ -113,6 +113,8 @@ namespace Atlas.Services.Inventory
                 product.ProductImages = new List<ProductImages>();
             }
 
+            product.Variants = variants?.ToList() ?? product.Variants;
+
             return await _productRepository.UpdateAsync(product);
         }
 
@@ -130,7 +132,7 @@ namespace Atlas.Services.Inventory
 
         public async Task<Products> GetProductByIdAsync(int id)
         {
-            return await _productRepository.GetByIdAsync(id);
+            return await _productRepository.GetByIdAsync(id) ?? throw new KeyNotFoundException($"Product {id} not found.");
         }
 
         public async Task<IEnumerable<Products>> SearchByNameAsync(string searchTerm)
