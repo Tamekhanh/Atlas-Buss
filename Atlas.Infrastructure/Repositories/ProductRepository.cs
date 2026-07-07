@@ -34,6 +34,15 @@ namespace Atlas.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Products>> GetAllWithVariantsAsync()
+        {
+            return await _context.Products
+                .Include(product => product.Variants)
+                .AsNoTracking()
+                .OrderBy(product => product.ProductName)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Products>> GetProductFilterAsync(string? searchTerm, string? category = null, bool? isActive = null, bool? onSale = null)
         {
             var query = _context.Products

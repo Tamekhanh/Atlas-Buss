@@ -11,11 +11,13 @@ namespace Atlas.Services
     {
         private readonly IPurchaseOrderRepository _poRepository;
         private readonly IPartyRepository _partyRepository; // Cần để kiểm tra Vendor
+        private readonly IProductRepository _productRepository;
 
-        public PurchaseOrderService(IPurchaseOrderRepository poRepository, IPartyRepository partyRepository)
+        public PurchaseOrderService(IPurchaseOrderRepository poRepository, IPartyRepository partyRepository, IProductRepository productRepository)
         {
             _poRepository = poRepository;
             _partyRepository = partyRepository;
+            _productRepository = productRepository;
         }
 
         public async Task<IEnumerable<PurchaseOrder>> GetAllAsync()
@@ -66,11 +68,9 @@ namespace Atlas.Services
                 return false;
             }
 
-            // 5. Logic kiểm tra chi tiết đơn hàng
-            foreach (var item in order.PurchaseOrderDetails)
+            if (!await ValidateAndHydrateDetailsAsync(order))
             {
-                if (item.Quantity <= 0) return false; // Số lượng phải > 0
-                if (item.UnitPrice < 0) return false; // Giá không được âm
+                return false;
             }
 
             return await _poRepository.AddAsync(order);
@@ -88,6 +88,14 @@ namespace Atlas.Services
             if (existingPo != null && existingPo.Id != order.Id)
             {
                 return false;
+            }
+
+            if (order.PurchaseOrderDetails != null && order.PurchaseOrderDetails.Any())
+            {
+                if (!await ValidateAndHydrateDetailsAsync(order))
+                {
+                    return false;
+                }
             }
 
             return await _poRepository.UpdateAsync(order);
@@ -128,6 +136,27 @@ namespace Atlas.Services
             }
 
             return await _poRepository.UpdateAsync(order);
+        }
+
+        private async Task<bool> ValidateAndHydrateDetailsAsync(PurchaseOrder order)
+        {
+            foreach (var item in order.PurchaseOrderDetails)
+            {
+                if (item.VariantId <= 0) return false;
+                if (item.WarehouseId <= 0) return false;
+                if (item.Quantity <= 0) return false;
+                if (item.UnitPrice < 0) return false;
+
+                var variant = await _productRepository.GetVariantByIdAsync(item.VariantId);
+                if (variant == null)
+                {
+                    return false;
+                }
+
+                item.ProductId = variant.ProductId;
+            }
+
+            return true;
         }
     }
 }

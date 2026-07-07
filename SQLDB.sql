@@ -419,39 +419,41 @@ GO
 -- 7. QUẢN LÝ BÁN HÀNG (SALES)
 -- =============================================
 
-CREATE TABLE dbo.SalesOrders(
-    id int identity(1,1) primary key,
+CREATE TABLE dbo.SalesOrders( 
+    id int identity(1,1) primary key, 
     OrderNumber nvarchar(50) not null UNIQUE, 
-    OrderDate datetime not null default GETDATE(),
-    EmployeeId int not null,
-    CustomerId int not null, -- Chỉ cần một cột trỏ tới Parties (IsCustomer = 1)
-    OrderStatusId int not null default 1,
-    CurrencyId int not null default 1, -- Tích hợp tiền tệ đơn hàng
-    ExchangeRate decimal(18,6) not null default 1.0, -- Ghi nhận tỷ giá tại thời điểm tạo đơn
-    IsDeleted bit default 0,
-    CreatedAt datetime default GETDATE(),
-    FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id),
-    FOREIGN KEY (CustomerId) REFERENCES dbo.Parties(id),
-    FOREIGN KEY (OrderStatusId) REFERENCES dbo.SalesOrderStatuses(id),
-    FOREIGN KEY (CurrencyId) REFERENCES dbo.Currencies(id)
+    OrderDate datetime not null default GETDATE(), 
+    EmployeeId int not null, 
+    CustomerId int not null, 
+    OrderStatusId int not null default 1, 
+    CurrencyId int not null default 1, 
+    ExchangeRate decimal(18,6) not null default 1.0, 
+    IsDeleted bit default 0, 
+    CreatedAt datetime default GETDATE(), 
+    FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id), 
+    FOREIGN KEY (CustomerId) REFERENCES dbo.Parties(id), 
+    FOREIGN KEY (OrderStatusId) REFERENCES dbo.SalesOrderStatuses(id), 
+    FOREIGN KEY (CurrencyId) REFERENCES dbo.Currencies(id) 
 )
 GO
 
-CREATE TABLE dbo.SalesOrderDetails(
-    id int identity(1,1) primary key,
-    OrderId int not null,
-    VariantId int not null, 
-    WarehouseId int not null,
-    Quantity int not null CHECK (Quantity > 0),
-    UnitPrice decimal(19,4) not null, -- Đơn giá chuẩn tài chính
-    Discount decimal(19,4) not null default 0,
-    -- Loại bỏ TaxId độc lập để tránh xung đột dữ liệu với bảng mapping đa thuế dưới
-    TaxAmount decimal(19,4) not null default 0, -- Lưu trữ tổng tiền thuế sau khi tính toán các loại thuế áp dụng
+
+CREATE TABLE dbo.SalesOrderDetails( 
+    id int identity(1,1) primary key, 
+    OrderId int not null, 
+    ProductId int not null, -- THÊM VÀO: Để nối trực tiếp với Product (Nhiều-Nhiều)
+    VariantId int not null, -- BẮT BUỘC: Phải chọn SKU cụ thể
+    WarehouseId int not null, 
+    Quantity int not null CHECK (Quantity > 0), 
+    UnitPrice decimal(19,4) not null, 
+    Discount decimal(19,4) not null default 0, 
+    TaxAmount decimal(19,4) not null default 0, 
     SubTotal AS ((Quantity * UnitPrice) - Discount), 
     LineTotal AS (((Quantity * UnitPrice) - Discount) + TaxAmount), 
-    FOREIGN KEY (OrderId) REFERENCES dbo.SalesOrders(id),
-    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id),
-    FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id)
+    FOREIGN KEY (OrderId) REFERENCES dbo.SalesOrders(id), 
+    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id), -- Link tới Product
+    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id), -- Link tới SKU
+    FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id) 
 )
 GO
 
@@ -505,39 +507,41 @@ GO
 -- 8. QUẢN LÝ NHẬP HÀNG (PURCHASE)
 -- =============================================
 
-CREATE TABLE dbo.PurchaseOrders(
-    id int identity(1,1) primary key,
+CREATE TABLE dbo.PurchaseOrders( 
+    id int identity(1,1) primary key, 
     PONumber nvarchar(50) not null UNIQUE, 
-    OrderDate datetime not null default GETDATE(),
-    EmployeeId int not null,
-    VendorId int not null, -- Trỏ về Parties (IsVendor = 1)
-    OrderStatusId int not null default 1,
-    CurrencyId int not null default 1,
-    ExchangeRate decimal(18,6) not null default 1.0,
-    IsDeleted bit default 0,
-    CreatedAt datetime default GETDATE(),
-    FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id),
-    FOREIGN KEY (VendorId) REFERENCES dbo.Parties(id),
-    FOREIGN KEY (OrderStatusId) REFERENCES dbo.PurchaseOrderStatuses(id),
-    FOREIGN KEY (CurrencyId) REFERENCES dbo.Currencies(id)
+    OrderDate datetime not null default GETDATE(), 
+    EmployeeId int not null, 
+    VendorId int not null, 
+    OrderStatusId int not null default 1, 
+    CurrencyId int not null default 1, 
+    ExchangeRate decimal(18,6) not null default 1.0, 
+    IsDeleted bit default 0, 
+    CreatedAt datetime default GETDATE(), 
+    FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id), 
+    FOREIGN KEY (VendorId) REFERENCES dbo.Parties(id), 
+    FOREIGN KEY (OrderStatusId) REFERENCES dbo.PurchaseOrderStatuses(id), 
+    FOREIGN KEY (CurrencyId) REFERENCES dbo.Currencies(id) 
 )
 GO
 
-CREATE TABLE dbo.PurchaseOrderDetails(
-    id int identity(1,1) primary key,
-    POId int not null,
-    VariantId int not null, 
-    WarehouseId int not null,
-    Quantity int not null CHECK (Quantity > 0),
+CREATE TABLE dbo.PurchaseOrderDetails( 
+    id int identity(1,1) primary key, 
+    POId int not null, 
+    ProductId int not null, -- THÊM VÀO: Để nối trực tiếp với Product
+    VariantId int not null, -- BẮT BUỘC: Phải nhập SKU cụ thể
+    WarehouseId int not null, 
+    Quantity int not null CHECK (Quantity > 0), 
     UnitPrice decimal(19,4) not null, 
-    Discount decimal(19,4) not null default 0,
-    TaxAmount decimal(19,4) not null default 0,
-    SubTotal AS ((Quantity * UnitPrice) - Discount),
-    LineTotal AS (((Quantity * UnitPrice) - Discount) + TaxAmount),
-    BillUrl nvarchar(255) null,
-    FOREIGN KEY (POId) REFERENCES dbo.PurchaseOrders(id),
-    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id),
-    FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id)
+    Discount decimal(19,4) not null default 0, 
+    TaxAmount decimal(19,4) not null default 0, 
+    SubTotal AS ((Quantity * UnitPrice) - Discount), 
+    LineTotal AS (((Quantity * UnitPrice) - Discount) + TaxAmount), 
+    BillUrl nvarchar(255) null, 
+    FOREIGN KEY (POId) REFERENCES dbo.PurchaseOrders(id), 
+    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id), -- Link tới Product
+    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id), -- Link tới SKU
+    FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id) 
 )
 GO
 
@@ -582,6 +586,7 @@ CREATE INDEX IX_FK_SalesOrderDetails_OrderId ON dbo.SalesOrderDetails(OrderId);
 CREATE INDEX IX_FK_SalesOrderDetails_VariantId ON dbo.SalesOrderDetails(VariantId);
 CREATE INDEX IX_FK_SalesOrderDetails_WarehouseId ON dbo.SalesOrderDetails(WarehouseId);
 CREATE INDEX IX_FK_PurchaseOrderDetails_POId ON dbo.PurchaseOrderDetails(POId);
+CREATE INDEX IX_FK_PurchaseOrderDetails_ProductId ON dbo.PurchaseOrderDetails(ProductId);
 CREATE INDEX IX_FK_PurchaseOrderDetails_VariantId ON dbo.PurchaseOrderDetails(VariantId);
 CREATE INDEX IX_FK_InventoryTransactions_VariantId ON dbo.InventoryTransactions(VariantId);
 CREATE INDEX IX_FK_Parties_AddressId ON dbo.Parties(AddressId);

@@ -23,6 +23,8 @@ namespace Atlas.Infrastructure.Repositories
                 // SỬA TẠI ĐÂY: o.Parties -> o.Vendor
                 .Include(o => o.Vendor)   
                 .Include(o => o.PurchaseOrderDetails)
+                    .ThenInclude(d => d.Product)
+                .Include(o => o.PurchaseOrderDetails)
                     .ThenInclude(d => d.Variant) 
                 .AsNoTracking()
                 .OrderByDescending(o => o.OrderDate)
@@ -35,6 +37,8 @@ namespace Atlas.Infrastructure.Repositories
                 .Include(o => o.Employee)
                 .Include(o => o.Vendor)
                 .Include(o => o.PurchaseOrderDetails)
+                    .ThenInclude(d => d.Product)
+                .Include(o => o.PurchaseOrderDetails)
                     .ThenInclude(d => d.Variant)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(o => o.Id == id);
@@ -45,6 +49,8 @@ namespace Atlas.Infrastructure.Repositories
             return await _context.PurchaseOrders
                 .Include(o => o.Employee)
                 .Include(o => o.Vendor)
+                .Include(o => o.PurchaseOrderDetails)
+                    .ThenInclude(d => d.Product)
                 .Include(o => o.PurchaseOrderDetails)
                     .ThenInclude(d => d.Variant)
                 .AsNoTracking()

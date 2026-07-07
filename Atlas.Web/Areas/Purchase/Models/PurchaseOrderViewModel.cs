@@ -1,8 +1,24 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Atlas.Web.Areas.PurchaseOrder.Models 
 {
+    public class PurchaseOrderProductLookupVM
+    {
+        public int Id { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public List<PurchaseOrderVariantLookupVM> Variants { get; set; } = new();
+    }
+
+    public class PurchaseOrderVariantLookupVM
+    {
+        public int Id { get; set; }
+        public int ProductId { get; set; }
+        public string SKU { get; set; } = string.Empty;
+        public decimal? VariantPrice { get; set; }
+    }
+
     public class PurchaseOrderVM
     {
         public int Id { get; set; }
@@ -26,11 +42,13 @@ namespace Atlas.Web.Areas.PurchaseOrder.Models
         public decimal ExchangeRate { get; set; } = 1.0m;
         public DateTime OrderDate { get; set; } = DateTime.Now;
 
+        public List<PurchaseOrderProductLookupVM> Products { get; set; } = new List<PurchaseOrderProductLookupVM>();
         public List<PurchaseOrderDetailVM> OrderDetails { get; set; } = new List<PurchaseOrderDetailVM>();
     }
 
     public class PurchaseOrderDetailVM
     {
+        public int ProductId { get; set; }
         public int VariantId { get; set; }
         public string VariantSKU { get; set; } = string.Empty;
         public string ProductName { get; set; } = string.Empty;

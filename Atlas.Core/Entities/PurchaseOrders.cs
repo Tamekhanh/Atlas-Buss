@@ -64,6 +64,10 @@ namespace Atlas.Core.Entities
         [ForeignKey("VariantId")]
         public virtual ProductVariant? Variant { get; set; }
 
+        public int ProductId { get; set; }
+        [ForeignKey("ProductId")]
+        public virtual Products? Product { get; set; }
+
         public int WarehouseId { get; set; }
         [ForeignKey("WarehouseId")]
         public virtual Warehouse? Warehouse { get; set; }

@@ -211,21 +211,22 @@ INSERT INTO dbo.SalesOrders (OrderNumber, EmployeeId, CustomerId, OrderStatusId,
 ('SO-2024-001', 2, 7, 4, 1, 1.0),
 ('SO-2024-002', 2, 3, 1, 1, 1.0);
 
--- Thêm chi tiết đơn hàng (Cột TaxRate được bỏ đi, tính toán thủ công nhét vào TaxAmount cho đơn giản)
-INSERT INTO dbo.SalesOrderDetails (OrderId, VariantId, WarehouseId, Quantity, UnitPrice, Discount, TaxAmount) VALUES 
-(1, 1, 1, 2, 45000000, 1000000, 8900000), -- Subtotal = 89m, 10% Tax = 8.9m
-(1, 3, 1, 5, 28000000, 0, 14000000),      -- Subtotal = 140m, 10% Tax = 14m
-(2, 5, 2, 1, 35000000, 200000, 3480000);  -- Subtotal = 34.8m, 10% Tax = 3.48m
+-- SỬA TẠI ĐÂY: Thêm ProductId vào trước VariantId
+-- Cấu trúc: (OrderId, ProductId, VariantId, WarehouseId, Quantity, UnitPrice, Discount, TaxAmount)
+INSERT INTO dbo.SalesOrderDetails (OrderId, ProductId, VariantId, WarehouseId, Quantity, UnitPrice, Discount, TaxAmount) VALUES 
+(1, 1, 1, 1, 2, 45000000, 1000000, 8900000), -- Product 1 (MacBook Pro), Variant 1, Warehouse 1
+(1, 2, 3, 1, 5, 28000000, 0, 14000000),      -- Product 2 (MacBook Air), Variant 3, Warehouse 1
+(2, 3, 5, 2, 1, 35000000, 200000, 3480000);  -- Product 3 (ThinkPad), Variant 5, Warehouse 2
 
--- Áp dụng bảng trung gian cho Stackable Taxes
+-- Áp dụng bảng trung gian cho Stackable Taxes (giữ nguyên vì dùng OrderDetailId)
 INSERT INTO dbo.SalesOrderDetailTaxes (OrderDetailId, TaxId) VALUES 
 (1, 1), (2, 1), (3, 1);
 
 INSERT INTO dbo.Invoices (InvoiceNumber, OrderId, TotalAmount, IsPaid) VALUES 
-('INV-2024-001', 1, 251900000, 1); -- (89m + 8.9m) + (140m + 14m)
+('INV-2024-001', 1, 251900000, 1); 
 
 INSERT INTO dbo.SalesOrderPayments (OrderId, Amount, PaymentMethodId, PaymentStatusId) VALUES 
-(1, 251900000, 2, 2); -- 2: Bank Transfer, 2: Completed
+(1, 251900000, 2, 2); 
 GO
 
 -- =============================================
@@ -234,12 +235,14 @@ GO
 -- Nhà cung cấp: Component Dist X (PartyId = 8), John Doe (PartyId = 4)
 INSERT INTO dbo.PurchaseOrders (PONumber, EmployeeId, VendorId, OrderStatusId, CurrencyId, ExchangeRate) VALUES 
 ('PO-2024-001', 1, 8, 3, 1, 1.0),
-('PO-2024-002', 1, 4, 1, 2, 24500.0); -- Mua bằng USD
+('PO-2024-002', 1, 4, 1, 2, 24500.0); 
 
-INSERT INTO dbo.PurchaseOrderDetails (POId, VariantId, WarehouseId, Quantity, UnitPrice, TaxAmount) VALUES 
-(1, 1, 1, 10, 40000000, 40000000), -- 400m total, 10% Tax = 40m
-(1, 3, 1, 50, 24000000, 120000000),
-(2, 5, 2, 20, 1200, 0); -- Giá 1200 USD
+-- SỬA TẠI ĐÂY: Thêm ProductId vào trước VariantId
+-- Cấu trúc: (POId, ProductId, VariantId, WarehouseId, Quantity, UnitPrice, TaxAmount)
+INSERT INTO dbo.PurchaseOrderDetails (POId, ProductId, VariantId, WarehouseId, Quantity, UnitPrice, TaxAmount) VALUES 
+(1, 1, 1, 1, 10, 40000000, 40000000), -- PO 1, Product 1, Variant 1, Warehouse 1
+(1, 2, 3, 1, 50, 24000000, 120000000), -- PO 1, Product 2, Variant 3, Warehouse 1
+(2, 3, 5, 2, 20, 1200, 0);             -- PO 2, Product 3, Variant 5, Warehouse 2 (USD)
 
 INSERT INTO dbo.PurchaseOrderDetailTaxes (OrderDetailId, TaxId) VALUES 
 (1, 1), (2, 1);

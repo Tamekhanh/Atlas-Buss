@@ -29,6 +29,7 @@ namespace Atlas.Core.Entities
         public Units? Unit { get; set; }
         public ICollection<ProductTax> ProductTaxes { get; set; } = new List<ProductTax>();
         public ICollection<CategoryProduct> CategoryProducts { get; set; } = new List<CategoryProduct>();
+        public ICollection<PurchaseOrderDetail> PurchaseOrderDetails { get; set; } = new List<PurchaseOrderDetail>();
 
         // Mối quan hệ 1-n với Biến thể sản phẩm
         public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();

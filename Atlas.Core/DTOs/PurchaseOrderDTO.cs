@@ -23,6 +23,7 @@ namespace Atlas.Core.DTOs
 
     public class PurchaseOrderDetailDTO
     {
+        public int ProductId { get; set; }
         public int VariantId { get; set; }
         public int WarehouseId { get; set; }
         public int Quantity { get; set; }
