@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using ProductEntity = Atlas.Core.Entities.Products;
+using CategoryEntity = Atlas.Core.Entities.Category;
 
 namespace Atlas.Web.Areas.Products.Controllers
 {
@@ -73,6 +74,14 @@ namespace Atlas.Web.Areas.Products.Controllers
                 var product = await _productService.GetProductByIdAsync(id);
                 if (product is null) return NotFound();
 
+                var categoryIds = await ResolveCategoryIdsAsync(model);
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.AttributeTypes = await _productService.GetAvailableAttributeTypesAsync();
+                    await PopulateCategoriesAsync(model);
+                    return View("~/Areas/Products/Views/Products/Detail.cshtml", model);
+                }
+
                 // 1. Lấy danh sách ImageIds từ form (Đây là những ảnh KHÔNG bị xóa)
                 List<int> finalImageIds = model.ImageIds ?? new List<int>();
 
@@ -108,7 +117,7 @@ namespace Atlas.Web.Areas.Products.Controllers
 
                 product.Variants = MapVariants(model.Variants, product.Id);
 
-                var updated = await _productService.UpdateProductAsync(product, model.CategoryIds, finalImageIds, product.Variants);
+                var updated = await _productService.UpdateProductAsync(product, categoryIds, finalImageIds, product.Variants);
                 if (!updated)
                 {
                     ModelState.AddModelError(string.Empty, "Could not update product.");
@@ -160,7 +169,6 @@ namespace Atlas.Web.Areas.Products.Controllers
         public async Task<IActionResult> Create(ProductModelView model)
         {
             model.EmployeeId = GetCurrentEmployeeId();
-            await PopulateCategoriesAsync(model);
 
             if (model.EmployeeId <= 0)
             {
@@ -172,6 +180,16 @@ namespace Atlas.Web.Areas.Products.Controllers
                 ViewBag.AttributeTypes = await _productService.GetAvailableAttributeTypesAsync();
                 return View("~/Areas/Products/Views/Products/Create.cshtml", model);
             }
+
+            var categoryIds = await ResolveCategoryIdsAsync(model);
+            if (!ModelState.IsValid)
+            {
+                await PopulateCategoriesAsync(model);
+                ViewBag.AttributeTypes = await _productService.GetAvailableAttributeTypesAsync();
+                return View("~/Areas/Products/Views/Products/Create.cshtml", model);
+            }
+
+            await PopulateCategoriesAsync(model);
 
             // --- BƯỚC 1: XỬ LÝ LƯU ẢNH VÀ LẤY IMAGE IDS ---
             List<int> imageIds = new List<int>();
@@ -223,7 +241,7 @@ namespace Atlas.Web.Areas.Products.Controllers
 
             // --- BƯỚC 2: GỌI SERVICE VỚI ĐÚNG THỨ TỰ THAM SỐ ---
             // Thứ tự: product, categoryIds, imageIds, variants
-            var created = await _productService.CreateProductAsync(product, model.CategoryIds, imageIds, product.Variants);
+            var created = await _productService.CreateProductAsync(product, categoryIds, imageIds, product.Variants);
 
             if (!created)
             {
@@ -314,6 +332,42 @@ namespace Atlas.Web.Areas.Products.Controllers
                     Text = category.CategoryName
                 })
                 .ToList();
+        }
+
+        private async Task<List<int>> ResolveCategoryIdsAsync(ProductModelView model)
+        {
+            var categoryIds = (model.CategoryIds ?? new List<int>())
+                .Where(categoryId => categoryId > 0)
+                .Distinct()
+                .ToList();
+
+            var newCategoryName = model.NewCategoryName?.Trim();
+            if (string.IsNullOrWhiteSpace(newCategoryName))
+            {
+                model.CategoryIds = categoryIds;
+                return categoryIds;
+            }
+
+            var existingCategory = await _categoryRepository.FindByNameAsync(newCategoryName);
+            if (existingCategory is null)
+            {
+                existingCategory = new CategoryEntity { CategoryName = newCategoryName };
+
+                if (!await _categoryRepository.AddAsync(existingCategory))
+                {
+                    ModelState.AddModelError(nameof(model.NewCategoryName), "Could not create category.");
+                    model.CategoryIds = categoryIds;
+                    return categoryIds;
+                }
+            }
+
+            if (existingCategory.Id > 0)
+            {
+                categoryIds.Add(existingCategory.Id);
+            }
+
+            model.CategoryIds = categoryIds.Distinct().ToList();
+            return model.CategoryIds;
         }
 
         private static List<ProductVariant> MapVariants(IEnumerable<VariantModel>? variants, int productId)

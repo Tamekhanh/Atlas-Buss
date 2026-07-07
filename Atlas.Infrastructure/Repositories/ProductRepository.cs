@@ -230,6 +230,19 @@ namespace Atlas.Infrastructure.Repositories
                 existingProduct.ProductDetail.Manufacturer = product.ProductDetail.Manufacturer;
             }
 
+            existingProduct.CategoryProducts.Clear();
+            if (product.CategoryProducts != null && product.CategoryProducts.Any())
+            {
+                foreach (var categoryProduct in product.CategoryProducts)
+                {
+                    existingProduct.CategoryProducts.Add(new CategoryProduct
+                    {
+                        ProductId = existingProduct.Id,
+                        CategoryId = categoryProduct.CategoryId
+                    });
+                }
+            }
+
             existingProduct.ProductImages.Clear();
             if (product.ProductImages != null && product.ProductImages.Any())
             {

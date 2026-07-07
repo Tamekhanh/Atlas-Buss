@@ -39,10 +39,6 @@ Enumerable.Empty<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
                     <input type="hidden" asp-for="Id" />
                     <input type="hidden" asp-for="UnitId" />
                     <input type="hidden" asp-for="EmployeeId" />
-                    @foreach (var imgId in Model.ImageIds)
-                    {
-                        <input type="hidden" name="ImageIds" value="@imgId" />
-                    }
 
                     <div class="row g-4">
                         <!-- CỘT TRÁI: THÔNG TIN CƠ BẢN -->

@@ -35,15 +35,12 @@ namespace Atlas.Services.Inventory
                 .Distinct()
                 .ToList();
 
-            if (distinctCategoryIds.Count > 0)
-            {
-                product.CategoryProducts = distinctCategoryIds
-                    .Select(categoryId => new CategoryProduct
-                    {
-                        CategoryId = categoryId
-                    })
-                    .ToList();
-            }
+            product.CategoryProducts = distinctCategoryIds
+                .Select(categoryId => new CategoryProduct
+                {
+                    CategoryId = categoryId
+                })
+                .ToList();
 
             // 3. Xử lý Hình ảnh (Images) - MỚI THÊM
             var distinctImageIds = (imageIds ?? Enumerable.Empty<int>())
@@ -81,15 +78,12 @@ namespace Atlas.Services.Inventory
                 .Distinct()
                 .ToList();
 
-            if (distinctCategoryIds.Count > 0)
-            {
-                product.CategoryProducts = distinctCategoryIds
-                    .Select(categoryId => new CategoryProduct
-                    {
-                        CategoryId = categoryId
-                    })
-                    .ToList();
-            }
+            product.CategoryProducts = distinctCategoryIds
+                .Select(categoryId => new CategoryProduct
+                {
+                    CategoryId = categoryId
+                })
+                .ToList();
 
             // 2. Xử lý Hình ảnh - MỚI THÊM
             var distinctImageIds = (imageIds ?? Enumerable.Empty<int>())
