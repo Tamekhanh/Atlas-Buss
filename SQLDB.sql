@@ -428,6 +428,9 @@ CREATE TABLE dbo.SalesOrders(
     OrderStatusId int not null default 1, 
     CurrencyId int not null default 1, 
     ExchangeRate decimal(18,6) not null default 1.0, 
+    TotalDiscount decimal(19,4) not null default 0,
+    TotalTax decimal(19,4) not null default 0,
+    TotalAmount decimal(19,4) not null default 0,
     IsDeleted bit default 0, 
     CreatedAt datetime default GETDATE(), 
     FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id), 
@@ -441,18 +444,18 @@ GO
 CREATE TABLE dbo.SalesOrderDetails( 
     id int identity(1,1) primary key, 
     OrderId int not null, 
-    ProductId int not null, -- THÊM VÀO: Để nối trực tiếp với Product (Nhiều-Nhiều)
-    VariantId int not null, -- BẮT BUỘC: Phải chọn SKU cụ thể
+    -- ĐÃ XÓA ProductId ở đây
+    VariantId int not null, 
     WarehouseId int not null, 
     Quantity int not null CHECK (Quantity > 0), 
     UnitPrice decimal(19,4) not null, 
     Discount decimal(19,4) not null default 0, 
-    TaxAmount decimal(19,4) not null default 0, 
-    SubTotal AS ((Quantity * UnitPrice) - Discount), 
-    LineTotal AS (((Quantity * UnitPrice) - Discount) + TaxAmount), 
+    TaxAmount decimal(19,4) not null default 0,
+    SubTotal AS ((Quantity * UnitPrice) - Discount) PERSISTED, 
+    LineTotal AS (((Quantity * UnitPrice) - Discount) + TaxAmount) PERSISTED, 
+    IsDeleted bit default 0,
     FOREIGN KEY (OrderId) REFERENCES dbo.SalesOrders(id), 
-    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id), -- Link tới Product
-    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id), -- Link tới SKU
+    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id), 
     FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id) 
 )
 GO
@@ -461,6 +464,7 @@ GO
 CREATE TABLE dbo.SalesOrderDetailTaxes (
     OrderDetailId int not null,
     TaxId int not null,
+    TaxAmountAtTime decimal(19,4) not null,
     PRIMARY KEY (OrderDetailId, TaxId),
     FOREIGN KEY (OrderDetailId) REFERENCES dbo.SalesOrderDetails(id),
     FOREIGN KEY (TaxId) REFERENCES dbo.Taxes(id)
@@ -472,9 +476,9 @@ CREATE TABLE dbo.SalesOrderPayments(
     OrderId int not null,
     PaymentDate datetime not null default GETDATE(),
     Amount decimal(19,4) not null,
-    PaymentMethodId int not null, -- Đã chuẩn hóa qua Lookup Table
+    PaymentMethodId int not null, 
     Note nvarchar(255),
-    PaymentStatusId int not null default 1, -- Đã chuẩn hóa qua Lookup Table
+    PaymentStatusId int not null default 1, 
     FOREIGN KEY (OrderId) REFERENCES dbo.SalesOrders(id),
     FOREIGN KEY (PaymentMethodId) REFERENCES dbo.PaymentMethods(id),
     FOREIGN KEY (PaymentStatusId) REFERENCES dbo.PaymentStatuses(id)
@@ -528,19 +532,18 @@ GO
 CREATE TABLE dbo.PurchaseOrderDetails( 
     id int identity(1,1) primary key, 
     POId int not null, 
-    ProductId int not null, -- THÊM VÀO: Để nối trực tiếp với Product
-    VariantId int not null, -- BẮT BUỘC: Phải nhập SKU cụ thể
+    -- ĐÃ XÓA ProductId ở đây
+    VariantId int not null, 
     WarehouseId int not null, 
     Quantity int not null CHECK (Quantity > 0), 
     UnitPrice decimal(19,4) not null, 
     Discount decimal(19,4) not null default 0, 
     TaxAmount decimal(19,4) not null default 0, 
-    SubTotal AS ((Quantity * UnitPrice) - Discount), 
-    LineTotal AS (((Quantity * UnitPrice) - Discount) + TaxAmount), 
+    SubTotal AS ((Quantity * UnitPrice) - Discount) PERSISTED, 
+    LineTotal AS (((Quantity * UnitPrice) - Discount) + TaxAmount) PERSISTED, 
     BillUrl nvarchar(255) null, 
     FOREIGN KEY (POId) REFERENCES dbo.PurchaseOrders(id), 
-    FOREIGN KEY (ProductId) REFERENCES dbo.Products(id), -- Link tới Product
-    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id), -- Link tới SKU
+    FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id), 
     FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id) 
 )
 GO
@@ -586,7 +589,6 @@ CREATE INDEX IX_FK_SalesOrderDetails_OrderId ON dbo.SalesOrderDetails(OrderId);
 CREATE INDEX IX_FK_SalesOrderDetails_VariantId ON dbo.SalesOrderDetails(VariantId);
 CREATE INDEX IX_FK_SalesOrderDetails_WarehouseId ON dbo.SalesOrderDetails(WarehouseId);
 CREATE INDEX IX_FK_PurchaseOrderDetails_POId ON dbo.PurchaseOrderDetails(POId);
-CREATE INDEX IX_FK_PurchaseOrderDetails_ProductId ON dbo.PurchaseOrderDetails(ProductId);
 CREATE INDEX IX_FK_PurchaseOrderDetails_VariantId ON dbo.PurchaseOrderDetails(VariantId);
 CREATE INDEX IX_FK_InventoryTransactions_VariantId ON dbo.InventoryTransactions(VariantId);
 CREATE INDEX IX_FK_Parties_AddressId ON dbo.Parties(AddressId);

@@ -1,0 +1,33 @@
+@using Atlas.Web.Areas.SaleOrder.Models
+@model IEnumerable<SaleOrderVM>
+
+<div class="container-fluid">
+	<div class="d-flex justify-content-between align-items-center mb-3">
+		<h2>Sale Orders</h2>
+		<a asp-action="Create" class="btn btn-primary">Create New SO</a>
+	</div>
+
+	<table class="table table-bordered table-striped">
+		<thead>
+			<tr>
+				<th>Order Number</th>
+				<th>Date</th>
+				<th>Customer</th>
+				<th>Status</th>
+				<th>Total</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td>@item.OrderNumber</td>
+					<td>@item.OrderDate.ToShortDateString()</td>
+					<td>@item.CustomerName</td>
+					<td><span class="badge bg-info">@item.StatusName</span></td>
+					<td>@item.TotalAmount.ToString("N0")</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
