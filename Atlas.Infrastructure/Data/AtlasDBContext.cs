@@ -478,12 +478,7 @@ namespace Atlas.Infrastructure
                     .HasForeignKey(detail => detail.POId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(detail => detail.Product)
-                    .WithMany(product => product.PurchaseOrderDetails)
-                    .HasForeignKey(detail => detail.ProductId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                // CHUẨN HÓA: Trỏ về Variant
+                // CHUẨN HÓA: Trỏ về Variant (Product được truy xuất qua Variant.Product)
                 entity.HasOne(detail => detail.Variant)
                     .WithMany()
                     .HasForeignKey(detail => detail.VariantId)

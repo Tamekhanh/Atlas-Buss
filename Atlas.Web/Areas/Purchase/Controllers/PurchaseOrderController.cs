@@ -13,13 +13,15 @@ namespace Atlas.Web.Controllers
     {
         private readonly IPurchaseOrderService _poService;
         private readonly IProductRepository _productRepository;
-        // private readonly IVendorRepository _vendorRepo; 
+        private readonly IWarehouseRepository _warehouseRepository;
+        // private readonly IVendorRepository _vendorRepo;
         // private readonly IProductVariantRepository _variantRepo;
 
-        public PurchaseOrderController(IPurchaseOrderService poService, IProductRepository productRepository)
+        public PurchaseOrderController(IPurchaseOrderService poService, IProductRepository productRepository, IWarehouseRepository warehouseRepository)
         {
             _poService = poService;
             _productRepository = productRepository;
+            _warehouseRepository = warehouseRepository;
         }
         [Route("Index")]
         [HttpGet]
@@ -33,6 +35,65 @@ namespace Atlas.Web.Controllers
                 OrderDate = x.OrderDate,
                 VendorId = x.VendorId,
             });
+            return View(model);
+        }
+
+        [Route("Details/{id}")]
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var order = await _poService.GetByIdAsync(id);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            // Tải trước danh sách kho để hiển thị tên thay vì chỉ WarehouseId
+            var warehouses = (await _warehouseRepository.GetAllAsync())
+                .Where(w => !w.IsDeleted)
+                .ToDictionary(w => w.Id, w => w.WarehouseName);
+
+            var lines = order.PurchaseOrderDetails
+                .OrderBy(d => d.Id)
+                .Select(d =>
+                {
+                    var lineTotal = (d.Quantity * d.UnitPrice) - d.Discount + d.TaxAmount;
+                    return new PurchaseOrderDetailLineVM
+                    {
+                        VariantId = d.VariantId,
+                        ProductName = d.Variant?.Product?.ProductName ?? string.Empty,
+                        VariantSKU = d.Variant?.SKU ?? string.Empty,
+                        WarehouseId = d.WarehouseId,
+                        WarehouseName = warehouses.TryGetValue(d.WarehouseId, out var whName) ? whName : string.Empty,
+                        Quantity = d.Quantity,
+                        UnitPrice = d.UnitPrice,
+                        Discount = d.Discount,
+                        TaxAmount = d.TaxAmount,
+                        LineTotal = lineTotal
+                    };
+                })
+                .ToList();
+
+            var model = new PurchaseOrderDetailPageVM
+            {
+                Id = order.Id,
+                PONumber = order.PONumber,
+                OrderDate = order.OrderDate,
+                VendorId = order.VendorId,
+                VendorName = order.Vendor?.DisplayName ?? string.Empty,
+                EmployeeId = order.EmployeeId,
+                EmployeeName = order.Employee?.FullName ?? string.Empty,
+                OrderStatusId = order.OrderStatusId,
+                StatusName = order.OrderStatus?.StatusName ?? string.Empty,
+                CurrencyCode = order.Currency?.CurrencyCode ?? string.Empty,
+                ExchangeRate = order.ExchangeRate,
+                SubTotal = lines.Sum(l => l.Quantity * l.UnitPrice),
+                TotalDiscount = lines.Sum(l => l.Discount),
+                TotalTax = lines.Sum(l => l.TaxAmount),
+                GrandTotal = lines.Sum(l => l.LineTotal),
+                Lines = lines
+            };
+
             return View(model);
         }
 
@@ -73,7 +134,6 @@ namespace Atlas.Web.Controllers
                 {
                     po.PurchaseOrderDetails.Add(new PurchaseOrderDetail
                     {
-                        ProductId = item.ProductId,
                         VariantId = item.VariantId,
                         Quantity = item.Quantity,
                         UnitPrice = item.UnitPrice,

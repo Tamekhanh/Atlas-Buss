@@ -50,6 +50,60 @@ namespace Atlas.Web.Areas.Sale.Controllers
 		}
 
 		[HttpGet]
+		[Route("Details/{id}")]
+		public async Task<IActionResult> Details(int id)
+		{
+			var order = await _salesOrderService.GetByIdAsync(id);
+			if (order == null)
+			{
+				return NotFound();
+			}
+
+			var lines = order.SalesOrderDetails
+				.OrderBy(d => d.Id)
+				.Select(d =>
+				{
+					var lineTotal = (d.Quantity * d.UnitPrice) - d.Discount + d.TaxAmount;
+					return new SaleOrderDetailLineVM
+					{
+						VariantId = d.VariantId,
+						ProductName = d.Variant?.Product?.ProductName ?? string.Empty,
+						VariantSKU = d.Variant?.SKU ?? string.Empty,
+						WarehouseId = d.WarehouseId,
+						WarehouseName = d.Warehouse?.WarehouseName ?? string.Empty,
+						Quantity = d.Quantity,
+						UnitPrice = d.UnitPrice,
+						Discount = d.Discount,
+						TaxAmount = d.TaxAmount,
+						LineTotal = lineTotal
+					};
+				})
+				.ToList();
+
+			var model = new SaleOrderDetailPageVM
+			{
+				Id = order.Id,
+				OrderNumber = order.OrderNumber,
+				OrderDate = order.OrderDate,
+				CustomerId = order.CustomerId,
+				CustomerName = order.Customer?.DisplayName ?? string.Empty,
+				EmployeeId = order.EmployeeId,
+				EmployeeName = order.Employee?.FullName ?? string.Empty,
+				OrderStatusId = order.OrderStatusId,
+				StatusName = order.OrderStatus?.StatusName ?? string.Empty,
+				CurrencyCode = order.Currency?.CurrencyCode ?? string.Empty,
+				ExchangeRate = order.ExchangeRate,
+				SubTotal = lines.Sum(l => l.Quantity * l.UnitPrice),
+				TotalDiscount = lines.Sum(l => l.Discount),
+				TotalTax = lines.Sum(l => l.TaxAmount),
+				GrandTotal = order.TotalAmount,
+				Lines = lines
+			};
+
+			return View(model);
+		}
+
+		[HttpGet]
 		[Route("Create")]
 		public async Task<IActionResult> Create()
 		{

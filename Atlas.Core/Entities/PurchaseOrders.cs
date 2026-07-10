@@ -64,10 +64,9 @@ namespace Atlas.Core.Entities
         [ForeignKey("VariantId")]
         public virtual ProductVariant? Variant { get; set; }
 
-        public int ProductId { get; set; }
-        [ForeignKey("ProductId")]
-        public virtual Products? Product { get; set; }
-
+        // SỬA LỖI: 'Invalid column name ProductId'
+        // Bảng SQL PurchaseOrderDetails không có cột ProductId (đã bị xóa bỏ).
+        // Product được truy xuất qua Variant.Product thay vì một FK riêng.
         public int WarehouseId { get; set; }
         [ForeignKey("WarehouseId")]
         public virtual Warehouse? Warehouse { get; set; }

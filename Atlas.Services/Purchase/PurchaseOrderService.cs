@@ -152,8 +152,6 @@ namespace Atlas.Services
                 {
                     return false;
                 }
-
-                item.ProductId = variant.ProductId;
             }
 
             return true;

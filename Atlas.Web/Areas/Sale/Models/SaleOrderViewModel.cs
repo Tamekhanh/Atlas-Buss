@@ -71,4 +71,39 @@ namespace Atlas.Web.Areas.SaleOrder.Models
 		public decimal Discount { get; set; }
 		public decimal TaxAmount { get; set; }
 	}
+
+	// View-model cho trang Detail (xem chi tiết đơn bán hàng)
+	public class SaleOrderDetailPageVM
+	{
+		public int Id { get; set; }
+		public string OrderNumber { get; set; } = string.Empty;
+		public DateTime OrderDate { get; set; }
+		public int CustomerId { get; set; }
+		public string CustomerName { get; set; } = string.Empty;
+		public int EmployeeId { get; set; }
+		public string EmployeeName { get; set; } = string.Empty;
+		public int OrderStatusId { get; set; }
+		public string StatusName { get; set; } = string.Empty;
+		public string CurrencyCode { get; set; } = string.Empty;
+		public decimal ExchangeRate { get; set; }
+		public decimal SubTotal { get; set; }
+		public decimal TotalDiscount { get; set; }
+		public decimal TotalTax { get; set; }
+		public decimal GrandTotal { get; set; }
+		public List<SaleOrderDetailLineVM> Lines { get; set; } = new();
+	}
+
+	public class SaleOrderDetailLineVM
+	{
+		public int VariantId { get; set; }
+		public string ProductName { get; set; } = string.Empty;
+		public string VariantSKU { get; set; } = string.Empty;
+		public int WarehouseId { get; set; }
+		public string WarehouseName { get; set; } = string.Empty;
+		public int Quantity { get; set; }
+		public decimal UnitPrice { get; set; }
+		public decimal Discount { get; set; }
+		public decimal TaxAmount { get; set; }
+		public decimal LineTotal { get; set; }
+	}
 }

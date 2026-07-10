@@ -35,6 +35,9 @@ namespace Atlas.Infrastructure.Repositories
                 .Include(o => o.Customer)
                 .Include(o => o.SalesOrderDetails)
                     .ThenInclude(d => d.Variant)
+                        .ThenInclude(v => v.Product)
+                .Include(o => o.SalesOrderDetails)
+                    .ThenInclude(d => d.Warehouse)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
