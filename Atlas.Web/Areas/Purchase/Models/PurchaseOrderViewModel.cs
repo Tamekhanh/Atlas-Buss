@@ -4,6 +4,18 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Atlas.Web.Areas.PurchaseOrder.Models 
 {
+    public class PurchaseOrderVendorLookupVM
+    {
+        public int Id { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
+    }
+
+    public class PurchaseOrderWarehouseLookupVM
+    {
+        public int Id { get; set; }
+        public string WarehouseName { get; set; } = string.Empty;
+    }
+
     public class PurchaseOrderProductLookupVM
     {
         public int Id { get; set; }
@@ -42,7 +54,9 @@ namespace Atlas.Web.Areas.PurchaseOrder.Models
         public decimal ExchangeRate { get; set; } = 1.0m;
         public DateTime OrderDate { get; set; } = DateTime.Now;
 
+        public List<PurchaseOrderVendorLookupVM> Vendors { get; set; } = new List<PurchaseOrderVendorLookupVM>();
         public List<PurchaseOrderProductLookupVM> Products { get; set; } = new List<PurchaseOrderProductLookupVM>();
+        public List<PurchaseOrderWarehouseLookupVM> Warehouses { get; set; } = new List<PurchaseOrderWarehouseLookupVM>();
         public List<PurchaseOrderDetailVM> OrderDetails { get; set; } = new List<PurchaseOrderDetailVM>();
     }
 
@@ -78,6 +92,14 @@ namespace Atlas.Web.Areas.PurchaseOrder.Models
         public decimal TotalTax { get; set; }
         public decimal GrandTotal { get; set; }
         public List<PurchaseOrderDetailLineVM> Lines { get; set; } = new();
+        public List<PurchaseOrderBillVM> Bills { get; set; } = new();
+    }
+
+    public class PurchaseOrderBillVM
+    {
+        public int Id { get; set; }
+        public string BillUrl { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
     }
 
     public class PurchaseOrderDetailLineVM

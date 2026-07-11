@@ -1,0 +1,105 @@
+@model AttributeTypeViewModel
+
+@{
+    ViewData["Title"] = "Create Attribute";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Create Attribute</h1>
+            <p class="text-muted mb-0">Define a new attribute type and its initial values.</p>
+        </div>
+        <a asp-area="Attributes" asp-controller="Attribute" asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <form asp-area="Attributes" asp-controller="Attribute" asp-action="Create" method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row g-4">
+                    <div class="col-12 col-md-6">
+                        <h2 class="h5 mb-3 border-bottom pb-2">Attribute Type</h2>
+                        <div class="mb-3">
+                            <label asp-for="AttributeName" class="form-label fw-semibold"></label>
+                            <input asp-for="AttributeName" class="form-control" placeholder="e.g. Color, Size" />
+                            <span asp-validation-for="AttributeName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-semibold"></label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Optional description"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <h2 class="h5 mb-3 border-bottom pb-2">Initial Values</h2>
+                        <small class="text-muted d-block mb-3">You can add values now or later from the list page.</small>
+
+                        <div id="create-values-list" class="d-flex flex-column gap-2">
+                            @if (Model.Values != null && Model.Values.Any())
+                            {
+                                for (int i = 0; i < Model.Values.Count; i++)
+                                {
+                                    <div class="input-group create-value-row">
+                                        <input name="Values[@i].Value" value="@Model.Values[i].Value" class="form-control" placeholder="e.g. Red" />
+                                        <button type="button" class="btn btn-outline-danger remove-create-value-btn" title="Remove">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-create-value-btn">+ Add Value</button>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-5">Create Attribute</button>
+                    <a asp-area="Attributes" asp-controller="Attribute" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (() => {
+            const list = document.getElementById('create-values-list');
+            const addBtn = document.getElementById('add-create-value-btn');
+
+            const reIndex = () => {
+                const rows = list?.querySelectorAll('.create-value-row') ?? [];
+                rows.forEach((row, idx) => {
+                    const input = row.querySelector('input');
+                    if (input) input.name = `Values[${idx}].Value`;
+                });
+            };
+
+            addBtn?.addEventListener('click', () => {
+                if (!list) return;
+                const row = document.createElement('div');
+                row.className = 'input-group create-value-row';
+                row.innerHTML = `
+                    <input class="form-control" placeholder="e.g. Red" />
+                    <button type="button" class="btn btn-outline-danger remove-create-value-btn" title="Remove">
+                        <i class="bi bi-x-lg"></i>
+                    </button>`;
+                list.appendChild(row);
+                reIndex();
+                row.querySelector('input')?.focus();
+            });
+
+            list?.addEventListener('click', (e) => {
+                const btn = e.target.closest('.remove-create-value-btn');
+                if (btn) {
+                    btn.closest('.create-value-row')?.remove();
+                    reIndex();
+                }
+            });
+        })();
+    </script>
+}

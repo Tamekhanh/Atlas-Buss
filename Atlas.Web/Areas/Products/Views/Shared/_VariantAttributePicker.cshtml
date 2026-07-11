@@ -10,6 +10,7 @@
             Id = value!.Id,
             Value = value.Value,
             TypeName = type.AttributeName,
+            TypeId = type.Id,
             SearchText = $"{type.AttributeName} {value.Value}".ToLowerInvariant()
         }))
         .ToList();
@@ -30,6 +31,68 @@
                     <input type="search" class="form-control" id="variant-attribute-picker-search" placeholder="Search attribute or value" />
                 </div>
 
+                <!-- Tạo nhanh thuộc tính / giá trị thuộc tính -->
+                <div class="accordion mb-3" id="variant-attribute-create-accordion">
+                    <div class="accordion-item border-0">
+                        <h2 class="accordion-header">
+                            <button type="button"
+                                    class="accordion-button collapsed bg-light py-2 px-3 rounded-2"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#variant-attribute-create-panel"
+                                    aria-expanded="false"
+                                    aria-controls="variant-attribute-create-panel">
+                                <i class="bi bi-plus-circle me-2"></i> Create a new attribute or value
+                            </button>
+                        </h2>
+                        <div id="variant-attribute-create-panel" class="accordion-collapse collapse" data-bs-parent="#variant-attribute-create-accordion">
+                            <div class="accordion-body border rounded-3 mt-2 p-3 bg-white">
+                                <ul class="nav nav-pills mb-3" id="variant-create-tabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="create-value-tab-btn" data-bs-toggle="pill" data-bs-target="#create-value-tab" type="button" role="tab">New value</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="create-type-tab-btn" data-bs-toggle="pill" data-bs-target="#create-type-tab" type="button" role="tab">New attribute</button>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <!-- Tạo giá trị mới cho loại thuộc tính đã có -->
+                                    <div class="tab-pane fade show active" id="create-value-tab" role="tabpanel">
+                                        <div class="mb-2">
+                                            <label class="form-label small fw-semibold">Attribute</label>
+                                            <select class="form-select form-select-sm" id="quick-create-value-type"></select>
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label small fw-semibold">Value <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control form-control-sm" id="quick-create-value-input" placeholder="e.g. Red, XL" autocomplete="off" />
+                                        </div>
+                                        <div class="text-danger small mb-2" id="quick-create-value-error"></div>
+                                        <button type="button" class="btn btn-primary btn-sm" id="quick-create-value-btn">Create value</button>
+                                    </div>
+
+                                    <!-- Tạo loại thuộc tính mới -->
+                                    <div class="tab-pane fade" id="create-type-tab" role="tabpanel">
+                                        <div class="mb-2">
+                                            <label class="form-label small fw-semibold">Attribute name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control form-control-sm" id="quick-create-type-name" placeholder="e.g. Color, Size" autocomplete="off" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label small fw-semibold">Description</label>
+                                            <input type="text" class="form-control form-control-sm" id="quick-create-type-desc" placeholder="Optional" autocomplete="off" />
+                                        </div>
+                                        <div class="mb-2">
+                                            <label class="form-label small fw-semibold">First values (comma-separated)</label>
+                                            <input type="text" class="form-control form-control-sm" id="quick-create-type-values" placeholder="Red, Blue, Green" autocomplete="off" />
+                                        </div>
+                                        <div class="text-danger small mb-2" id="quick-create-type-error"></div>
+                                        <button type="button" class="btn btn-primary btn-sm" id="quick-create-type-btn">Create attribute</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="variant-attribute-option-list border rounded-3 p-2 bg-light" id="variant-attribute-picker-list" style="max-height: 60vh; overflow: auto;">
                     @if (options.Any())
                     {
@@ -38,6 +101,7 @@
                             <label class="list-group-item list-group-item-action d-flex align-items-start gap-3 rounded-2 mb-2 variant-attribute-option"
                                    data-variant-attribute-search="@option.SearchText"
                                    data-variant-attribute-id="@option.Id"
+                                   data-variant-attribute-type-id="@option.TypeId"
                                    data-variant-attribute-label="@option.Value">
                                 <input class="form-check-input mt-1 variant-attribute-checkbox" type="checkbox" value="@option.Id" />
                                 <span class="flex-grow-1">
@@ -77,6 +141,15 @@
     const applyButton = document.getElementById('variant-attribute-picker-apply');
     const clearButton = document.getElementById('variant-attribute-picker-clear');
     const labelMap = new Map();
+
+    // Endpoints tạo nhanh thuộc tính / giá trị thuộc tính.
+    const createValueUrl = '@Url.Action("CreateValue", "Attribute", new { area = "Attributes" })';
+    const createTypeUrl = '@Url.Action("QuickCreateType", "Attribute", new { area = "Attributes" })';
+
+    const getAntiForgeryToken = () => {
+        const input = document.querySelector('input[name="__RequestVerificationToken"]');
+        return input ? input.value : '';
+    };
 
     let activeRow = null;
 
@@ -234,6 +307,175 @@
         }
         filterOptions();
         updateSummary();
+    });
+
+    // ---------- TẠO NHANH THUỘC TÍNH / GIÁ TRỊ ----------
+    const createPanel = document.getElementById('variant-attribute-create-panel');
+    const typeSelect = document.getElementById('quick-create-value-type');
+    const valueInput = document.getElementById('quick-create-value-input');
+    const valueError = document.getElementById('quick-create-value-error');
+    const valueBtn = document.getElementById('quick-create-value-btn');
+    const typeNameInput = document.getElementById('quick-create-type-name');
+    const typeDescInput = document.getElementById('quick-create-type-desc');
+    const typeValuesInput = document.getElementById('quick-create-type-values');
+    const typeError = document.getElementById('quick-create-type-error');
+    const typeBtn = document.getElementById('quick-create-type-btn');
+
+    // Cập nhật lại dropdown loại thuộc tính (dựa trên option đang có trong list).
+    const refreshTypeSelect = () => {
+        if (!typeSelect) return;
+        const seen = new Map(); // attributeName -> id
+        listElement?.querySelectorAll('.variant-attribute-option').forEach(option => {
+            const label = option.querySelector('.text-muted')?.textContent?.trim();
+            const id = option.dataset.variantAttributeId;
+            if (label && id && !seen.has(label)) {
+                seen.set(label, id);
+            }
+        });
+
+        const current = typeSelect.value;
+        typeSelect.innerHTML = '';
+        if (seen.size === 0) {
+            const empty = document.createElement('option');
+            empty.value = '';
+            empty.textContent = 'No attributes yet — create a new one ->';
+            empty.disabled = true;
+            empty.selected = true;
+            typeSelect.appendChild(empty);
+            return;
+        }
+
+        seen.forEach((id, name) => {
+            const opt = document.createElement('option');
+            // Lấy typeId thực: ta không có trực tiếp, dùng attributeTypeId lưu trên option.
+            const typeId = listElement?.querySelector(`[data-variant-attribute-id="${id}"]`)?.dataset.variantAttributeTypeId || '';
+            opt.value = typeId;
+            opt.textContent = name;
+            typeSelect.appendChild(opt);
+        });
+
+        if (current) typeSelect.value = current;
+    };
+
+    const createOptionRow = (id, value, typeName, typeId) => {
+        const label = document.createElement('label');
+        label.className = 'list-group-item list-group-item-action d-flex align-items-start gap-3 rounded-2 mb-2 variant-attribute-option';
+        label.dataset.variantAttributeSearch = `${typeName} ${value}`.toLowerCase();
+        label.dataset.variantAttributeId = String(id);
+        label.dataset.variantAttributeLabel = value;
+        if (typeId) label.dataset.variantAttributeTypeId = String(typeId);
+        label.innerHTML = `
+            <input class="form-check-input mt-1 variant-attribute-checkbox" type="checkbox" value="${id}" />
+            <span class="flex-grow-1">
+                <span class="d-block fw-semibold">${value}</span>
+                <span class="d-block small text-muted">${typeName}</span>
+            </span>`;
+        return label;
+    };
+
+    const addOptionToView = (id, value, typeName, typeId, autoCheck = true) => {
+        if (!listElement) return;
+        // Bỏ thông báo "No attributes available." nếu còn.
+        listElement.querySelectorAll('.text-center.text-muted.py-4').forEach(el => el.remove());
+
+        const row = createOptionRow(id, value, typeName, typeId);
+        listElement.appendChild(row);
+
+        labelMap.set(String(id), value);
+        if (autoCheck) {
+            row.querySelector('.variant-attribute-checkbox').checked = true;
+        }
+        updateSummary();
+    };
+
+    // Tạo giá trị mới cho loại thuộc tính có sẵn.
+    valueBtn?.addEventListener('click', () => {
+        valueError.textContent = '';
+        const typeBaseUrl = typeSelect?.value;
+        const value = valueInput?.value.trim();
+
+        if (!typeBaseUrl || !value) {
+            valueError.textContent = 'Please choose an attribute and enter a value.';
+            return;
+        }
+
+        // typeBaseUrl là typeId (số) lấy từ dataset; giá trị trị gửi dạng AttributeTypeId.
+        fetch(createValueUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': getAntiForgeryToken()
+            },
+            body: JSON.stringify({ Value: value, AttributeTypeId: Number(typeBaseUrl) })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) {
+                valueError.textContent = data.message || 'Could not create value.';
+                return;
+            }
+            addOptionToView(data.id, data.value, data.attributeName || '', data.attributeTypeId, true);
+            valueInput.value = '';
+        })
+        .catch(() => { valueError.textContent = 'Something went wrong.'; });
+    });
+
+    // Tạo loại thuộc tính mới (có thể kèm nhiều giá trị đầu tiên).
+    typeBtn?.addEventListener('click', () => {
+        typeError.textContent = '';
+        const name = typeNameInput?.value.trim();
+        if (!name) {
+            typeError.textContent = 'Attribute name is required.';
+            return;
+        }
+
+        const description = typeDescInput?.value.trim() || '';
+        const valuesRaw = (typeValuesInput?.value || '').split(',').map(v => v.trim()).filter(Boolean);
+
+        fetch(createTypeUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': getAntiForgeryToken()
+            },
+            body: JSON.stringify({ AttributeName: name, Description: description })
+        })
+        .then(r => r.json())
+        .then(async data => {
+            if (!data.success) {
+                typeError.textContent = data.message || 'Could not create attribute.';
+                return;
+            }
+            refreshTypeSelect();
+
+            // Tạo các giá trị đầu tiên nếu có.
+            for (const v of valuesRaw) {
+                try {
+                    const resp = await fetch(createValueUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': getAntiForgeryToken()
+                        },
+                        body: JSON.stringify({ Value: v, AttributeTypeId: data.id })
+                    });
+                    const val = await resp.json();
+                    if (val.success) {
+                        addOptionToView(val.id, val.value, data.attributeName, data.attributeTypeId || data.id, true);
+                    }
+                } catch (_) { /* bỏ qua giá trị lỗi đơn lẻ */ }
+            }
+
+            typeNameInput.value = '';
+            typeDescInput.value = '';
+            typeValuesInput.value = '';
+        })
+        .catch(() => { typeError.textContent = 'Something went wrong.'; });
+    });
+
+    // Khi panel tạo mở: nạp lại dropdown loại thuộc tính.
+    createPanel?.addEventListener('shown.bs.collapse', () => {
+        refreshTypeSelect();
     });
 })();
 </script>

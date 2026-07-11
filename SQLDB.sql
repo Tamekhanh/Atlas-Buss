@@ -525,6 +525,7 @@ CREATE TABLE dbo.PurchaseOrders(
     FOREIGN KEY (EmployeeId) REFERENCES dbo.Employee(id), 
     FOREIGN KEY (VendorId) REFERENCES dbo.Parties(id), 
     FOREIGN KEY (OrderStatusId) REFERENCES dbo.PurchaseOrderStatuses(id), 
+    BillUrl nvarchar(255) null, 
     FOREIGN KEY (CurrencyId) REFERENCES dbo.Currencies(id) 
 )
 GO
@@ -540,8 +541,7 @@ CREATE TABLE dbo.PurchaseOrderDetails(
     Discount decimal(19,4) not null default 0, 
     TaxAmount decimal(19,4) not null default 0, 
     SubTotal AS ((Quantity * UnitPrice) - Discount) PERSISTED, 
-    LineTotal AS (((Quantity * UnitPrice) - Discount) + TaxAmount) PERSISTED, 
-    BillUrl nvarchar(255) null, 
+    LineTotal AS (((Quantity * UnitPrice) - Discount) + TaxAmount) PERSISTED,
     FOREIGN KEY (POId) REFERENCES dbo.PurchaseOrders(id), 
     FOREIGN KEY (VariantId) REFERENCES dbo.ProductVariants(id), 
     FOREIGN KEY (WarehouseId) REFERENCES dbo.Warehouses(id) 
@@ -569,6 +569,16 @@ CREATE TABLE dbo.PurchaseOrderPayments(
     FOREIGN KEY (OrderId) REFERENCES dbo.PurchaseOrders(id),
     FOREIGN KEY (PaymentMethodId) REFERENCES dbo.PaymentMethods(id),
     FOREIGN KEY (PaymentStatusId) REFERENCES dbo.PaymentStatuses(id)
+)
+GO
+
+-- Lưu nhiều file bill (PDF, ảnh scan, ...) đính kèm cho 1 Purchase Order
+CREATE TABLE dbo.PurchaseOrderBills(
+    id int identity(1,1) primary key,
+    OrderId int not null,
+    BillUrl nvarchar(255) not null,
+    CreatedAt datetime default GETDATE(),
+    FOREIGN KEY (OrderId) REFERENCES dbo.PurchaseOrders(id)
 )
 GO
 

@@ -91,6 +91,14 @@ namespace Atlas.Web.Areas.SaleOrder.Models
 		public decimal TotalTax { get; set; }
 		public decimal GrandTotal { get; set; }
 		public List<SaleOrderDetailLineVM> Lines { get; set; } = new();
+		public List<SaleOrderBillVM> Bills { get; set; } = new();
+	}
+
+	public class SaleOrderBillVM
+	{
+		public int Id { get; set; }
+		public string BillUrl { get; set; } = string.Empty;
+		public DateTime CreatedAt { get; set; }
 	}
 
 	public class SaleOrderDetailLineVM

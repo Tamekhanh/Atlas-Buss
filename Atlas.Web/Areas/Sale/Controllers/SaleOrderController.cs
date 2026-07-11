@@ -16,17 +16,23 @@ namespace Atlas.Web.Areas.Sale.Controllers
 		private readonly IPartyRepository _partyRepository;
 		private readonly IProductRepository _productRepository;
 		private readonly IWarehouseRepository _warehouseRepository;
+		private readonly IStorageProvider _storageProvider;
+		private readonly ISalesOrderBillRepository _soBillRepository;
 
 		public SaleOrderController(
 			ISalesOrderService salesOrderService,
 			IPartyRepository partyRepository,
 			IProductRepository productRepository,
-			IWarehouseRepository warehouseRepository)
+			IWarehouseRepository warehouseRepository,
+			IStorageProvider storageProvider,
+			ISalesOrderBillRepository soBillRepository)
 		{
 			_salesOrderService = salesOrderService;
 			_partyRepository = partyRepository;
 			_productRepository = productRepository;
 			_warehouseRepository = warehouseRepository;
+			_storageProvider = storageProvider;
+			_soBillRepository = soBillRepository;
 		}
 
 		[HttpGet]
@@ -97,10 +103,77 @@ namespace Atlas.Web.Areas.Sale.Controllers
 				TotalDiscount = lines.Sum(l => l.Discount),
 				TotalTax = lines.Sum(l => l.TaxAmount),
 				GrandTotal = order.TotalAmount,
-				Lines = lines
+				Lines = lines,
+				Bills = (await _soBillRepository.GetByOrderIdAsync(order.Id))
+					.Select(b => new SaleOrderBillVM
+					{
+						Id = b.Id,
+						BillUrl = b.BillUrl,
+						CreatedAt = b.CreatedAt
+					})
+					.ToList()
 			};
 
 			return View(model);
+		}
+
+		// Tải lên 1 file bill (PDF, ảnh scan, ...) đính kèm cho Sales Order
+		[Route("UploadBill/{id}")]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> UploadBill(int id, Microsoft.AspNetCore.Http.IFormFile? billFile)
+		{
+			var order = await _salesOrderService.GetByIdAsync(id);
+			if (order == null)
+			{
+				return NotFound();
+			}
+
+			if (billFile == null || billFile.Length == 0)
+			{
+				TempData["Error"] = "Vui lòng chọn file bill để tải lên.";
+				return RedirectToAction(nameof(Details), new { id });
+			}
+
+			try
+			{
+				using var stream = billFile.OpenReadStream();
+				var relativePath = await _storageProvider.SaveFileAsync(stream, "SaleBills", billFile.FileName);
+
+				var bill = new SalesOrderBill
+				{
+					OrderId = order.Id,
+					BillUrl = relativePath
+				};
+				await _soBillRepository.AddAsync(bill);
+			}
+			catch
+			{
+				TempData["Error"] = "Không thể lưu file bill. Vui lòng thử lại.";
+			}
+
+			return RedirectToAction(nameof(Details), new { id });
+		}
+
+		// Xóa 1 file bill đính kèm (chỉ xóa record; file vật lý trên ổ cứng được giữ lại)
+		[Route("DeleteBill/{id}")]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteBill(int id, int billId)
+		{
+			var order = await _salesOrderService.GetByIdAsync(id);
+			if (order == null)
+			{
+				return NotFound();
+			}
+
+			var bill = await _soBillRepository.GetByIdAsync(billId);
+			if (bill != null && bill.OrderId == order.Id)
+			{
+				await _soBillRepository.DeleteAsync(billId);
+			}
+
+			return RedirectToAction(nameof(Details), new { id });
 		}
 
 		[HttpGet]

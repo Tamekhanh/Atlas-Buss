@@ -24,7 +24,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IInventoryTransactionRepository, InventoryTransactionRepository>();
         services.AddScoped<ISalesOrderRepository, SalesOrderRepository>();
         services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
-        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IPurchaseOrderBillRepository, PurchaseOrderBillRepository>();
+        services.AddScoped<ISalesOrderBillRepository, SalesOrderBillRepository>();        services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ITaxRepository, TaxRepository>();
         services.AddScoped<IPricelistRepository, PricelistRepository>();
         services.AddScoped<IAuthRepository, AuthRepository>();
@@ -32,6 +33,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IStorageProvider, LocalStorageProvider>();
         services.AddScoped<IPartyRepository, PartyRepository>();
         services.AddScoped<IImageRepository, ImageRepository>();
+        services.AddScoped<IAttributeRepository, AttributeRepository>();
 
         return services;
     }

@@ -92,7 +92,12 @@ builder.Services.AddAuthorization(options =>
         policy.RequireClaim("permission", "SALE_MANAGE", "ADMIN"));
     options.AddPolicy("SaleView", policy =>
         policy.RequireClaim("permission", "SALE_MANAGE", "SALE_VIEW"));
-    
+
+    options.AddPolicy("AttributeManage", policy =>
+        policy.RequireClaim("permission", "PRODUCT_MANAGE", "ADMIN"));
+    options.AddPolicy("AttributeView", policy =>
+        policy.RequireClaim("permission", "PRODUCT_MANAGE", "ADMIN"));
+
 });
 
 builder.Services.AddAtlasInfrastructure(builder.Configuration);
@@ -193,6 +198,12 @@ app.MapAreaControllerRoute(
     areaName: "Sale",
     pattern: "Sale/{action=Index}/{id?}",
     defaults: new { controller = "SaleOrder" });
+
+app.MapAreaControllerRoute(
+    name: "attributes",
+    areaName: "Attributes",
+    pattern: "Attributes/{action=Index}/{id?}",
+    defaults: new { controller = "Attribute" });
 
 app.MapGet("/", (HttpContext context) =>
     context.User.Identity?.IsAuthenticated == true

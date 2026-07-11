@@ -4,6 +4,7 @@ using Atlas.Web.Areas.Party.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace Atlas.Web.Areas.Party.Controllers
 {
@@ -11,10 +12,12 @@ namespace Atlas.Web.Areas.Party.Controllers
     public class PartyController : Controller
     {
         private readonly IPartyRepository _partyRepository;
+        private readonly ILogService _logService;
 
-        public PartyController(IPartyRepository partyRepository)
+        public PartyController(IPartyRepository partyRepository, ILogService logService)
         {
             _partyRepository = partyRepository;
+            _logService = logService;
         }
 
         // GET: /Party/Party/Index
@@ -90,6 +93,13 @@ namespace Atlas.Web.Areas.Party.Controllers
                 }
             };
 
+            //LOG
+            var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(employeeIdValue, out var employeeId))
+            {
+                await _logService.AddLogAsync(employeeId, $"Created new party: {newParty.DisplayName} (ID: {newParty.Id})");
+            }
+
             await _partyRepository.AddAsync(newParty);
             return RedirectToAction(nameof(Index));
         }
@@ -112,7 +122,17 @@ namespace Atlas.Web.Areas.Party.Controllers
         {
             try
             {
+                var party = await _partyRepository.GetByIdAsync(id);
+                if (party == null) return NotFound();
+
                 await _partyRepository.DeleteAsync(id);
+
+                //LOG
+                var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (int.TryParse(employeeIdValue, out var employeeId))
+                {
+                    await _logService.AddLogAsync(employeeId, $"Deleted party: {party.DisplayName} (ID: {party.Id})");
+                }
                 TempData["SuccessMessage"] = "Party deleted successfully!";
                 return RedirectToAction(nameof(Index));
             }
@@ -124,6 +144,6 @@ namespace Atlas.Web.Areas.Party.Controllers
             }
         }
 
-        
+
     }
 }

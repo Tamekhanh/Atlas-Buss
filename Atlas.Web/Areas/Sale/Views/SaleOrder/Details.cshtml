@@ -98,6 +98,55 @@
 		</tfoot>
 	</table>
 
+	<h5 class="mt-4">Bills</h5>
+
+	<form asp-action="UploadBill" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" class="d-flex gap-2 align-items-center mb-3">
+		@Html.AntiForgeryToken()
+		<input type="file" name="billFile" class="form-control" required />
+		<button type="submit" class="btn btn-primary btn-sm">+ Add Bill</button>
+	</form>
+
+	@if (!Model.Bills.Any())
+	{
+		<p class="text-muted">No bills attached to this order.</p>
+	}
+	else
+	{
+		<table class="table table-bordered table-sm">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>File</th>
+					<th class="text-end">Uploaded At</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var bill in Model.Bills)
+				{
+					<tr>
+						<td>@bill.Id</td>
+						<td>
+							<a href="/file-storage/@bill.BillUrl" target="_blank" rel="noopener">View bill</a>
+							<small class="text-muted d-block">@bill.BillUrl</small>
+						</td>
+						<td class="text-end">@bill.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+						<td class="text-end">
+							<form asp-action="DeleteBill" asp-route-id="@Model.Id" method="post" class="d-inline">
+								@Html.AntiForgeryToken()
+								<input type="hidden" name="billId" value="@bill.Id" />
+								<button type="submit" class="btn btn-danger btn-sm"
+										onclick="return confirm('Delete this bill record? (The file on disk is kept.)')">
+									Delete
+								</button>
+							</form>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	}
+
 	<div class="text-end mt-3">
 		<a asp-action="Index" class="btn btn-secondary">Back to List</a>
 	</div>

@@ -14,7 +14,18 @@
             <div class="col-md-3">
                 <label>Vendor</label>
                 <select asp-for="VendorId" class="form-control">
-                    <option value="1">Vendor A</option>
+                    <option value="">-- Select vendor --</option>
+                    @foreach (var vendor in Model.Vendors)
+                    {
+                        if (vendor.Id == Model.VendorId)
+                        {
+                            <option value="@vendor.Id" selected="selected">@vendor.Id - @vendor.DisplayName</option>
+                        }
+                        else
+                        {
+                            <option value="@vendor.Id">@vendor.Id - @vendor.DisplayName</option>
+                        }
+                    }
                 </select>
                 <span asp-validation-for="VendorId" class="text-danger"></span>
             </div>
@@ -67,7 +78,20 @@
                             <select name="OrderDetails[@i].VariantId" class="form-control variant-select" data-selected-variant="@detail.VariantId"></select>
                         </td>
                         <td>
-                            <input name="OrderDetails[@i].WarehouseId" class="form-control" value="@detail.WarehouseId" required />
+                            <select name="OrderDetails[@i].WarehouseId" class="form-control warehouse-select" required>
+                                <option value="">-- Select warehouse --</option>
+                                @foreach (var warehouse in Model.Warehouses)
+                                {
+                                    if (warehouse.Id == detail.WarehouseId)
+                                    {
+                                        <option value="@warehouse.Id" selected="selected">@warehouse.WarehouseName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@warehouse.Id">@warehouse.WarehouseName</option>
+                                    }
+                                }
+                            </select>
                         </td>
                         <td>
                             <input name="OrderDetails[@i].Quantity" class="form-control qty" type="number" value="@detail.Quantity" min="1" />
@@ -100,10 +124,19 @@
 @section Scripts {
     <script>
         const purchaseCatalog = @Html.Raw(JsonSerializer.Serialize(Model.Products));
+        const warehouses = @Html.Raw(JsonSerializer.Serialize(Model.Warehouses));
+
+        function buildWarehouseOptions(selectedWarehouseId) {
+            const options = ['<option value="">-- Select warehouse --</option>'];
+            for (const warehouse of warehouses) {
+                const selected = warehouse.Id === selectedWarehouseId ? ' selected' : '';
+                options.push(`<option value="${warehouse.Id}"${selected}>${warehouse.WarehouseName}</option>`);
+            }
+            return options.join('');
+        }
 
         function buildVariantOptions(productId, selectedVariantId) {
-            const product = purchaseCatalog.find(p => p.Id === productId);
-            if (!product || !product.Variants) {
+            const product = purchaseCatalog.find(p => p.Id === productId);            if (!product || !product.Variants) {
                 return '<option value="">-- Select SKU --</option>';
             }
 
@@ -192,7 +225,9 @@
                         </select>
                     </td>
                     <td>
-                        <input name="OrderDetails[${rowIndex}].WarehouseId" class="form-control" required />
+                        <select name="OrderDetails[${rowIndex}].WarehouseId" class="form-control warehouse-select" required>
+                            ${buildWarehouseOptions(0)}
+                        </select>
                     </td>
                     <td>
                         <input name="OrderDetails[${rowIndex}].Quantity" class="form-control qty" type="number" value="1" min="1" />

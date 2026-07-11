@@ -14,14 +14,20 @@ namespace Atlas.Web.Controllers
         private readonly IPurchaseOrderService _poService;
         private readonly IProductRepository _productRepository;
         private readonly IWarehouseRepository _warehouseRepository;
+        private readonly IPartyRepository _partyRepository;
+        private readonly IStorageProvider _storageProvider;
+        private readonly IPurchaseOrderBillRepository _poBillRepository;
         // private readonly IVendorRepository _vendorRepo;
         // private readonly IProductVariantRepository _variantRepo;
 
-        public PurchaseOrderController(IPurchaseOrderService poService, IProductRepository productRepository, IWarehouseRepository warehouseRepository)
+        public PurchaseOrderController(IPurchaseOrderService poService, IProductRepository productRepository, IWarehouseRepository warehouseRepository, IPartyRepository partyRepository, IStorageProvider storageProvider, IPurchaseOrderBillRepository poBillRepository)
         {
             _poService = poService;
             _productRepository = productRepository;
             _warehouseRepository = warehouseRepository;
+            _partyRepository = partyRepository;
+            _storageProvider = storageProvider;
+            _poBillRepository = poBillRepository;
         }
         [Route("Index")]
         [HttpGet]
@@ -91,10 +97,77 @@ namespace Atlas.Web.Controllers
                 TotalDiscount = lines.Sum(l => l.Discount),
                 TotalTax = lines.Sum(l => l.TaxAmount),
                 GrandTotal = lines.Sum(l => l.LineTotal),
-                Lines = lines
+                Lines = lines,
+                Bills = (await _poBillRepository.GetByOrderIdAsync(order.Id))
+                    .Select(b => new PurchaseOrderBillVM
+                    {
+                        Id = b.Id,
+                        BillUrl = b.BillUrl,
+                        CreatedAt = b.CreatedAt
+                    })
+                    .ToList()
             };
 
             return View(model);
+        }
+
+        // Tải lên 1 file bill (PDF, ảnh scan, ...) đính kèm cho Purchase Order
+        [Route("UploadBill/{id}")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadBill(int id, Microsoft.AspNetCore.Http.IFormFile? billFile)
+        {
+            var order = await _poService.GetByIdAsync(id);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            if (billFile == null || billFile.Length == 0)
+            {
+                TempData["Error"] = "Vui lòng chọn file bill để tải lên.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            try
+            {
+                using var stream = billFile.OpenReadStream();
+                var relativePath = await _storageProvider.SaveFileAsync(stream, "PurchaseBills", billFile.FileName);
+
+                var bill = new PurchaseOrderBill
+                {
+                    OrderId = order.Id,
+                    BillUrl = relativePath
+                };
+                await _poBillRepository.AddAsync(bill);
+            }
+            catch
+            {
+                TempData["Error"] = "Không thể lưu file bill. Vui lòng thử lại.";
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        // Xóa 1 file bill đính kèm (chỉ xóa record; file vật lý trên ổ cứng được giữ lại)
+        [Route("DeleteBill/{id}")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteBill(int id, int billId)
+        {
+            var order = await _poService.GetByIdAsync(id);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            var bill = await _poBillRepository.GetByIdAsync(billId);
+            if (bill != null && bill.OrderId == order.Id)
+            {
+                await _poBillRepository.DeleteAsync(billId);
+            }
+
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         [Route("Create")]
@@ -152,6 +225,15 @@ namespace Atlas.Web.Controllers
 
         private async Task PopulateCreateLookupsAsync(PurchaseOrderCreateVM model)
         {
+            var vendors = await _partyRepository.GetVendorsAsync();
+            model.Vendors = vendors
+                .Select(vendor => new PurchaseOrderVendorLookupVM
+                {
+                    Id = vendor.Id,
+                    DisplayName = vendor.DisplayName
+                })
+                .ToList();
+
             var products = await _productRepository.GetAllWithVariantsAsync();
             model.Products = products
                 .Select(product => new PurchaseOrderProductLookupVM
@@ -167,6 +249,16 @@ namespace Atlas.Web.Controllers
                             VariantPrice = variant.VariantPrice
                         })
                         .ToList()
+                })
+                .ToList();
+
+            var warehouses = await _warehouseRepository.GetAllAsync();
+            model.Warehouses = warehouses
+                .Where(warehouse => !warehouse.IsDeleted)
+                .Select(warehouse => new PurchaseOrderWarehouseLookupVM
+                {
+                    Id = warehouse.Id,
+                    WarehouseName = warehouse.WarehouseName
                 })
                 .ToList();
         }

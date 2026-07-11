@@ -21,9 +21,11 @@ namespace Atlas.Infrastructure
         public DbSet<SalesOrderStatuses> SalesOrderStatuses { get; set; }
         public DbSet<SalesOrder> SalesOrders { get; set; }
         public DbSet<SalesOrderDetail> SalesOrderDetails { get; set; }
+        public DbSet<SalesOrderBill> SalesOrderBills { get; set; }
         public DbSet<PurchaseOrderStatuses> PurchaseOrderStatuses { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         public DbSet<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
+        public DbSet<PurchaseOrderBill> PurchaseOrderBills { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Warehouse> Warehouses { get; set; }
@@ -302,6 +304,32 @@ namespace Atlas.Infrastructure
                 entity.HasKey(i => i.Id);
                 entity.Property(i => i.ImageUrl).IsRequired().HasMaxLength(255);
                 entity.Property(i => i.CreatedAt).HasDefaultValueSql("GETDATE()");
+            });
+
+            modelBuilder.Entity<PurchaseOrderBill>(entity =>
+            {
+                entity.ToTable("PurchaseOrderBills", "dbo");
+                entity.HasKey(b => b.Id);
+                entity.Property(b => b.BillUrl).IsRequired().HasMaxLength(255);
+                entity.Property(b => b.CreatedAt).HasDefaultValueSql("GETDATE()");
+
+                entity.HasOne(b => b.PurchaseOrder)
+                    .WithMany()
+                    .HasForeignKey(b => b.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<SalesOrderBill>(entity =>
+            {
+                entity.ToTable("SalesOrderBills", "dbo");
+                entity.HasKey(b => b.Id);
+                entity.Property(b => b.BillUrl).IsRequired().HasMaxLength(255);
+                entity.Property(b => b.CreatedAt).HasDefaultValueSql("GETDATE()");
+
+                entity.HasOne(b => b.SalesOrder)
+                    .WithMany()
+                    .HasForeignKey(b => b.OrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
 

@@ -82,9 +82,7 @@ namespace Atlas.Core.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)] 
         public decimal SubTotal { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)] 
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public decimal LineTotal { get; set; }
-
-        public string? BillUrl { get; set; }
     }
 }
