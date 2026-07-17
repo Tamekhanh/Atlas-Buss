@@ -1,0 +1,135 @@
+@model Atlas.Core.Entities.Warehouse
+@{
+    ViewData["Title"] = "Warehouse Details";
+
+    var managerName = ViewData["ManagerName"] as string;
+    var address = ViewData["Address"] as Atlas.Core.Entities.Addresses;
+    var stockLines = ViewData["StockLines"] as IEnumerable<Atlas.Web.Areas.Warehouse.Models.WarehouseStockLineViewModel> ?? Enumerable.Empty<Atlas.Web.Areas.Warehouse.Models.WarehouseStockLineViewModel>();
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>@Model.WarehouseName</h2>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-light"><strong>Information</strong></div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Name</dt>
+                        <dd class="col-sm-8">@Model.WarehouseName</dd>
+
+                        <dt class="col-sm-4">Manager</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrEmpty(managerName) ? "—" : managerName)</dd>
+
+                        <dt class="col-sm-4">Created</dt>
+                        <dd class="col-sm-8">@Model.CreatedAt.ToShortDateString()</dd>
+
+                        <dt class="col-sm-4">Status</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.IsDeleted)
+                            {
+                                <span class="badge bg-danger">Deleted</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light"><strong>Address</strong></div>
+                <div class="card-body">
+                    @if (address == null)
+                    {
+                        <span class="text-muted">No address recorded.</span>
+                    }
+                    else
+                    {
+                        <dl class="row mb-0">
+                            <dt class="col-sm-3">Type</dt>
+                            <dd class="col-sm-9">@address.AddressType</dd>
+
+                            <dt class="col-sm-3">Street</dt>
+                            <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(address.Street) ? "—" : address.Street)</dd>
+
+                            <dt class="col-sm-3">City</dt>
+                            <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(address.City) ? "—" : address.City)</dd>
+
+                            <dt class="col-sm-3">State</dt>
+                            <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(address.State) ? "—" : address.State)</dd>
+
+                            <dt class="col-sm-3">Country</dt>
+                            <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(address.Country) ? "—" : address.Country)</dd>
+                        </dl>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <strong>Inventory</strong>
+            <span class="badge bg-secondary">@stockLines.Count() item(s)</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>SKU</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Reserved</th>
+                            <th>Available</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!stockLines.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">No stock recorded for this warehouse.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var line in stockLines)
+                            {
+                                <tr>
+                                    <td>@(line.VariantSKU ?? "—")</td>
+                                    <td>@(line.ProductName ?? "—")</td>
+                                    <td>@line.Quantity</td>
+                                    <td>@line.ReservedQuantity</td>
+                                    <td>
+                                        @if (line.AvailableQuantity > 0)
+                                        {
+                                            <span class="badge bg-success">@line.AvailableQuantity</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">@line.AvailableQuantity</span>
+                                        }
+                                    </td>
+                                    <td>@line.LastUpdated.ToShortDateString()</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

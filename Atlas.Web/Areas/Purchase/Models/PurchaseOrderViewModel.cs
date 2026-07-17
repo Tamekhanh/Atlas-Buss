@@ -45,7 +45,6 @@ namespace Atlas.Web.Areas.PurchaseOrder.Models
 
     public class PurchaseOrderCreateVM
     {
-        [Required]
         public string PONumber { get; set; } = string.Empty;
         [Required]
         public int VendorId { get; set; }

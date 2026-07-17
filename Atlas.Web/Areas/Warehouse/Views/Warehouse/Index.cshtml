@@ -1,0 +1,100 @@
+@model IEnumerable<Atlas.Web.Areas.Warehouse.Models.WarehouseListViewModel>
+@{
+    ViewData["Title"] = "Warehouses";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Warehouse List</h2>
+        <a asp-action="Create" class="btn btn-primary">Create New Warehouse</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="table-responsive shadow-sm rounded-3 bg-white">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Warehouse Name</th>
+                    <th>Manager</th>
+                    <th>City</th>
+                    <th>Country</th>
+                    <th>Items In Stock</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td><strong>@item.WarehouseName</strong></td>
+                        <td>@(item.ManagerName ?? "—")</td>
+                        <td>@(item.City ?? "—")</td>
+                        <td>@(item.Country ?? "—")</td>
+                        <td>
+                            <span class="badge bg-secondary">@item.InventoryItemCount</span>
+                        </td>
+                        <td>@item.CreatedAt.ToShortDateString()</td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-info text-white">Details</a>
+                            <a asp-action="Edit" asp-route-id="@item.Id"
+                               class="btn btn-sm btn-warning">Edit</a>
+                            <button type="button" class="btn btn-sm btn-danger"
+                                    onclick="confirmDelete(@item.Id, '@item.WarehouseName')">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Form ẩn để gửi request soft-delete bằng POST (chống CSRF) -->
+<form id="deleteForm" asp-action="DeleteConfirmed" method="post" style="display:none;">
+    <input type="hidden" name="id" id="deleteWarehouseId" />
+    @Html.AntiForgeryToken()
+</form>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(id, name) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to delete "${name}". This action cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    submitDeleteForm(id);
+                }
+            });
+        }
+
+        function submitDeleteForm(id) {
+            document.getElementById('deleteWarehouseId').value = id;
+            document.getElementById('deleteForm').submit();
+        }
+    </script>
+}

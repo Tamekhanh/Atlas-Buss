@@ -12,6 +12,7 @@
     var categoryView = (await AuthorizationService.AuthorizeAsync(User, "CategoryView")).Succeeded;
     var purchaseView = (await AuthorizationService.AuthorizeAsync(User, "PurchaseView")).Succeeded;
     var saleView = (await AuthorizationService.AuthorizeAsync(User, "SaleView")).Succeeded;
+    var warehouseView = (await AuthorizationService.AuthorizeAsync(User, "WarehouseView")).Succeeded;
     var adminView = (await AuthorizationService.AuthorizeAsync(User, "Administration")).Succeeded;
 }
 
@@ -76,11 +77,19 @@
                 </a>
             }
 
+            @if(warehouseView)
+            {
+                <a href="/Warehouse/Index" class="home-btn-container text-decoration-none">
+                    <div class="home-btn"><img src="~/public/Warehouse.png" alt="Warehouse" /></div>
+                    <div class="home-btn-text">Warehouse</div>
+                </a>
+            }
+
             @if (adminView)
             {
                 <a href="/Setting" class="home-btn-container text-decoration-none">
                     <div class="home-btn"><img src="~/public/Setting.png" alt="Admin" /></div>
-                    <div class="home-btn-text">Admin</div>
+                    <div class="home-btn-text">Settings</div>
                 </a>
             }
 

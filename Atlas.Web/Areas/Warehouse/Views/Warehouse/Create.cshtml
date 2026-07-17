@@ -1,0 +1,72 @@
+@model Atlas.Web.Areas.Warehouse.Models.WarehouseCreateViewModel
+@{
+    ViewData["Title"] = Model.Id == 0 ? "Create New Warehouse" : "Edit Warehouse";
+    var managers = ViewBag.Managers as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>;
+}
+
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    <form asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="mb-3">Warehouse Information</h4>
+
+                <div class="mb-3">
+                    <label asp-for="WarehouseName" class="form-label">Warehouse Name <span class="text-danger">*</span></label>
+                    <input asp-for="WarehouseName" class="form-control" placeholder="e.g. Main Warehouse - Hanoi" />
+                    <span asp-validation-for="WarehouseName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ManagerId" class="form-label">Manager</label>
+                    <select asp-for="ManagerId" class="form-select" asp-items="managers">
+                        <option value="">— No manager —</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h4 class="mb-3">Address</h4>
+
+                <div class="mb-3">
+                    <label asp-for="AddressType" class="form-label">Address Type</label>
+                    <input asp-for="AddressType" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Street" class="form-label">Street</label>
+                    <input asp-for="Street" class="form-control" />
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="City" class="form-label">City / District / Province</label>
+                        <input asp-for="City" class="form-control" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="State" class="form-label">State / Province</label>
+                        <input asp-for="State" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Country" class="form-label">Country</label>
+                    <input asp-for="Country" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 mb-5 border-top pt-3">
+            <button type="submit" class="btn btn-success px-4">Save</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -28,18 +28,21 @@ INSERT INTO dbo.Permissions (PermissionKey, Description) VALUES
 ('PURCHASE_MANAGE', 'Manage purchase orders'),                       -- Id: 10
 ('PURCHASE_VIEW', 'View purchase orders'),                           -- Id: 11
 ('SALE_MANAGE', 'Manage sales orders'),                              -- Id: 12
-('SALE_VIEW', 'View sales orders');                                  -- Id: 13
+('SALE_VIEW', 'View sales orders'),                                  -- Id: 13
+('WAREHOUSE_MANAGE', 'Create, edit, and delete warehouses/stock'),   -- Id: 14
+('WAREHOUSE_VIEW', 'View warehouses and stock');                     -- Id: 15
 
 -- 3. Map Roles to Permissions Logically
 INSERT INTO dbo.RolePermissions (RoleId, PermissionId) VALUES 
--- Administrator (Role 1) gets ADMIN, which usually bypasses everything, 
+-- Administrator (Role 1) gets ADMIN, which usually bypasses everything,
 -- but you can explicitly grant all if your architecture requires it.
-(1, 1), (1, 2), (1, 4), (1, 6), (1, 8), (1, 10), (1, 12), -- Full access
+(1, 1), (1, 2), (1, 4), (1, 6), (1, 8), (1, 10), (1, 12), (1, 14), -- Full access
 
 -- Sales Staff (Role 2) gets Sales and Product View permissions
 (2, 12), (2, 13), -- SALE_MANAGE, SALE_VIEW
 (2, 3),           -- PRODUCT_VIEW
 (2, 9),           -- CATEGORY_VIEW
+(2, 15),          -- WAREHOUSE_VIEW
 
 -- HR Manager (Role 3) gets HR permissions
 (3, 4), (3, 5),   -- HR_MANAGE, HR_VIEW
@@ -48,7 +51,7 @@ INSERT INTO dbo.RolePermissions (RoleId, PermissionId) VALUES
 (4, 2), (4, 3),   -- PRODUCT_MANAGE, PRODUCT_VIEW
 (4, 8), (4, 9),   -- CATEGORY_MANAGE, CATEGORY_VIEW
 
-(5, 3), (5, 5), (5, 7), (5, 9), (5, 11), (5, 13);   -- Viewer role gets PARTY_VIEW and SALE_VIEW
+(5, 3), (5, 5), (5, 7), (5, 9), (5, 11), (5, 13), (5, 15);   -- Viewer role gets view-only permissions incl. WAREHOUSE_VIEW
 
 -- Seed Statuses & Lookups
 INSERT INTO dbo.SalesOrderStatuses (StatusName, Description) VALUES 

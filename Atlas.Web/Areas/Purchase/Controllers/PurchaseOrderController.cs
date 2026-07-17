@@ -17,10 +17,11 @@ namespace Atlas.Web.Controllers
         private readonly IPartyRepository _partyRepository;
         private readonly IStorageProvider _storageProvider;
         private readonly IPurchaseOrderBillRepository _poBillRepository;
+        private readonly IDocumentNumberService _documentNumberService;
         // private readonly IVendorRepository _vendorRepo;
         // private readonly IProductVariantRepository _variantRepo;
 
-        public PurchaseOrderController(IPurchaseOrderService poService, IProductRepository productRepository, IWarehouseRepository warehouseRepository, IPartyRepository partyRepository, IStorageProvider storageProvider, IPurchaseOrderBillRepository poBillRepository)
+        public PurchaseOrderController(IPurchaseOrderService poService, IProductRepository productRepository, IWarehouseRepository warehouseRepository, IPartyRepository partyRepository, IStorageProvider storageProvider, IPurchaseOrderBillRepository poBillRepository, IDocumentNumberService documentNumberService)
         {
             _poService = poService;
             _productRepository = productRepository;
@@ -28,6 +29,7 @@ namespace Atlas.Web.Controllers
             _partyRepository = partyRepository;
             _storageProvider = storageProvider;
             _poBillRepository = poBillRepository;
+            _documentNumberService = documentNumberService;
         }
         [Route("Index")]
         [HttpGet]
@@ -172,10 +174,14 @@ namespace Atlas.Web.Controllers
 
         [Route("Create")]
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var model = new PurchaseOrderCreateVM();
-            PopulateCreateLookupsAsync(model).GetAwaiter().GetResult();
+            await PopulateCreateLookupsAsync(model);
+
+            // Hiển thị sẵn số PO tiếp theo (chỉ để tham khảo, hệ thống tự sinh khi lưu).
+            model.PONumber = await _documentNumberService.GeneratePurchaseOrderNumberAsync();
+
             return View(model);
         }
 
@@ -186,11 +192,13 @@ namespace Atlas.Web.Controllers
         {
             await PopulateCreateLookupsAsync(model);
 
+            // Số PO do hệ thống tự sinh tuần tự, bỏ qua giá trị người dùng nhập (chỉ nhập tay nếu muốn nhưng không khuyến khích).
+            // Nếu ModelState lỗi do các trường khác thì vẫn phải trả lại view; tạm bỏ [Required] trên PONumber để không chặn.
             if (!ModelState.IsValid) return View(model);
 
             var po = new PurchaseOrder
             {
-                PONumber = model.PONumber,
+                PONumber = await _documentNumberService.GeneratePurchaseOrderNumberAsync(),
                 VendorId = model.VendorId,
                 OrderDate = model.OrderDate,
                 OrderStatusId = model.OrderStatusId,

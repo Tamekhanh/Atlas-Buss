@@ -93,6 +93,11 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("SaleView", policy =>
         policy.RequireClaim("permission", "SALE_MANAGE", "SALE_VIEW"));
 
+    options.AddPolicy("WarehouseManage", policy =>
+        policy.RequireClaim("permission", "WAREHOUSE_MANAGE", "ADMIN"));
+    options.AddPolicy("WarehouseView", policy =>
+        policy.RequireClaim("permission", "WAREHOUSE_MANAGE", "WAREHOUSE_VIEW"));
+
     options.AddPolicy("AttributeManage", policy =>
         policy.RequireClaim("permission", "PRODUCT_MANAGE", "ADMIN"));
     options.AddPolicy("AttributeView", policy =>
@@ -198,6 +203,12 @@ app.MapAreaControllerRoute(
     areaName: "Sale",
     pattern: "Sale/{action=Index}/{id?}",
     defaults: new { controller = "SaleOrder" });
+
+app.MapAreaControllerRoute(
+    name: "warehouse",
+    areaName: "Warehouse",
+    pattern: "Warehouse/{action=Index}/{id?}",
+    defaults: new { controller = "Warehouse" });
 
 app.MapAreaControllerRoute(
     name: "attributes",

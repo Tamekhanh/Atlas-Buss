@@ -60,6 +60,16 @@ namespace Atlas.Infrastructure.Repositories
                 .FirstOrDefaultAsync(o => o.PONumber == poNumber);
         }
 
+        public async Task<IEnumerable<string>> GetAllNumbersAsync()
+        {
+            // Chỉ lấy cột số PO (bỏ qua bản ghi đã xóa mềm) để tối ưu.
+            return await _context.PurchaseOrders
+                .Where(o => !o.IsDeleted)
+                .Select(o => o.PONumber)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<bool> AddAsync(PurchaseOrder order)
         {
             await _context.PurchaseOrders.AddAsync(order);

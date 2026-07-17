@@ -56,6 +56,9 @@
     <Folder Include="Areas\Setting\Data\" />
     <Folder Include="Areas\Setting\Models\" />
     <Folder Include="Areas\Setting\Views\" />
+    <Folder Include="Areas\Warehouse\Controllers\" />
+    <Folder Include="Areas\Warehouse\Models\" />
+    <Folder Include="Areas\Warehouse\Views\" />
   </ItemGroup>
 
 </Project>

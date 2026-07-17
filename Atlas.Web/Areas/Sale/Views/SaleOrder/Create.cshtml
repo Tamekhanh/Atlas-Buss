@@ -14,7 +14,8 @@
 		<div class="row mb-3">
 			<div class="col-md-3">
 				<label asp-for="OrderNumber" class="form-label"></label>
-				<input asp-for="OrderNumber" class="form-control" />
+				<input asp-for="OrderNumber" class="form-control" readonly />
+				<small class="text-muted">Auto-generated on save</small>
 				<span asp-validation-for="OrderNumber" class="text-danger"></span>
 			</div>
 			<div class="col-md-3">
@@ -73,11 +74,19 @@
 						<tr>
 							<td>
 								<input type="hidden" name="OrderDetails.Index" value="@i" />
+								<select name="OrderDetails[@i].ProductId" class="form-control product-select" data-selected-product="@detail.VariantId">
+									<option value="">-- Select product --</option>
+									@foreach (var product in Model.Products)
+									{
+										<option value="@product.Id">@product.ProductName</option>
+									}
+								</select>
+							</td>
+							<td>
 								<select name="OrderDetails[@i].VariantId" class="form-control variant-select" data-selected-variant="@detail.VariantId">
 									<option value="">-- Select SKU --</option>
 								</select>
 							</td>
-							<td class="variant-sku"></td>
 							<td>
 								<select name="OrderDetails[@i].WarehouseId" class="form-control warehouse-select" required>
 									<option value="">-- Select warehouse --</option>
@@ -128,15 +137,16 @@
 		const saleCatalog = @Html.Raw(JsonSerializer.Serialize(Model.Products));
 		const warehouses = @Html.Raw(JsonSerializer.Serialize(Model.Warehouses));
 
-		function buildVariantOptions(selectedVariantId) {
-			const options = ['<option value="">-- Select SKU --</option>'];
+		function buildVariantOptions(productId, selectedVariantId) {
+			const product = saleCatalog.find(p => p.Id === productId);
+			if (!product || !product.Variants) {
+				return '<option value="">-- Select SKU --</option>';
+			}
 
-			for (const product of saleCatalog) {
-				for (const variant of (product.Variants || [])) {
-					const selected = variant.Id === selectedVariantId ? ' selected' : '';
-					const priceText = variant.VariantPrice !== null && variant.VariantPrice !== undefined ? ` - ${variant.VariantPrice}` : '';
-					options.push(`<option value="${variant.Id}" data-product-id="${product.Id}" data-sku="${variant.SKU}" data-price="${variant.VariantPrice ?? ''}"${selected}>${product.ProductName} / ${variant.SKU}${priceText}</option>`);
-				}
+			const options = ['<option value="">-- Select SKU --</option>'];
+			for (const variant of product.Variants) {
+				const selected = variant.Id === selectedVariantId ? ' selected' : '';
+				options.push(`<option value="${variant.Id}" data-price="${variant.VariantPrice ?? ''}"${selected}>${variant.SKU}</option>`);
 			}
 
 			return options.join('');
@@ -161,37 +171,45 @@
 		}
 
 		function wireRow(row) {
+			const productSelect = row.querySelector('.product-select');
 			const variantSelect = row.querySelector('.variant-select');
-			const skuCell = row.querySelector('.variant-sku');
 
-			if (variantSelect) {
+			if (productSelect && variantSelect) {
+				// Trường hợp edit: chỉ có VariantId của detail, cần suy ra ProductId tương ứng.
 				const selectedVariantId = parseInt(variantSelect.dataset.selectedVariant || '0');
-				variantSelect.innerHTML = buildVariantOptions(selectedVariantId);
-
-				variantSelect.addEventListener('change', function () {
-					const option = this.options[this.selectedIndex];
-					const price = option ? parseFloat(option.dataset.price || '0') : 0;
-					const sku = option ? option.dataset.sku || '' : '';
-					if (!Number.isNaN(price)) {
-						row.querySelector('.price').value = price;
+				if (selectedVariantId && !productSelect.value) {
+					const variant = saleCatalog
+						.flatMap(p => p.Variants || [])
+						.find(v => v.Id === selectedVariantId);
+					if (variant) {
+						productSelect.value = variant.ProductId.toString();
 					}
+				}
 
-					if (skuCell) {
-						skuCell.innerText = sku;
-					}
+				const selectedProductId = parseInt(productSelect.value || '0');
+				variantSelect.innerHTML = buildVariantOptions(selectedProductId, selectedVariantId);
 
+				productSelect.addEventListener('change', function () {
+					const productId = parseInt(this.value || '0');
+					variantSelect.innerHTML = buildVariantOptions(productId, 0);
+					variantSelect.value = '';
 					recalculateRow(row);
 				});
 
-				const selectedOption = variantSelect.options[variantSelect.selectedIndex];
-				if (selectedOption) {
-					const price = parseFloat(selectedOption.dataset.price || '0');
-					const sku = selectedOption.dataset.sku || '';
-					if (!Number.isNaN(price) && price > 0) {
+				variantSelect.addEventListener('change', function () {
+					const selectedOption = this.options[this.selectedIndex];
+					const price = selectedOption ? parseFloat(selectedOption.dataset.price || '0') : 0;
+					if (!Number.isNaN(price)) {
 						row.querySelector('.price').value = price;
 					}
-					if (skuCell) {
-						skuCell.innerText = sku;
+					recalculateRow(row);
+				});
+
+				if (variantSelect.value) {
+					const selectedOption = variantSelect.options[variantSelect.selectedIndex];
+					const price = selectedOption ? parseFloat(selectedOption.dataset.price || '0') : 0;
+					if (!Number.isNaN(price) && price > 0) {
+						row.querySelector('.price').value = price;
 					}
 				}
 			}
@@ -207,11 +225,16 @@
 				<tr>
 					<td>
 						<input type="hidden" name="OrderDetails.Index" value="${rowIndex}" />
+						<select name="OrderDetails[${rowIndex}].ProductId" class="form-control product-select" required>
+							<option value="">-- Select product --</option>
+							${saleCatalog.map(product => `<option value="${product.Id}">${product.ProductName}</option>`).join('')}
+						</select>
+					</td>
+					<td>
 						<select name="OrderDetails[${rowIndex}].VariantId" class="form-control variant-select" required>
 							<option value="">-- Select SKU --</option>
 						</select>
 					</td>
-					<td class="variant-sku"></td>
 					<td>
 						<select name="OrderDetails[${rowIndex}].WarehouseId" class="form-control warehouse-select" required>
 							${buildWarehouseOptions(0)}

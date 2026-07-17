@@ -18,6 +18,7 @@ namespace Atlas.Web.Areas.Sale.Controllers
 		private readonly IWarehouseRepository _warehouseRepository;
 		private readonly IStorageProvider _storageProvider;
 		private readonly ISalesOrderBillRepository _soBillRepository;
+		private readonly IDocumentNumberService _documentNumberService;
 
 		public SaleOrderController(
 			ISalesOrderService salesOrderService,
@@ -25,7 +26,8 @@ namespace Atlas.Web.Areas.Sale.Controllers
 			IProductRepository productRepository,
 			IWarehouseRepository warehouseRepository,
 			IStorageProvider storageProvider,
-			ISalesOrderBillRepository soBillRepository)
+			ISalesOrderBillRepository soBillRepository,
+			IDocumentNumberService documentNumberService)
 		{
 			_salesOrderService = salesOrderService;
 			_partyRepository = partyRepository;
@@ -33,6 +35,7 @@ namespace Atlas.Web.Areas.Sale.Controllers
 			_warehouseRepository = warehouseRepository;
 			_storageProvider = storageProvider;
 			_soBillRepository = soBillRepository;
+			_documentNumberService = documentNumberService;
 		}
 
 		[HttpGet]
@@ -182,6 +185,10 @@ namespace Atlas.Web.Areas.Sale.Controllers
 		{
 			var model = new SaleOrderCreateVM();
 			await PopulateCreateLookupsAsync(model);
+
+			// Hiển thị sẵn số SO tiếp theo (chỉ để tham khảo, hệ thống tự sinh khi lưu).
+			model.OrderNumber = await _documentNumberService.GenerateSalesOrderNumberAsync();
+
 			return View(model);
 		}
 
@@ -192,6 +199,7 @@ namespace Atlas.Web.Areas.Sale.Controllers
 		{
 			await PopulateCreateLookupsAsync(model);
 
+			// Số SO do hệ thống tự sinh tuần tự, bỏ qua giá trị người dùng nhập.
 			if (!ModelState.IsValid)
 			{
 				return View(model);
@@ -205,7 +213,7 @@ namespace Atlas.Web.Areas.Sale.Controllers
 
 			var salesOrder = new SalesOrder
 			{
-				OrderNumber = model.OrderNumber.Trim(),
+				OrderNumber = await _documentNumberService.GenerateSalesOrderNumberAsync(),
 				CustomerId = model.CustomerId,
 				OrderDate = model.OrderDate,
 				OrderStatusId = model.OrderStatusId,
@@ -264,7 +272,8 @@ namespace Atlas.Web.Areas.Sale.Controllers
 							Id = variant.Id,
 							ProductId = variant.ProductId,
 							SKU = variant.SKU,
-							VariantPrice = variant.VariantPrice
+							VariantPrice = variant.VariantPrice,
+							AttributeText = BuildAttributeText(variant)
 						})
 						.ToList()
 				})
@@ -290,6 +299,24 @@ namespace Atlas.Web.Areas.Sale.Controllers
 			}
 
 			return 0;
+		}
+
+		// Nối các giá trị thuộc tính của biến thể (vd: "Đỏ, L") để phân biệt các biến thể
+		// cùng tên sản phẩm trong dropdown chọn theo tên.
+		private static string BuildAttributeText(ProductVariant variant)
+		{
+			if (variant?.AttributeMappings == null || !variant.AttributeMappings.Any())
+			{
+				return string.Empty;
+			}
+
+			var values = variant.AttributeMappings
+				.Where(mapping => mapping.AttributeValue != null)
+				.Select(mapping => mapping.AttributeValue!.Value)
+				.Where(value => !string.IsNullOrWhiteSpace(value))
+				.ToList();
+
+			return string.Join(", ", values);
 		}
 	}
 }

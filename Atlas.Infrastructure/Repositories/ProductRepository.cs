@@ -38,6 +38,9 @@ namespace Atlas.Infrastructure.Repositories
         {
             return await _context.Products
                 .Include(product => product.Variants)
+                    .ThenInclude(variant => variant.AttributeMappings)
+                        .ThenInclude(mapping => mapping.AttributeValue)
+                            .ThenInclude(attributeValue => attributeValue.AttributeType)
                 .AsNoTracking()
                 .OrderBy(product => product.ProductName)
                 .ToListAsync();

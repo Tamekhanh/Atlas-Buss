@@ -9,6 +9,7 @@ namespace Atlas.Core.Interfaces
         Task<IEnumerable<SalesOrder>> GetAllAsync();
         Task<SalesOrder?> GetByIdAsync(int id);
         Task<SalesOrder?> GetByOrderNumberAsync(string orderNumber);
+        Task<IEnumerable<string>> GetAllNumbersAsync();
         Task<bool> AddAsync(SalesOrder order);
         Task<bool> UpdateAsync(SalesOrder order);
         Task<bool> DeleteAsync(int id);

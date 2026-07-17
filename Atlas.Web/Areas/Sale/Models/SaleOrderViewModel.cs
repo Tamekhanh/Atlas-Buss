@@ -23,6 +23,7 @@ namespace Atlas.Web.Areas.SaleOrder.Models
 		public int ProductId { get; set; }
 		public string SKU { get; set; } = string.Empty;
 		public decimal? VariantPrice { get; set; }
+		public string AttributeText { get; set; } = string.Empty;
 	}
 
 	public class SaleOrderWarehouseLookupVM
@@ -45,7 +46,6 @@ namespace Atlas.Web.Areas.SaleOrder.Models
 
 	public class SaleOrderCreateVM
 	{
-		[Required]
 		public string OrderNumber { get; set; } = string.Empty;
 
 		[Required]
