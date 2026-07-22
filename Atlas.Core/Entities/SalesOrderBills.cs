@@ -21,6 +21,10 @@ namespace Atlas.Core.Entities
         [StringLength(255)]
         public string BillUrl { get; set; } = string.Empty;
 
+        // Nguồn file bill: "Uploaded" (người dùng tải lên) hoặc "Generated" (hệ thống in PDF).
+        [StringLength(20)]
+        public string BillSource { get; set; } = "Uploaded";
+
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

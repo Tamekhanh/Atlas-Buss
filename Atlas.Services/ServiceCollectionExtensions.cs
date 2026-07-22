@@ -4,6 +4,7 @@ using Atlas.Services.HRM;
 using Atlas.Services.Inventory;
 using Atlas.Services.Category;
 using Atlas.Services.Attributes;
+using Atlas.Services.Report;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Atlas.Services;
@@ -22,6 +23,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISalesOrderService, SalesOrderService>();
         services.AddScoped<IAttributeService, AttributeService>();
         services.AddScoped<IDocumentNumberService, DocumentNumberService>();
+        services.AddScoped<ISalesOrderReportService, SalesOrderReportService>();
 
         return services;
     }

@@ -494,6 +494,30 @@ CREATE TABLE dbo.SalesOrderBills(
 )
 GO
 
+ALTER TABLE dbo.SalesOrderBills ADD BillSource nvarchar(20) not null default 'Uploaded';
+GO
+
+-- =============================================
+-- 8b. BILL TEMPLATES (MẪU IN BILL TÙY CHỈNH CHO SALES ORDER)
+-- =============================================
+-- Lưu cấu hình mẫu in mà người dùng tự tạo trong khu vực Bill Template.
+-- OptionsJson lưu các tùy chọn in (show logo, show tax, signature line, page size...) dưới dạng JSON.
+CREATE TABLE dbo.BillTemplates(
+    id int identity(1,1) primary key,
+    TemplateName nvarchar(100) not null,
+    Description nvarchar(255) null,
+    PageSize nvarchar(20) not null default 'A4',        -- A4 | A5 | Letter
+    Orientation nvarchar(10) not null default 'Portrait', -- Portrait | Landscape
+    OptionsJson nvarchar(max) null,                      -- JSON các tùy chọn in
+    HeaderNote nvarchar(500) null,
+    FooterNote nvarchar(500) null,
+    IsDefault bit not null default 0,
+    IsDeleted bit not null default 0,
+    CreatedAt datetime not null default GETDATE(),
+    UpdatedAt datetime not null default GETDATE()
+)
+GO
+
 CREATE TABLE dbo.Invoices(
     id int identity(1,1) primary key,
     InvoiceNumber nvarchar(50) not null UNIQUE,

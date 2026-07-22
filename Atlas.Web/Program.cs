@@ -181,10 +181,11 @@ app.MapAreaControllerRoute(
     pattern: "Party/{action=Index}/{id?}",
     defaults: new { controller = "Party" });
 
-app.MapControllerRoute(
+app.MapAreaControllerRoute(
     name: "setting",
-    pattern: "Setting",
-    defaults: new { controller = "Setting", action = "Settings" });
+    areaName: "Setting",
+    pattern: "Setting/{action=Settings}/{id?}",
+    defaults: new { controller = "Setting" });
 
 app.MapAreaControllerRoute(
     name: "category",

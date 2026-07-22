@@ -46,6 +46,9 @@ namespace Atlas.Infrastructure
         public DbSet<Party> Parties { get; set; }
         public DbSet<Images> Images { get; set; }
         public DbSet<ProductImages> ProductImages { get; set; }
+        public DbSet<Currencies> Currencies { get; set; } = null!;
+        public DbSet<MyCompanyInfo> MyCompanyInfo { get; set; } = null!;
+        public DbSet<BillTemplates> BillTemplates { get; set; } = null!;
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -324,6 +327,7 @@ namespace Atlas.Infrastructure
                 entity.ToTable("SalesOrderBills", "dbo");
                 entity.HasKey(b => b.Id);
                 entity.Property(b => b.BillUrl).IsRequired().HasMaxLength(255);
+                entity.Property(b => b.BillSource).HasMaxLength(20).HasDefaultValue("Uploaded");
                 entity.Property(b => b.CreatedAt).HasDefaultValueSql("GETDATE()");
 
                 entity.HasOne(b => b.SalesOrder)
@@ -332,6 +336,44 @@ namespace Atlas.Infrastructure
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
+            modelBuilder.Entity<MyCompanyInfo>(entity =>
+            {
+                entity.ToTable("MyCompanyInfo", "dbo");
+                entity.HasKey(c => c.Id);
+                entity.Property(c => c.CompanyName).IsRequired().HasMaxLength(100);
+                entity.Property(c => c.TaxId).HasMaxLength(20);
+                entity.Property(c => c.Address).HasMaxLength(255);
+                entity.Property(c => c.PhoneNumber).HasColumnName("Phone").HasMaxLength(20);
+                entity.Property(c => c.Email).HasMaxLength(50);
+
+                entity.HasOne(c => c.Logo)
+                    .WithMany()
+                    .HasForeignKey(c => c.LogoId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            modelBuilder.Entity<BillTemplates>(entity =>
+            {
+                entity.ToTable("BillTemplates", "dbo");
+                entity.HasKey(t => t.Id);
+                entity.Property(t => t.TemplateName).IsRequired().HasMaxLength(100);
+                entity.Property(t => t.Description).HasMaxLength(255);
+                entity.Property(t => t.PageSize).IsRequired().HasMaxLength(20).HasDefaultValue("A4");
+                entity.Property(t => t.Orientation).IsRequired().HasMaxLength(10).HasDefaultValue("Portrait");
+                entity.Property(t => t.OptionsJson).HasColumnType("nvarchar(max)");
+                entity.Property(t => t.HeaderNote).HasMaxLength(500);
+                entity.Property(t => t.FooterNote).HasMaxLength(500);
+                entity.Property(t => t.CreatedAt).HasDefaultValueSql("GETDATE()");
+                entity.Property(t => t.UpdatedAt).HasDefaultValueSql("GETDATE()");
+            });
+
+            modelBuilder.Entity<Currencies>(entity =>
+            {
+                entity.ToTable("Currencies", "dbo");
+                entity.HasKey(c => c.Id);
+                entity.Property(c => c.CurrencyCode).IsRequired().HasMaxLength(3);
+                entity.Property(c => c.CurrencyName).IsRequired().HasMaxLength(50);
+            });
 
             modelBuilder.Entity<ProductImages>(entity =>
             {

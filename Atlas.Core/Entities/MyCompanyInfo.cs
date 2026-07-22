@@ -13,7 +13,9 @@ namespace Atlas.Core.Entities
         public string? Email { get; set; }
         public string? TaxId { get; set; }
 
-        [ForeignKey("LogoId")] 
-        public virtual Images? LogoId { get; set; }
+        public int? LogoId { get; set; }
+
+        [ForeignKey(nameof(LogoId))]
+        public virtual Images? Logo { get; set; }
     }
 }

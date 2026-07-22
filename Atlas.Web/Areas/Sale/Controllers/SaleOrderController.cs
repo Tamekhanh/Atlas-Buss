@@ -1,8 +1,10 @@
 using System.Linq;
+using System.IO;
 using System.Security.Claims;
 using Atlas.Core.Entities;
 using Atlas.Core.Interfaces;
 using Atlas.Services;
+using Atlas.Services.Report;
 using Atlas.Web.Areas.SaleOrder.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +21,9 @@ namespace Atlas.Web.Areas.Sale.Controllers
 		private readonly IStorageProvider _storageProvider;
 		private readonly ISalesOrderBillRepository _soBillRepository;
 		private readonly IDocumentNumberService _documentNumberService;
+		private readonly IBillTemplateRepository _billTemplateRepository;
+		private readonly ISalesOrderReportService _reportService;
+		private readonly ILogService _logService;
 
 		public SaleOrderController(
 			ISalesOrderService salesOrderService,
@@ -27,7 +32,10 @@ namespace Atlas.Web.Areas.Sale.Controllers
 			IWarehouseRepository warehouseRepository,
 			IStorageProvider storageProvider,
 			ISalesOrderBillRepository soBillRepository,
-			IDocumentNumberService documentNumberService)
+			IDocumentNumberService documentNumberService,
+			IBillTemplateRepository billTemplateRepository,
+			ISalesOrderReportService reportService,
+			ILogService logService)
 		{
 			_salesOrderService = salesOrderService;
 			_partyRepository = partyRepository;
@@ -36,6 +44,9 @@ namespace Atlas.Web.Areas.Sale.Controllers
 			_storageProvider = storageProvider;
 			_soBillRepository = soBillRepository;
 			_documentNumberService = documentNumberService;
+			_billTemplateRepository = billTemplateRepository;
+			_reportService = reportService;
+			_logService = logService;
 		}
 
 		[HttpGet]
@@ -112,6 +123,7 @@ namespace Atlas.Web.Areas.Sale.Controllers
 					{
 						Id = b.Id,
 						BillUrl = b.BillUrl,
+						BillSource = b.BillSource,
 						CreatedAt = b.CreatedAt
 					})
 					.ToList()
@@ -174,6 +186,91 @@ namespace Atlas.Web.Areas.Sale.Controllers
 			if (bill != null && bill.OrderId == order.Id)
 			{
 				await _soBillRepository.DeleteAsync(billId);
+			}
+
+			return RedirectToAction(nameof(Details), new { id });
+		}
+
+		// === IN BILL (PDF) CHO SALE ORDER ===
+		// GET: /Sale/Bill/{id} — Trang chọn mẫu in + xem thử PDF.
+		[HttpGet]
+		[Route("Bill/{id}")]
+		public async Task<IActionResult> Bill(int id)
+		{
+			var order = await _salesOrderService.GetByIdAsync(id);
+			if (order == null) return NotFound();
+
+			var templates = await _billTemplateRepository.GetAllAsync();
+			var defaultTemplate = await _billTemplateRepository.GetDefaultAsync();
+			var firstTemplateId = templates.FirstOrDefault()?.Id
+				?? defaultTemplate?.Id
+				?? 0;
+
+			ViewBag.OrderId = id;
+			ViewBag.OrderNumber = order.OrderNumber;
+			ViewBag.Templates = templates.Select(t => new
+			{
+				t.Id,
+				t.TemplateName,
+				t.IsDefault
+			}).ToList();
+			ViewBag.DefaultTemplateId = firstTemplateId;
+
+			return View();
+		}
+
+		// GET: /Sale/PreviewPdf/{id}?templateId= — trả PDF inline để xem thử / in ra thiết bị.
+		[HttpGet]
+		[Route("PreviewPdf/{id}")]
+		public async Task<IActionResult> PreviewPdf(int id, int templateId)
+		{
+			var data = await _reportService.BuildReportDataAsync(id, templateId);
+			if (data == null) return NotFound();
+
+			// Ghi log khi render/in PDF bill (dùng cho preview lẫn Print to Device).
+			await LogAsync($"Printed/previewed bill PDF for Sale Order: {data.OrderNumber} (ID: {id}, TemplateID: {templateId})");
+
+			var bytes = _reportService.RenderPdf(data);
+			var fileName = $"SO_{data.OrderNumber}.pdf";
+			Response.Headers.Append("Content-Disposition", $"inline; filename=\"{fileName}\"");
+			return File(bytes, "application/pdf");
+		}
+
+		// POST: /Sale/SavePdf/{id}?templateId= — render + lưu PDF vào AtlasStorage + ghi SalesOrderBills.
+		[HttpPost]
+		[Route("SavePdf/{id}")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> SavePdf(int id, int templateId)
+		{
+			var order = await _salesOrderService.GetByIdAsync(id);
+			if (order == null) return NotFound();
+
+			try
+			{
+				var data = await _reportService.BuildReportDataAsync(id, templateId);
+				if (data == null) return NotFound();
+
+				var bytes = _reportService.RenderPdf(data);
+				var fileName = $"SO_{order.OrderNumber}.pdf";
+
+				using var stream = new MemoryStream(bytes);
+				var relativePath = await _storageProvider.SaveFileAsync(stream, "SaleReports", fileName);
+
+				var bill = new SalesOrderBill
+				{
+					OrderId = order.Id,
+					BillUrl = relativePath,
+					BillSource = "Generated"
+				};
+				await _soBillRepository.AddAsync(bill);
+
+				await LogAsync($"Saved bill PDF for Sale Order: {order.OrderNumber} (ID: {id}, TemplateID: {templateId})");
+
+				TempData["Success"] = "Đã lưu file PDF bill vào AtlasStorage.";
+			}
+			catch
+			{
+				TempData["Error"] = "Không thể tạo/lưu file PDF. Vui lòng thử lại.";
 			}
 
 			return RedirectToAction(nameof(Details), new { id });
@@ -299,6 +396,23 @@ namespace Atlas.Web.Areas.Sale.Controllers
 			}
 
 			return 0;
+		}
+
+		// Ghi log hành động của nhân viên đang đăng nhập. Không ném lỗi để tránh ảnh hưởng luồng chính.
+		private async Task LogAsync(string message)
+		{
+			try
+			{
+				var employeeIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+				if (int.TryParse(employeeIdValue, out var employeeId))
+				{
+					await _logService.AddLogAsync(employeeId, message);
+				}
+			}
+			catch
+			{
+				// Log là best-effort: không làm gián đoạn nghiệp vụ khi ghi log thất bại.
+			}
 		}
 
 		// Nối các giá trị thuộc tính của biến thể (vd: "Đỏ, L") để phân biệt các biến thể

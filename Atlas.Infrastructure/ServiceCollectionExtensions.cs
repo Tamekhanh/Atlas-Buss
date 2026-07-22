@@ -34,6 +34,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPartyRepository, PartyRepository>();
         services.AddScoped<IImageRepository, ImageRepository>();
         services.AddScoped<IAttributeRepository, AttributeRepository>();
+        services.AddScoped<IBillTemplateRepository, BillTemplateRepository>();
+        services.AddScoped<IMyCompanyInfoRepository, MyCompanyInfoRepository>();
 
         return services;
     }

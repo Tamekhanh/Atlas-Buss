@@ -375,3 +375,27 @@ INSERT INTO dbo.ProductVariants (ProductId, SKU, VariantPrice, VariantCost) VALU
 (34, 'SON-XM5-BLK', 8000000, 6000000),
 (34, 'SON-XM5-SLV', 8000000, 6000000),
 (35, 'STE-A7-BLK', 5000000, 3500000);
+
+-- =============================================
+-- SEED DEFAULT BILL TEMPLATE (Mẫu in bill mặc định cho Sales Order)
+-- =============================================
+-- Đảm bảo chỉ có 1 dòng IsDefault = 1. OptionsJson lưu tùy chọn in.
+INSERT INTO dbo.BillTemplates
+    (TemplateName, Description, PageSize, Orientation, OptionsJson, HeaderNote, FooterNote, IsDefault, IsDeleted)
+VALUES
+(
+    'Default Invoice',
+    'Mẫu in bill mặc định cho Sales Order.',
+    'A4',
+    'Portrait',
+    N'{"showLogo":true,"showTaxBreakdown":true,"showSignatureLine":true,"showGrandTotalBox":true}',
+    N'Thank you for your business.',
+    N'This is a computer generated document and does not require a signature.',
+    1,
+    0
+);
+GO
+
+-- Cập nhật lại các SO bill cũ (nếu có) về nguồn Uploaded để khớp giá trị mặc định của cột BillSource.
+UPDATE dbo.SalesOrderBills SET BillSource = 'Uploaded' WHERE BillSource IS NULL OR BillSource = '';
+GO

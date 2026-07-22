@@ -98,7 +98,49 @@ namespace Atlas.Web.Areas.SaleOrder.Models
 	{
 		public int Id { get; set; }
 		public string BillUrl { get; set; } = string.Empty;
+		public string BillSource { get; set; } = "Uploaded";
 		public DateTime CreatedAt { get; set; }
+	}
+
+	// View-model cho danh mục mẫu in bill (Bill Template).
+	public class BillTemplateVM
+	{
+		public int Id { get; set; }
+		public string TemplateName { get; set; } = string.Empty;
+		public string? Description { get; set; }
+		public string PageSize { get; set; } = "A4";
+		public string Orientation { get; set; } = "Portrait";
+		public bool ShowLogo { get; set; } = true;
+		public bool ShowTaxBreakdown { get; set; } = true;
+		public bool ShowSignatureLine { get; set; } = true;
+		public bool ShowGrandTotalBox { get; set; } = true;
+		public bool ShowCustomerInfo { get; set; } = true;
+		public bool ShowWarehouseColumn { get; set; } = true;
+		public string? HeaderNote { get; set; }
+		public string? FooterNote { get; set; }
+		public bool IsDefault { get; set; }
+	}
+
+	public class BillTemplateEditVM
+	{
+		public int Id { get; set; }
+		[Required, StringLength(100)]
+		public string TemplateName { get; set; } = string.Empty;
+		[StringLength(255)]
+		public string? Description { get; set; }
+		public string PageSize { get; set; } = "A4";
+		public string Orientation { get; set; } = "Portrait";
+		public bool ShowLogo { get; set; } = true;
+		public bool ShowTaxBreakdown { get; set; } = true;
+		public bool ShowSignatureLine { get; set; } = true;
+		public bool ShowGrandTotalBox { get; set; } = true;
+		public bool ShowCustomerInfo { get; set; } = true;
+		public bool ShowWarehouseColumn { get; set; } = true;
+		[StringLength(500)]
+		public string? HeaderNote { get; set; }
+		[StringLength(500)]
+		public string? FooterNote { get; set; }
+		public bool IsDefault { get; set; }
 	}
 
 	public class SaleOrderDetailLineVM

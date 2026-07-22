@@ -4,12 +4,21 @@
 <div class="container-fluid">
 	<div class="d-flex justify-content-between align-items-center mb-3">
 		<h2>Sale Order Details</h2>
-		<a asp-action="Index" class="btn btn-secondary">Back to List</a>
+		<div class="d-flex gap-2">
+			<a asp-action="Bill" asp-route-id="@Model.Id" class="btn btn-success">
+				Print Bill (PDF)
+			</a>
+			<a asp-action="Index" class="btn btn-secondary">Back to List</a>
+		</div>
 	</div>
 
 	@if (TempData["Error"] != null)
 	{
 		<div class="alert alert-danger">@TempData["Error"]</div>
+	}
+	@if (TempData["Success"] != null)
+	{
+		<div class="alert alert-success">@TempData["Success"]</div>
 	}
 
 	<div class="card mb-3">
@@ -116,6 +125,7 @@
 			<thead>
 				<tr>
 					<th>#</th>
+					<th>Source</th>
 					<th>File</th>
 					<th class="text-end">Uploaded At</th>
 					<th></th>
@@ -126,6 +136,12 @@
 				{
 					<tr>
 						<td>@bill.Id</td>
+						<td>
+							@if (bill.BillSource == "Generated")
+							{<span class="badge bg-info">Generated</span>}
+							else
+							{<span class="badge bg-secondary">Uploaded</span>}
+						</td>
 						<td>
 							<a href="/file-storage/@bill.BillUrl" target="_blank" rel="noopener">View bill</a>
 							<small class="text-muted d-block">@bill.BillUrl</small>
