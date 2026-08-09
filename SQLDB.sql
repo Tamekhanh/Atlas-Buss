@@ -509,8 +509,8 @@ CREATE TABLE dbo.BillTemplates(
     PageSize nvarchar(20) not null default 'A4',        -- A4 | A5 | Letter
     Orientation nvarchar(10) not null default 'Portrait', -- Portrait | Landscape
     OptionsJson nvarchar(max) null,                      -- JSON các tùy chọn in
-    HeaderNote nvarchar(500) null,
-    FooterNote nvarchar(500) null,
+    HeaderNote nvarchar(4000) null,
+    FooterNote nvarchar(4000) null,
     IsDefault bit not null default 0,
     IsDeleted bit not null default 0,
     CreatedAt datetime not null default GETDATE(),

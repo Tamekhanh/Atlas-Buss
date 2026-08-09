@@ -32,6 +32,24 @@
 					<option value="Landscape">Landscape</option>
 				</select>
 			</div>
+			<div class="col-md-6 mb-3">
+				<label class="form-label fw-semibold">Preview with Sales Order</label>
+				<div class="input-group">
+					<select id="PreviewOrderId" class="form-select">
+						<option value="">-- Select an order --</option>
+						@if (ViewBag.Orders != null)
+						{
+							foreach (var o in ViewBag.Orders)
+							{
+								<option value="@o.Id">@o.OrderNumber (@o.CustomerName, @o.OrderDate.ToString("yyyy-MM-dd"))</option>
+							}
+						}
+					</select>
+					<button type="button" id="BtnPreview" class="btn btn-outline-primary">Preview</button>
+					<button type="button" id="BtnPreviewTab" class="btn btn-outline-secondary" title="Open PDF in a new browser tab">Open</button>
+				</div>
+				<small class="text-muted">Renders this unsaved template against the chosen order.</small>
+			</div>
 		</div>
 
 		<h6 class="mt-3 mb-2 text-muted">Print Options</h6>
@@ -62,14 +80,90 @@
 			</div>
 		</div>
 
+		<h6 class="mt-3 mb-2 text-muted">Bill Title</h6>
+		<div class="row">
+			<div class="col-md-6 mb-3">
+				<label asp-for="BillTitle" class="form-label fw-semibold"></label>
+				<input asp-for="BillTitle" class="form-control" placeholder='Empty = default "SALES ORDER"' />
+				<span asp-validation-for="BillTitle" class="text-danger small"></span>
+			</div>
+			<div class="col-md-6 mb-3">
+				<label asp-for="BillSubtitle" class="form-label fw-semibold"></label>
+				<input asp-for="BillSubtitle" class="form-control" placeholder="Optional subtitle under the title" />
+				<span asp-validation-for="BillSubtitle" class="text-danger small"></span>
+			</div>
+		</div>
+
+		<h6 class="mt-3 mb-2 text-muted">Line Item Columns</h6>
+		<div class="row">
+			<div class="col-md-4 form-check ms-3">
+				<input class="form-check-input" asp-for="ShowSkuColumn" />
+				<label class="form-check-label" asp-for="ShowSkuColumn">Show SKU column</label>
+			</div>
+			<div class="col-md-4 form-check ms-3">
+				<input class="form-check-input" asp-for="ShowDescriptionColumn" />
+				<label class="form-check-label" asp-for="ShowDescriptionColumn">Show product description column</label>
+			</div>
+		</div>
+
+		<h6 class="mt-3 mb-2 text-muted">Additional Fields</h6>
+		<div class="row">
+			<div class="col-md-4 form-check ms-3">
+				<input class="form-check-input" asp-for="ShowAmountInWords" />
+				<label class="form-check-label" asp-for="ShowAmountInWords">Print amount in words</label>
+			</div>
+			<div class="col-md-4 form-check ms-3">
+				<input class="form-check-input" asp-for="ShowCurrencyCode" />
+				<label class="form-check-label" asp-for="ShowCurrencyCode">Show currency code</label>
+			</div>
+			<div class="col-md-4 form-check ms-3">
+				<input class="form-check-input" asp-for="ShowExchangeRate" />
+				<label class="form-check-label" asp-for="ShowExchangeRate">Show exchange rate</label>
+			</div>
+			<div class="col-md-4 form-check ms-3">
+				<input class="form-check-input" asp-for="ShowPageNumbers" />
+				<label class="form-check-label" asp-for="ShowPageNumbers">Show page numbers</label>
+			</div>
+		</div>
+
+		<h6 class="mt-3 mb-2 text-muted">Styling</h6>
+		<div class="row">
+			<div class="col-md-4 mb-3">
+				<label asp-for="AccentColorHex" class="form-label fw-semibold"></label>
+				<div class="input-group">
+					<input type="color" class="form-control form-control-color" id="AccentColorSwatch" value="#1F77B4" title="Pick accent color" />
+					<input asp-for="AccentColorHex" class="form-control" id="AccentColorText" placeholder="#1F77B4" />
+				</div>
+				<span asp-validation-for="AccentColorHex" class="text-danger small"></span>
+			</div>
+			<div class="col-md-4 mb-3">
+				<label asp-for="GrandTotalBoxStyle" class="form-label fw-semibold"></label>
+				<select asp-for="GrandTotalBoxStyle" class="form-select">
+					<option value="Box">Box (shaded background)</option>
+					<option value="Line">Line (top border only)</option>
+					<option value="None">None (plain text)</option>
+				</select>
+			</div>
+			<div class="col-md-2 mb-3">
+				<label asp-for="LogoMaxHeight" class="form-label fw-semibold"></label>
+				<input asp-for="LogoMaxHeight" class="form-control" type="number" min="0" max="400" />
+				<span asp-validation-for="LogoMaxHeight" class="text-danger small"></span>
+			</div>
+			<div class="col-md-2 mb-3">
+				<label asp-for="PageMargin" class="form-label fw-semibold"></label>
+				<input asp-for="PageMargin" class="form-control" type="number" min="0" max="120" />
+				<span asp-validation-for="PageMargin" class="text-danger small"></span>
+			</div>
+		</div>
+
 		<div class="mb-3 mt-3">
 			<label asp-for="HeaderNote" class="form-label fw-semibold"></label>
-			<input asp-for="HeaderNote" class="form-control" />
+			<textarea asp-for="HeaderNote" class="form-control" rows="2"></textarea>
 		</div>
 
 		<div class="mb-3">
 			<label asp-for="FooterNote" class="form-label fw-semibold"></label>
-			<input asp-for="FooterNote" class="form-control" />
+			<textarea asp-for="FooterNote" class="form-control" rows="2"></textarea>
 		</div>
 
 		<div class="form-check mb-3">
@@ -81,5 +175,154 @@
 			<button type="submit" class="btn btn-primary">Save</button>
 			<a asp-controller="BillTemplate" asp-area="Sale" asp-action="Index" class="btn btn-secondary">Cancel</a>
 		</div>
+
+		<!-- Modal xem trước PDF -->
+		<div class="modal fade" id="PreviewModal" tabindex="-1" aria-labelledby="PreviewModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-xl modal-dialog-scrollable">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="PreviewModalLabel">Bill Preview</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body p-0">
+						<iframe id="PreviewFrame" style="width:100%; height:75vh; border:0;"></iframe>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
+
+<script>
+	// Đồng bộ ô màu (color picker) và ô nhập mã HEX.
+	(function () {
+		var swatch = document.getElementById('AccentColorSwatch');
+		var text = document.getElementById('AccentColorText');
+		if (!swatch || !text) return;
+		function syncFromText() {
+			var v = (text.value || '').trim();
+			if (/^#[0-9A-Fa-f]{6}$/.test(v)) swatch.value = v;
+		}
+		swatch.addEventListener('input', function () { text.value = swatch.value.toUpperCase(); });
+		text.addEventListener('input', syncFromText);
+		syncFromText();
+	})();
+</script>
+
+<!-- Preview modal: hiển thị PDF inline bằng iframe -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-scrollable">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="previewModalLabel">Bill Preview</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-0">
+				<iframe id="previewFrame" style="width:100%; height:75vh; border:0;"></iframe>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	// ===== Preview: gom form -> POST JSON -> blob PDF -> iframe/new tab =====
+	(function () {
+		var btnPreview = document.getElementById('BtnPreview');
+		var btnOpen = document.getElementById('BtnPreviewTab');
+		var orderSelect = document.getElementById('PreviewOrderId');
+		var frame = document.getElementById('previewFrame');
+		var modalEl = document.getElementById('previewModal');
+		if (!btnPreview) return;
+
+		function getAntiForgeryToken() {
+			var input = document.querySelector('input[name="__RequestVerificationToken"]');
+			return input ? input.value : '';
+		}
+
+		// Lấy value của một input/checkbox theo asp-for id.
+		function val(id, isCheckbox) {
+			var el = document.getElementById(id);
+			if (!el) return isCheckbox ? false : '';
+			return isCheckbox ? el.checked : (el.value || '');
+		}
+
+		// Gom toàn bộ form thành BillTemplatePreviewVM.
+		function collectPayload() {
+			return {
+				OrderId: parseInt(val('PreviewOrderId', false), 10) || 0,
+				PageSize: val('PageSize', false),
+				Orientation: val('Orientation', false),
+				ShowLogo: val('ShowLogo', true),
+				ShowTaxBreakdown: val('ShowTaxBreakdown', true),
+				ShowSignatureLine: val('ShowSignatureLine', true),
+				ShowGrandTotalBox: val('ShowGrandTotalBox', true),
+				ShowCustomerInfo: val('ShowCustomerInfo', true),
+				ShowWarehouseColumn: val('ShowWarehouseColumn', true),
+				BillTitle: val('BillTitle', false),
+				BillSubtitle: val('BillSubtitle', false),
+				ShowSkuColumn: val('ShowSkuColumn', true),
+				ShowDescriptionColumn: val('ShowDescriptionColumn', true),
+				ShowAmountInWords: val('ShowAmountInWords', true),
+				ShowCurrencyCode: val('ShowCurrencyCode', true),
+				ShowExchangeRate: val('ShowExchangeRate', true),
+				ShowPageNumbers: val('ShowPageNumbers', true),
+				AccentColorHex: val('AccentColorText', false),
+				LogoMaxHeight: parseInt(val('LogoMaxHeight', false), 10) || 0,
+				PageMargin: parseInt(val('PageMargin', false), 10) || 0,
+				GrandTotalBoxStyle: val('GrandTotalBoxStyle', false),
+				HeaderNote: val('HeaderNote', false),
+				FooterNote: val('FooterNote', false)
+			};
+		}
+
+		function showError(msg) {
+			alert('Preview failed: ' + (msg || 'unknown error'));
+		}
+
+		// POST payload -> nhận blob PDF. Trả về Promise<Uint8Array>.
+		function fetchPreviewPdf() {
+			var orderId = parseInt(orderSelect ? orderSelect.value : '0', 10) || 0;
+			if (!orderId) {
+				alert('Please select a Sales Order to preview with.');
+				return Promise.reject('no-order');
+			}
+			return fetch('@Url.Action("Preview", "BillTemplate", new { area = "Sale" })', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'RequestVerificationToken': getAntiForgeryToken()
+				},
+				body: JSON.stringify(collectPayload())
+			}).then(function (r) {
+				if (!r.ok) {
+					return r.text().then(function (t) { throw new Error(t || (r.status + ' ' + r.statusText)); });
+				}
+				return r.blob();
+			});
+		}
+
+		btnPreview.addEventListener('click', function () {
+			fetchPreviewPdf().then(function (blob) {
+				// Giải phóng blob URL cũ nếu có.
+				if (frame.src && frame.src.indexOf('blob:') === 0) URL.revokeObjectURL(frame.src);
+				frame.src = URL.createObjectURL(blob);
+				if (modalEl) {
+					var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+					modal.show();
+				}
+			}).catch(function (e) {
+				if (e !== 'no-order' && e) showError(e.message || String(e));
+			});
+		});
+
+		btnOpen.addEventListener('click', function () {
+			fetchPreviewPdf().then(function (blob) {
+				var url = URL.createObjectURL(blob);
+				window.open(url, '_blank');
+				// Trình duyệt tự đóng blob URL khi đóng tab; không revoke ngay tránh bị chặn.
+			}).catch(function (e) {
+				if (e !== 'no-order' && e) showError(e.message || String(e));
+			});
+		});
+	})();
+</script>

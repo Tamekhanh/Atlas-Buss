@@ -33,10 +33,10 @@ namespace Atlas.Core.Entities
         // JSON chứa các tùy chọn in (showLogo, showTaxBreakdown, showSignatureLine, ...)
         public string? OptionsJson { get; set; }
 
-        [StringLength(500)]
+        [StringLength(4000)]
         public string? HeaderNote { get; set; }
 
-        [StringLength(500)]
+        [StringLength(4000)]
         public string? FooterNote { get; set; }
 
         public bool IsDefault { get; set; }

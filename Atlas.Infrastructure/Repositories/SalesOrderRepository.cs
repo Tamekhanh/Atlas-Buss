@@ -1,6 +1,7 @@
 using Atlas.Core.Entities;
 using Atlas.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -60,6 +61,21 @@ namespace Atlas.Infrastructure.Repositories
                 .Where(o => !o.IsDeleted)
                 .Select(o => o.OrderNumber)
                 .AsNoTracking()
+                .ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<(int Id, string OrderNumber, DateTime OrderDate, string CustomerName)>> GetOrderListAsync()
+        {
+            // Bỏ includes nặng — chỉ project các cột cần cho dropdown chọn order.
+            return await _context.SalesOrders
+                .Where(o => !o.IsDeleted)
+                .OrderByDescending(o => o.OrderDate)
+                .Select(o => new ValueTuple<int, string, DateTime, string>(
+                    o.Id,
+                    o.OrderNumber,
+                    o.OrderDate,
+                    o.Customer != null ? o.Customer.DisplayName : string.Empty))
                 .ToListAsync();
         }
 

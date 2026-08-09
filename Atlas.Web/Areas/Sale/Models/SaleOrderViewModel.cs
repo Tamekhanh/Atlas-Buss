@@ -116,6 +116,22 @@ namespace Atlas.Web.Areas.SaleOrder.Models
 		public bool ShowGrandTotalBox { get; set; } = true;
 		public bool ShowCustomerInfo { get; set; } = true;
 		public bool ShowWarehouseColumn { get; set; } = true;
+		// Tiêu đề bill tùy chỉnh
+		public string? BillTitle { get; set; }
+		public string? BillSubtitle { get; set; }
+		// Cột dòng hàng
+		public bool ShowSkuColumn { get; set; } = true;
+		public bool ShowDescriptionColumn { get; set; } = false;
+		// Trường bổ sung
+		public bool ShowAmountInWords { get; set; } = false;
+		public bool ShowCurrencyCode { get; set; } = true;
+		public bool ShowExchangeRate { get; set; } = true;
+		public bool ShowPageNumbers { get; set; } = true;
+		// Màu nhấn & kiểu dáng
+		public string? AccentColorHex { get; set; }
+		public int LogoMaxHeight { get; set; } = 50;
+		public int PageMargin { get; set; } = 40;
+		public string GrandTotalBoxStyle { get; set; } = "Box";
 		public string? HeaderNote { get; set; }
 		public string? FooterNote { get; set; }
 		public bool IsDefault { get; set; }
@@ -136,11 +152,67 @@ namespace Atlas.Web.Areas.SaleOrder.Models
 		public bool ShowGrandTotalBox { get; set; } = true;
 		public bool ShowCustomerInfo { get; set; } = true;
 		public bool ShowWarehouseColumn { get; set; } = true;
-		[StringLength(500)]
+		// Tiêu đề bill tùy chỉnh
+		[StringLength(100), Display(Name = "Bill Title")]
+		public string? BillTitle { get; set; }
+		[StringLength(200), Display(Name = "Bill Subtitle")]
+		public string? BillSubtitle { get; set; }
+		// Cột dòng hàng
+		public bool ShowSkuColumn { get; set; } = true;
+		public bool ShowDescriptionColumn { get; set; } = false;
+		// Trường bổ sung
+		public bool ShowAmountInWords { get; set; } = false;
+		public bool ShowCurrencyCode { get; set; } = true;
+		public bool ShowExchangeRate { get; set; } = true;
+		public bool ShowPageNumbers { get; set; } = true;
+		// Màu nhấn & kiểu dáng
+		[StringLength(20), Display(Name = "Accent Color")]
+		public string? AccentColorHex { get; set; }
+		[Range(0, 400), Display(Name = "Logo Max Height (px)")]
+		public int LogoMaxHeight { get; set; } = 50;
+		[Range(0, 120), Display(Name = "Page Margin (px)")]
+		public int PageMargin { get; set; } = 40;
+		[StringLength(20), Display(Name = "Grand Total Box Style")]
+		public string GrandTotalBoxStyle { get; set; } = "Box";
+		[StringLength(4000)]
 		public string? HeaderNote { get; set; }
-		[StringLength(500)]
+		[StringLength(4000)]
 		public string? FooterNote { get; set; }
 		public bool IsDefault { get; set; }
+	}
+
+	// View-model cho nút Preview trên form tạo/sửa Bill Template.
+	// Chỉ mang OrderId được chọn + các tùy chọn in (mirror BillTemplateEditVM) để POST lên endpoint Preview.
+	public class BillTemplatePreviewVM
+	{
+		[Required]
+		public int OrderId { get; set; }
+
+		// Page / orientation
+		public string PageSize { get; set; } = "A4";
+		public string Orientation { get; set; } = "Portrait";
+
+		// Tùy chọn in (giống BillTemplateOptions)
+		public bool ShowLogo { get; set; } = true;
+		public bool ShowTaxBreakdown { get; set; } = true;
+		public bool ShowSignatureLine { get; set; } = true;
+		public bool ShowGrandTotalBox { get; set; } = true;
+		public bool ShowCustomerInfo { get; set; } = true;
+		public bool ShowWarehouseColumn { get; set; } = true;
+		public string? BillTitle { get; set; }
+		public string? BillSubtitle { get; set; }
+		public bool ShowSkuColumn { get; set; } = true;
+		public bool ShowDescriptionColumn { get; set; } = false;
+		public bool ShowAmountInWords { get; set; } = false;
+		public bool ShowCurrencyCode { get; set; } = true;
+		public bool ShowExchangeRate { get; set; } = true;
+		public bool ShowPageNumbers { get; set; } = true;
+		public string? AccentColorHex { get; set; }
+		public int LogoMaxHeight { get; set; } = 50;
+		public int PageMargin { get; set; } = 40;
+		public string GrandTotalBoxStyle { get; set; } = "Box";
+		public string? HeaderNote { get; set; }
+		public string? FooterNote { get; set; }
 	}
 
 	public class SaleOrderDetailLineVM

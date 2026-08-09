@@ -35,6 +35,44 @@ namespace Atlas.Services.Report
 
         public async Task<SalesOrderReportData?> BuildReportDataAsync(int orderId, int templateId)
         {
+            var template = await _templateRepository.GetByIdAsync(templateId)
+                ?? await _templateRepository.GetDefaultAsync();
+
+            var options = ParseOptions(template?.OptionsJson);
+            return await BuildDataCoreAsync(
+                orderId,
+                options,
+                template?.PageSize ?? "A4",
+                template?.Orientation ?? "Portrait",
+                template?.HeaderNote,
+                template?.FooterNote);
+        }
+
+        /// <summary>
+        /// Tổng hợp dữ liệu in bill dựa trên các tùy chọn chưa lưu (dùng cho Preview trên form tạo/sửa mẫu).
+        /// Không tra cứu BillTemplates — mọi giá trị truyền thẳng từ form.
+        /// </summary>
+        public async Task<SalesOrderReportData?> BuildReportDataAsync(
+            int orderId,
+            BillTemplateOptions options,
+            string pageSize,
+            string orientation,
+            string? headerNote,
+            string? footerNote)
+        {
+            options ??= new BillTemplateOptions();
+            return await BuildDataCoreAsync(orderId, options, pageSize, orientation, headerNote, footerNote);
+        }
+
+        // Phần chung: tải order + company + currency + dòng hàng, gắn options/page/header/footer.
+        private async Task<SalesOrderReportData?> BuildDataCoreAsync(
+            int orderId,
+            BillTemplateOptions options,
+            string pageSize,
+            string orientation,
+            string? headerNote,
+            string? footerNote)
+        {
             var order = await _context.SalesOrders
                 .Include(o => o.Employee)
                 .Include(o => o.Customer)!
@@ -43,7 +81,8 @@ namespace Atlas.Services.Report
                     .ThenInclude(p => p.Contact)
                 .Include(o => o.SalesOrderDetails)
                     .ThenInclude(d => d.Variant)!
-                        .ThenInclude(v => v.Product)
+                        .ThenInclude(v => v.Product)!
+                            .ThenInclude(p => p.ProductDetail)
                 .Include(o => o.SalesOrderDetails)
                     .ThenInclude(d => d.Warehouse)
                 .Include(o => o.OrderStatus)
@@ -51,9 +90,6 @@ namespace Atlas.Services.Report
                 .FirstOrDefaultAsync(o => o.Id == orderId && !o.IsDeleted);
 
             if (order == null) return null;
-
-            var template = await _templateRepository.GetByIdAsync(templateId)
-                ?? await _templateRepository.GetDefaultAsync();
 
             var company = await _companyRepository.GetAsync();
 
@@ -65,8 +101,6 @@ namespace Atlas.Services.Report
                     .AsNoTracking()
                     .FirstOrDefaultAsync(c => c.Id == order.CurrencyId);
             }
-
-            var options = ParseOptions(template?.OptionsJson);
 
             var data = new SalesOrderReportData
             {
@@ -86,11 +120,11 @@ namespace Atlas.Services.Report
                 EmployeeName = order.Employee?.FullName ?? string.Empty,
                 CurrencyCode = currency?.CurrencyCode ?? string.Empty,
                 ExchangeRate = order.ExchangeRate,
-                PageSize = template?.PageSize ?? "A4",
-                Orientation = template?.Orientation ?? "Portrait",
+                PageSize = string.IsNullOrWhiteSpace(pageSize) ? "A4" : pageSize,
+                Orientation = string.IsNullOrWhiteSpace(orientation) ? "Portrait" : orientation,
                 Options = options,
-                HeaderNote = template?.HeaderNote,
-                FooterNote = template?.FooterNote,
+                HeaderNote = headerNote,
+                FooterNote = footerNote,
             };
 
             // Logo
@@ -106,6 +140,8 @@ namespace Atlas.Services.Report
                 {
                     ProductName = d.Variant?.Product?.ProductName ?? string.Empty,
                     Sku = d.Variant?.SKU ?? string.Empty,
+                    // Mô tả sản phẩm: lấy từ ProductDetails.ProductDescription (nếu có).
+                    Description = d.Variant?.Product?.ProductDetail?.ProductDescription,
                     WarehouseName = d.Warehouse?.WarehouseName ?? d.WarehouseId.ToString(),
                     Quantity = d.Quantity,
                     UnitPrice = d.UnitPrice,
